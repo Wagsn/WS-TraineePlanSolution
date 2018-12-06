@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AuthorizationCenter</name>
+    </assembly>
+    <members>
+        <member name="T:AuthorizationCenter.Controllers.CheckController">
+            <summary>
+            用于检查服务连通性
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Filters.CheckPermission">
+            <summary>
+            权限检查过滤器，Controller的Method都是原子操作
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Filters.CheckPermission.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
+            <summary>
+            异步过滤
+            </summary>
+            <param name="context"></param>
+            <param name="next"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Managers.IOrganizationManager">
+            <summary>
+            组织管理
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Models.ApplicationDbContext">
+            <summary>
+            书据库上下文
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Models.ApplicationDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            在模型创建时
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Models.ApplicationDbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <summary>
+            数据库配置
+            </summary>
+            <param name="builder">数据库上下文选项创建器</param>
+        </member>
+        <member name="T:AuthorizationCenter.Models.Organization">
+            <summary>
+            组织模型
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Models.Permission">
+            <summary>
+            权限模型
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Models.Role">
+            <summary>
+            角色模型
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Models.User">
+            <summary>
+            用户模型
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IOrganizationStore">
+            <summary>
+            组织存储
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.IServiceCollectionExtensions">
+            <summary>
+            服务扩展，关键在于 this 参数，必须保证静态类和静态方法
+            </summary>
+        </member>
+    </members>
+</doc>
