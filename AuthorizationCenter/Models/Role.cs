@@ -16,14 +16,17 @@ namespace AuthorizationCenter.Models
         /// 角色GUID
         /// </summary>
         [Key]
-        [MaxLength(36)]
+        //[MaxLength(36)]
+        [StringLength(36, MinimumLength =36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage =Constants.GUID_ERR)]
         public string Id { get; set; }
 
         /// <summary>
         /// 角色名称
         /// </summary>
-        [MaxLength(15)]
+        //[MaxLength(15)]
+        [StringLength(15, MinimumLength = 2)]
+        [RegularExpression(Constants.VISIBLE_REG, ErrorMessage =Constants.VISIBLE_ERR)]
         public string Name { get; set; }
 
         /// <summary>

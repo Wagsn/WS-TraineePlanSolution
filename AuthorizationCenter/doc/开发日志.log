@@ -1,0 +1,11 @@
+﻿# 开发日志
+[2018-12-04]
+[18:00]
+[DONE] 新建解决方案，新建授权中心项目，查看开发文档
+[2018-12-05]
+[12:53]
+[DONE] 基础分层，依赖注入分离，权限检查过滤器，使用 .NET Core 2.1, EF Core 2.1, AspNet Core, MySQL.
+[DONE] 引入 Swagger（Swashbuckle.AspNetCore）
+[15:26]
+[DONE] 引入 AutoMapper
+

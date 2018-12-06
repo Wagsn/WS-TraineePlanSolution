@@ -30,9 +30,14 @@ namespace AuthorizationCenter.Models
         public DbSet<Role> Roles { get; set; }
 
         /// <summary>
-        /// 全信啊数据集
+        /// 权限数据集
         /// </summary>
         public DbSet<Permission> Permissions { get; set; }
+
+        /// <summary>
+        /// 组织数据集
+        /// </summary>
+        public DbSet<Organization> Organizations { get; set; }
 
         #endregion
 
@@ -77,7 +82,7 @@ namespace AuthorizationCenter.Models
         {
             base.OnConfiguring(builder);
             // Pomelo.EntityFrameworkCore.MySql 
-            // 采用配置文件的方式
+            // TODO: 采用配置文件的方式
             builder.UseMySql("server=localhost;database=ws_internship;user=admin;password=123456;");
         }
     }

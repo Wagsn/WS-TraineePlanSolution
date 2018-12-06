@@ -9,6 +9,100 @@
             用于检查服务连通性
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Controllers.CheckController.Get">
+            <summary>
+            检查
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.CheckController.GetResponse">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Define.Constants">
+            <summary>
+            常量
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.GUID_REG">
+            <summary>
+            GUID 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.GUID_ERR">
+            <summary>
+            GUID 格式错误消息
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.SIGNNAME_REG">
+            <summary>
+            签名 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.SIGNNAME_ERR">
+            <summary>
+            签名 格式错误消息
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.PASSWORD_REG">
+            <summary>
+            密码 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.PASSWORD_ERR">
+            <summary>
+            密码 格式错误消息
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.VISIBLE_REG">
+            <summary>
+            可见字符 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.VISIBLE_ERR">
+            <summary>
+            可见字符 格式错误，不能包含空格以及制表符等不可见字符"
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.CAPSCASE_REG">
+            <summary>
+            大写字母 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.LOWERCASE_REG">
+            <summary>
+            小写字母 正则表达式
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.LETTER_REG">
+            <summary>
+            英文字母 正则表达式
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Request.ModelRequest`1">
+            <summary>
+            元数据操作请求
+            </summary>
+            <typeparam name="TData"></typeparam>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Request.ModelRequest`1.Data">
+            <summary>
+            模型 为单实体操作
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Request.ModelListRequest`1">
+            <summary>
+            元数据批量操作
+            </summary>
+            <typeparam name="TData"></typeparam>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Request.UserBaseRequest">
+            <summary>
+            用户请求
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Filters.CheckPermission">
             <summary>
             权限检查过滤器，Controller的Method都是原子操作
@@ -27,9 +121,48 @@
             组织管理
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Managers.IUserManager`2">
+            <summary>
+            用户管理
+            </summary>
+            <typeparam name="IStore"></typeparam>
+            <typeparam name="TModel"></typeparam>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Create(AuthorizationCenter.Dto.Request.ModelRequest{`1})">
+            <summary>
+            创建
+            </summary>
+            <param name="request"></param>
+        </member>
         <member name="T:AuthorizationCenter.Models.ApplicationDbContext">
             <summary>
             书据库上下文
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Models.ApplicationDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{AuthorizationCenter.Models.ApplicationDbContext})">
+            <summary>
+            应用数据库上下文
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="P:AuthorizationCenter.Models.ApplicationDbContext.Users">
+            <summary>
+            用户数据集
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.ApplicationDbContext.Roles">
+            <summary>
+            角色数据集
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.ApplicationDbContext.Permissions">
+            <summary>
+            权限数据集
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.ApplicationDbContext.Organizations">
+            <summary>
+            组织数据集
             </summary>
         </member>
         <member name="M:AuthorizationCenter.Models.ApplicationDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
@@ -49,9 +182,39 @@
             组织模型
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Models.Organization.Id">
+            <summary>
+            组织ID（GUID）
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Organization.Name">
+            <summary>
+            组织名称
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Organization.Description">
+            <summary>
+            组织描述
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Models.Permission">
             <summary>
             权限模型
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Permission.Id">
+            <summary>
+            权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Permission.Name">
+            <summary>
+            权限名称
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Permission.Description">
+            <summary>
+            权限描述
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Models.Role">
@@ -59,15 +222,220 @@
             角色模型
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Models.User">
+        <member name="P:AuthorizationCenter.Models.Role.Id">
+            <summary>
+            角色GUID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Role.Name">
+            <summary>
+            角色名称
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.Role.Decription">
+            <summary>
+            角色描述
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Models.UserBase">
             <summary>
             用户模型
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Stores.IOrganizationStore">
+        <member name="P:AuthorizationCenter.Models.UserBase.Id">
+            <summary>
+            用户ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.UserBase.SignName">
+            <summary>
+            用户签名
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Models.UserBase.PassWord">
+            <summary>
+            用户密码
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IOrganizationStore`1">
             <summary>
             组织存储
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore`1.ById(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 根据ID
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore`1.ByName(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 通过名称
+            </summary>
+            <param name="user"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore`1.Create(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            新建
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore`1.Update(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            更新
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore`1.Delete(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IPermissionStore`1">
+            <summary>
+            权限存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IPermissionStore`1.ById(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 根据ID
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IPermissionStore`1.ByName(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 通过名称
+            </summary>
+            <param name="user"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IPermissionStore`1.Create(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            新建
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IPermissionStore`1.Update(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            更新
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IPermissionStore`1.Delete(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IRoleStore`1">
+            <summary>
+            角色存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore`1.ById(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 根据ID
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore`1.ByName(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            查询 通过名称
+            </summary>
+            <param name="user"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore`1.Create(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            新建
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore`1.Update(AuthorizationCenter.Models.UserBase,`0)">
+            <summary>
+            更新
+            </summary>
+            <param name="user"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore`1.Delete(AuthorizationCenter.Models.UserBase,System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="user"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IUserBaseStore`1">
+            <summary>
+            用户存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore`1.ById(`0,System.String)">
+            <summary>
+            查询 根据用户ID查询用户
+            </summary>
+            <param name="signuser"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore`1.ByName(`0,System.String)">
+            <summary>
+            查询 通过用户名查询用户
+            </summary>
+            <param name="signuser"></param>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore`1.Create(`0,`0)">
+            <summary>
+            新建 创建用户
+            </summary>
+            <param name="signuser"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore`1.Update(`0,`0)">
+            <summary>
+            更新 更新用户
+            </summary>
+            <param name="signuser"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore`1.Delete(`0,System.String)">
+            <summary>
+            删除 删除用户
+            </summary>
+            <param name="signuser"></param>
+            <param name="userid"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.Extensions.DependencyInjection.IServiceCollectionExtensions">
             <summary>

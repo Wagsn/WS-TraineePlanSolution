@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WS.Core.Dto;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -11,12 +12,30 @@ namespace AuthorizationCenter.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class CheckController
+    public class CheckController: Controller // ControllerBase
     {
+        ///// <summary>
+        ///// 检查
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public ActionResult<string> Get()
+        //{
+        //    return "The website is working.";
+        //}
+
+        /// <summary>
+        /// 检查
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public ActionResult<string> Get()
+        public ResponseMessage<string> GetResponse()
         {
-            return "The website is working.";
+            ResponseMessage<string> response = new ResponseMessage<string>
+            {
+                Extension = "666"
+            };
+            return response;
         }
     }
 }

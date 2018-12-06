@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Dto\Response\" />
     <Folder Include="wwwroot\" />
+    <Folder Include="Views\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +27,15 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WS.Core">
+      <HintPath>lib\WS.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="WS.Text">
+      <HintPath>lib\WS.Text.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
