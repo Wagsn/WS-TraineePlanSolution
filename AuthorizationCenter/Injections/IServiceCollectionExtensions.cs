@@ -10,6 +10,11 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class IServiceCollectionExtensions
     {
+        /// <summary>
+        /// 添加用户定义的依赖注入
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static UserDefinedBuilder AddUserDefined(this IServiceCollection services)
         {
             if (services == null)

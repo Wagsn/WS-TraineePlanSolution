@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\Response\" />
+    <Folder Include="Dto\Responses\" />
     <Folder Include="wwwroot\" />
     <Folder Include="Views\" />
   </ItemGroup>

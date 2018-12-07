@@ -14,15 +14,29 @@ using Microsoft.Extensions.Options;
 
 namespace AuthorizationCenter
 {
+    /// <summary>
+    /// 启动
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// 配置
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// 服务
+        /// </summary>
+        /// <param name="services"></param>
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -51,6 +65,11 @@ namespace AuthorizationCenter
             });
         }
 
+        /// <summary>
+        /// 配置
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {

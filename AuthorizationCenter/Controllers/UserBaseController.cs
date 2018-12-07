@@ -1,5 +1,8 @@
-﻿using AuthorizationCenter.Dto.Request;
+﻿using AuthorizationCenter.Dto.Jsons;
+using AuthorizationCenter.Dto.Requests;
+using AuthorizationCenter.Managers;
 using AuthorizationCenter.Models;
+using AuthorizationCenter.Stores;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,14 +15,19 @@ namespace AuthorizationCenter.Controllers
     /// <summary>
     /// 用户控制
     /// </summary>
-    public class UserBaseController : Controller
+    public class UserBaseController : Controller 
     {
+        /// <summary>
+        /// 用户管理
+        /// </summary>
+        public IUserManager<IUserBaseStore<UserBase>, UserBaseJson> UserManager { get; set; }
+
         /// <summary>
         /// 注册
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public Task<ResponseMessage<UserBase>> SignUp(ModelRequest<UserBase> request)
+        public Task<ResponseMessage<UserBaseJson>> SignUp(ModelRequest<UserBaseJson> request)
         {
             return null;
         }
@@ -29,7 +37,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public Task<ResponseMessage<UserBase>> SignIn(ModelRequest<UserBase> request)
+        public Task<ResponseMessage<UserBaseJson>> SignIn(ModelRequest<UserBaseJson> request)
         {
             return null;
         }
@@ -39,7 +47,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public Task<ResponseMessage<UserBase>> SignOut(ModelRequest<UserBase> request)
+        public Task<ResponseMessage<UserBaseJson>> SignOut(ModelRequest<UserBaseJson> request)
         {
             return null;
         }

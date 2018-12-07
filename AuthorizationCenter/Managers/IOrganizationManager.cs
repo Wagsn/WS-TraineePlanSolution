@@ -1,9 +1,8 @@
-﻿using AuthorizationCenter.Dto.Request;
+﻿using AuthorizationCenter.Dto.Jsons;
+using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Models;
 using AuthorizationCenter.Stores;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using WS.Core.Dto;
 
@@ -12,31 +11,31 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 组织管理
     /// </summary>
-    /// <typeparam name="IStore"></typeparam>
-    /// <typeparam name="TModel"></typeparam>
-    public interface IOrganizationManager<IStore, TModel> where IStore : IOrganizationStore<TModel> where TModel : Organization
+    /// <typeparam name="IStore">存储</typeparam>
+    /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
+    public interface IOrganizationManager<IStore, TJson> where IStore : IOrganizationStore<Organization> where TJson : OrganizationJson
     {
         /// <summary>
         /// 新建
         /// </summary>
-        /// <param name="response"></param>
-        /// <param name="request"></param>
-        Task Create(ResponseMessage<TModel> response, ModelRequest<TModel> request);
+        /// <param name="response">响应</param>
+        /// <param name="request">请求</param>
+        Task Create([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="response"></param>
-        /// <param name="request"></param>
+        /// <param name="response">响应</param>
+        /// <param name="request">请求</param>
         /// <returns></returns>
-        Task Update(ResponseMessage<TModel> response, ModelRequest<TModel> request);
+        Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="response"></param>
-        /// <param name="request"></param>
+        /// <param name="response">响应</param>
+        /// <param name="request">请求</param>
         /// <returns></returns>
-        Task Delete(ResponseMessage<TModel> response, ModelRequest<TModel> request);
+        Task Delete([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
     }
 }

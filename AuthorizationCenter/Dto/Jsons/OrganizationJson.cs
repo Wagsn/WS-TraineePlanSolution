@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthorizationCenter.Dto.Request
+namespace AuthorizationCenter.Dto.Jsons
 {
     /// <summary>
-    /// 用户请求
+    /// 组织Dto
     /// </summary>
-    public class UserBaseRequest
+    public class OrganizationJson
     {
     }
 }
