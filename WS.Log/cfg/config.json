@@ -1,0 +1,14 @@
+﻿{
+  "Log": {
+    "default": {
+      "logRoot": "./log/default/log",
+      "errRoot": "./log/default/err",
+      "debugRoot": "./log/default/debug"
+    },
+    "shell": {
+      "logRoot": "./log/shell/log",
+      "errRoot": "./log/shell/err",
+      "debugRoot": "./log/shell/debug"
+    }
+  }
+}
