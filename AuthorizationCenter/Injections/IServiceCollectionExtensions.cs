@@ -1,4 +1,9 @@
-﻿using System;
+﻿using AuthorizationCenter.Dto.Jsons;
+using AuthorizationCenter.Managers;
+using AuthorizationCenter.Models;
+using AuthorizationCenter.Stores;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,15 +29,19 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // 依赖注入
 
+            services.AddScoped<ApplicationDbContext>();
+
+            services.AddScoped<DbContext, ApplicationDbContext>();
+
             #region << Store >>
 
-
+            services.AddScoped<IUserBaseStore, UserBaseStore>();
 
             #endregion
 
             #region << Manager >>
 
-
+            services.AddScoped<IUserManager<IUserBaseStore, UserBaseJson>, UserManager>();
 
             #endregion
 

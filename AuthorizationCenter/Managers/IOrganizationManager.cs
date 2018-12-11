@@ -13,7 +13,7 @@ namespace AuthorizationCenter.Managers
     /// </summary>
     /// <typeparam name="IStore">存储</typeparam>
     /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
-    public interface IOrganizationManager<IStore, TJson> where IStore : IOrganizationStore<Organization> where TJson : OrganizationJson
+    public interface IOrganizationManager<IStore, TJson> where IStore : IOrganizationStore where TJson : OrganizationJson
     {
         /// <summary>
         /// 新建

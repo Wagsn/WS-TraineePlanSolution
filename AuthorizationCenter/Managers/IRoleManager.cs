@@ -16,7 +16,7 @@ namespace AuthorizationCenter.Managers
     /// </summary>
     /// <typeparam name="IStore">存储</typeparam>
     /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
-    public interface IRoleManager<IStore, TJson> where IStore : IRoleStore<Role> where TJson : RoleJson
+    public interface IRoleManager<IStore, TJson> where IStore : IRoleStore where TJson : RoleJson
     {
         /// <summary>
         /// 新建

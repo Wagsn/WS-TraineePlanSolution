@@ -1,0 +1,40 @@
+﻿@model ModelRequest<UserBaseJson>
+
+@{
+    ViewData["Title"] = "登陆";
+}
+
+<h2>登陆</h2>
+
+<h4>用户</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Sign">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Data.Id" />
+            <div class="form-group">
+                <label asp-for="Data.SignName" class="control-label">用户名</label>
+                <input asp-for="Data.SignName" class="form-control" />
+                <span asp-validation-for="Data.SignName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Data.PassWord" class="control-label">密码</label>
+                <input asp-for="Data.PassWord" class="form-control" />
+                <span asp-validation-for="Data.PassWord" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-action="SignIn" type="submit" value="登陆" class="btn btn-default" />
+                <input asp-action="SignUp" type="submit" value="注册" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@*<div>
+        <a asp-action="Index">Back to List</a>
+    </div>*@
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

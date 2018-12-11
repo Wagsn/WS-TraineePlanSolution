@@ -1,0 +1,47 @@
+﻿@model PagingResponseMessage<UserBaseJson>
+@* 分页查询 *@
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New User</a>
+</p>
+@{ 
+    var users = Model.Extension;
+    // 判断是否登陆
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                SignName
+                @*@Html.DisplayNameFor(models => models.Extension[0].SignName)*@
+            </th>
+            <th>
+                PassWord
+                @*@Html.DisplayNameFor(model => model.PassWord)*@
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in users) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SignName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PassWord)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -169,7 +169,7 @@ PassWord: [Letter|Digit]{6, 63}
 NickName: Letter{1,31}
 Email: String{, 255}
 
-### 角色: Role
+### 角色（通用）: Role 
 
 Id: GUID
 Name: [Letter|Digit]{2,15}
@@ -181,6 +181,7 @@ Id: GUID
 Code: Digit{12}
 Name: Word{2,15}
 Description: String{,255}
+ParentId： GUID
 
 ### 权限（通用）: Permission
 

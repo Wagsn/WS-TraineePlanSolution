@@ -3,14 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthorizationCenter.Dto.Jsons;
 
 namespace AuthorizationCenter.Models
 {
     /// <summary>
-    /// 书据库上下文
+    /// 数据库上下文
     /// </summary>
     public class ApplicationDbContext : DbContext
     {
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        public ApplicationDbContext() { }
+
         /// <summary>
         /// 应用数据库上下文
         /// </summary>
@@ -22,7 +28,7 @@ namespace AuthorizationCenter.Models
         /// <summary>
         /// 用户数据集
         /// </summary>
-        public DbSet<UserBase> Users { get; set; }
+        public DbSet<UserBase> UserBases { get; set; }
 
         /// <summary>
         /// 角色数据集
@@ -58,7 +64,8 @@ namespace AuthorizationCenter.Models
 
             builder.Entity<Role>(b =>
             {
-                b.ToTable("ws_role");
+                b.ToTable("ws_role");  //.HasIndex(i=>i.Name).IsUnique();
+                b.Property(p => p.Name);
             });
 
             builder.Entity<Permission>(b =>
@@ -83,7 +90,19 @@ namespace AuthorizationCenter.Models
             base.OnConfiguring(builder);
             // Pomelo.EntityFrameworkCore.MySql 
             // TODO: 采用配置文件的方式
-            builder.UseMySql("server=localhost;database=ws_internship;user=admin;password=123456;");
+            builder.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
         }
+
+        /// <summary>
+        /// 数据库配置
+        /// </summary>
+        /// <param name="builder">数据库上下文选项创建器</param>
+        public DbSet<AuthorizationCenter.Dto.Jsons.OrganizationJson> OrganizationJson { get; set; }
+
+        /// <summary>
+        /// 数据库配置
+        /// </summary>
+        /// <param name="builder">数据库上下文选项创建器</param>
+        public DbSet<AuthorizationCenter.Dto.Jsons.UserBaseJson> UserBaseJson { get; set; }
     }
 }

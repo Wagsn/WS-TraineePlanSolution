@@ -10,7 +10,7 @@ namespace AuthorizationCenter.Controllers
     /// <summary>
     /// 用于检查服务连通性
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CheckController: Controller // ControllerBase
     {
@@ -24,18 +24,27 @@ namespace AuthorizationCenter.Controllers
         //    return "The website is working.";
         //}
 
+        ///// <summary>
+        ///// 检查
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet]
+        //public ResponseMessage<string> GetResponse()
+        //{
+        //    ResponseMessage<string> response = new ResponseMessage<string>
+        //    {
+        //        Extension = "666"
+        //    };
+        //    return response;
+        //}
+
         /// <summary>
         /// 检查
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public ResponseMessage<string> GetResponse()
+        public ViewResult Check()
         {
-            ResponseMessage<string> response = new ResponseMessage<string>
-            {
-                Extension = "666"
-            };
-            return response;
+            return View("Check");
         }
     }
 }

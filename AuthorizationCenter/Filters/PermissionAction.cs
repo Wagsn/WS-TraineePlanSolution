@@ -4,6 +4,7 @@ using AuthorizationCenter.Models;
 using AuthorizationCenter.Stores;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace AuthorizationCenter.Filters
@@ -16,22 +17,22 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<IUserBaseStore<UserBase>, UserBaseJson> UserManager { get; set; }
+        public IUserManager<IUserBaseStore, UserBaseJson> UserManager { get; set; }
 
         /// <summary>
         /// 权限管理
         /// </summary>
-        public IPermissionManager<IPermissionStore<Permission>, PermissionJson> PermissionManager { get; set; }
+        public IPermissionManager<IPermissionStore, PermissionJson> PermissionManager { get; set; }
 
         /// <summary>
         /// 角色管理
         /// </summary>
-        public IRoleManager<IRoleStore<Role>, RoleJson> RoleManager { get; set; }
+        public IRoleManager<IRoleStore, RoleJson> RoleManager { get; set; }
 
         /// <summary>
         /// 组织管理
         /// </summary>
-        public IOrganizationManager<IOrganizationStore<Organization>, OrganizationJson> OrganizationManager { get; set; }
+        public IOrganizationManager<IOrganizationStore, OrganizationJson> OrganizationManager { get; set; }
 
         /// <summary>
         /// 异步过滤

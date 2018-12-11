@@ -42,6 +42,8 @@ namespace AuthorizationCenter
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddSession();
+
             // 这里应该是依赖注入 对象映射
             services.AddAutoMapper();
 
@@ -77,6 +79,7 @@ namespace AuthorizationCenter
             {
                 app.UseDeveloperExceptionPage();
             }
+
             
             // 启用Swagger中间件以生成Swagger作为JSON数据（必须在app.UseMvc();之前）
             app.UseSwagger();
@@ -87,7 +90,14 @@ namespace AuthorizationCenter
                 //c.ShowRequestHeaders();
             });
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller}/{action}/{id?}");
+            });
+
+            app.UseSession();
 
             // 默认访问index.html
             app.UseDefaultFiles();

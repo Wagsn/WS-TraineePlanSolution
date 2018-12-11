@@ -22,6 +22,13 @@ namespace AuthorizationCenter.Models
         public string Id { get; set; }
 
         /// <summary>
+        /// 父组织ID
+        /// </summary>
+        [StringLength(36, MinimumLength = 36)]
+        [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
+        public string ParentId { get; set; }
+
+        /// <summary>
         /// 组织名称
         /// </summary>
         [StringLength(15, MinimumLength = 2)]
