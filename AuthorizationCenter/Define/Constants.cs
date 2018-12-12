@@ -64,5 +64,20 @@ namespace AuthorizationCenter.Define
         /// 英文字母 正则表达式
         /// </summary>
         public const string LETTER_REG = "[a-zA-Z]";
+
+        /// <summary>
+        /// 一些字符串常量
+        /// </summary>
+        public static class Str
+        {
+            /// <summary>
+            /// SignName
+            /// </summary>
+            public const string SignName = "SignName";
+            /// <summary>
+            /// PassWord
+            /// </summary>
+            public const string PassWord = "PassWord";
+        }
     }
 }

@@ -105,6 +105,11 @@ namespace AuthorizationCenter.Managers
         {
             var userbase = await Store.ByName(user.SignName).FirstOrDefaultAsync();
 
+            if (userbase == null)
+            {
+                return false;
+            }
+
             if (userbase.PassWord == user.PassWord)
             {
                 return true;

@@ -1,4 +1,4 @@
-﻿@model ModelRequest<UserBaseJson>
+﻿@model SignInViewModel
 
 @{
     ViewData["Title"] = "登陆";
@@ -11,21 +11,22 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-controller="Sign">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Data.Id" />
+            @*<input type="hidden" asp-for="Data.Id" />*@
             <div class="form-group">
-                <label asp-for="Data.SignName" class="control-label">用户名</label>
-                <input asp-for="Data.SignName" class="form-control" />
-                <span asp-validation-for="Data.SignName" class="text-danger"></span>
+                <label asp-for="SignName" class="control-label">用户名</label>
+                <input asp-for="SignName" class="form-control" />
+                <span asp-validation-for="SignName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Data.PassWord" class="control-label">密码</label>
-                <input asp-for="Data.PassWord" class="form-control" />
-                <span asp-validation-for="Data.PassWord" class="text-danger"></span>
+                <label asp-for="PassWord" class="control-label">密码</label>
+                <input asp-for="PassWord" class="form-control" />
+                <span asp-validation-for="PassWord" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-action="SignIn" type="submit" value="登陆" class="btn btn-default" />
-                <input asp-action="SignUp" type="submit" value="注册" class="btn btn-default" />
+                <input asp-action="SignIn" formmethod="post" asp-route-returnUrl="@(ViewData["returnUrl"])" type="submit" value="登陆" class="btn btn-default" />
+                <input asp-action="SignUp" asp-route-returnUrl="@(ViewData["returnUrl"])" type="submit" value="注册" class="btn btn-default" />
             </div>
         </form>
     </div>

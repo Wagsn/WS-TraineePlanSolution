@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.ViewModels.Sign
 {
     /// <summary>
-    /// 登陆
+    /// 登陆模型 
     /// </summary>
     public class SignInViewModel
     {
-        ///// <summary>
-        ///// 用户ID
-        ///// </summary>
-        //[Key]
-        //[MaxLength(36)]
-        //[RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
-        //public string Id { get; set; }
+        /// <summary>
+        /// 用户ID
+        /// </summary>
+        [Key]
+        [MaxLength(36)]
+        [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
+        public string Id { get; set; }
 
         /// <summary>
         /// 用户签名

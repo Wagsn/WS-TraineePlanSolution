@@ -12,7 +12,6 @@ namespace AuthorizationCenter.Dto.Jsons
     /// </summary>
     public class UserBaseJson
     {
-
         /// <summary>
         /// 用户ID
         /// </summary>

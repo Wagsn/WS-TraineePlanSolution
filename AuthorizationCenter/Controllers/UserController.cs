@@ -1,14 +1,17 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Managers;
 using AuthorizationCenter.Models;
 using AuthorizationCenter.Stores;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Core.Dto;
+using WS.Text;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -57,11 +60,19 @@ namespace AuthorizationCenter.Controllers
 
             await UserManager.List(response, new Dto.Requests.ModelRequest<UserBaseJson>());
 
-
+            // userid
+            string signname = HttpContext.Session.GetString(Constants.Str.SignName);
+            string password = HttpContext.Session.GetString(Constants.Str.PassWord);
+            ViewData["SignUser"] = new UserBaseJson{ SignName = signname, PassWord = password };
+            Console.WriteLine("ViewData[\"SignUser\"]: " + JsonUtil.ToJson(ViewData["SignUser"]));
 
             return View(response);  //Mapper.Map<UserBaseJson>(await _context.UserBases.ToListAsync())
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: UserBaseJsons/Details/5
         public async Task<IActionResult> Details(string id)
         {

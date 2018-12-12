@@ -2,14 +2,19 @@
 @* 分页查询 *@
 @{
     ViewData["Title"] = "Index";
+    Console.WriteLine("Sign Name: "+ ((UserBaseJson)ViewData["SignUser"]).SignName??"");
 }
 
 <h2>Index</h2>
 
 <p>
+    当前用户登陆用户为<span id="sign-name">@(((UserBaseJson)ViewData["SignUser"]).SignName ??"游客")</span>
+</p>
+
+<p>
     <a asp-action="Create">Create New User</a>
 </p>
-@{ 
+@{
     var users = Model.Extension;
     // 判断是否登陆
 }
@@ -28,20 +33,21 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in users) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SignName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PassWord)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in users)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SignName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PassWord)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

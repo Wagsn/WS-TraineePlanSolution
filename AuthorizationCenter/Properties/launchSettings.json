@@ -20,7 +20,7 @@
     "AuthorizationCenter": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/swagger/index.html",
+      "launchUrl": "sign/index",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

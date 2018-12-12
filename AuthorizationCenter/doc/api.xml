@@ -93,6 +93,11 @@
             角色控制
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Controllers.SignController">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="F:AuthorizationCenter.Controllers.SignController.Logger">
             <summary>
             日志器
@@ -103,17 +108,22 @@
             用户管理
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.SignController.Index">
+        <member name="P:AuthorizationCenter.Controllers.SignController.Session">
             <summary>
-            
+            Session
             </summary>
-            <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.SignController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Stores.IUserBaseStore,AuthorizationCenter.Dto.Jsons.UserBaseJson})">
             <summary>
             构造器
             </summary>
             <param name="userManager"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.SignController.Index(System.String)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.SignController.SignUp(AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserBaseJson})">
             <summary>
@@ -122,10 +132,12 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.SignController.SignIn(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
+        <member name="M:AuthorizationCenter.Controllers.SignController.SignIn(AuthorizationCenter.ViewModels.Sign.SignInViewModel,System.String)">
             <summary>
             签入
             </summary>
+            <param name="request">请求</param>
+            <param name="returnUrl">返回URL（跳转）</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.SignController.SignOut(AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserBaseJson})">
@@ -133,6 +145,15 @@
             签出
             </summary>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.SignController.RedirectUrlToAction(System.String,System.Object)">
+            <summary>
+            将ActionURL解析出ActionName与ControllerName
+            再重定向到Action并传递参数
+            </summary>
+            <param name="actionURL"></param>
+            <param name="routeValues"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserBasesController.Index">
@@ -173,6 +194,13 @@
             <summary>
             列表
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.UserController.Details(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserController.Create">
@@ -271,6 +299,21 @@
         <member name="F:AuthorizationCenter.Define.Constants.LETTER_REG">
             <summary>
             英文字母 正则表达式
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Define.Constants.Str">
+            <summary>
+            一些字符串常量
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.Str.SignName">
+            <summary>
+            SignName
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.Str.PassWord">
+            <summary>
+            PassWord
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.OrganizationJson">
@@ -996,7 +1039,12 @@
         </member>
         <member name="T:AuthorizationCenter.ViewModels.Sign.SignInViewModel">
             <summary>
-            登陆
+            登陆模型 
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.ViewModels.Sign.SignInViewModel.Id">
+            <summary>
+            用户ID
             </summary>
         </member>
         <member name="P:AuthorizationCenter.ViewModels.Sign.SignInViewModel.SignName">

@@ -90,6 +90,9 @@ namespace AuthorizationCenter
                 //c.ShowRequestHeaders();
             });
 
+            // app.UseMvc之前
+            app.UseSession();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -97,7 +100,7 @@ namespace AuthorizationCenter
                     template: "{controller}/{action}/{id?}");
             });
 
-            app.UseSession();
+            
 
             // 默认访问index.html
             app.UseDefaultFiles();
