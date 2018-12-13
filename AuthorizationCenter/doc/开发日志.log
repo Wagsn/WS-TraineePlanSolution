@@ -8,4 +8,11 @@
 [DONE] 引入 Swagger（Swashbuckle.AspNetCore）
 [15:26]
 [DONE] 引入 AutoMapper
-
+[2018-12-12]
+[19:30]
+[DONE] 保持登陆OK
+[DONE] 页面结构优化
+[2018-12-12]
+[10:40]
+[DONE] 登陆过滤OK
+[TODO] 用户管理分层 [CASE] 之前采用基架没有分层明确

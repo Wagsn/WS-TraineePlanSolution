@@ -66,18 +66,48 @@ namespace AuthorizationCenter.Define
         public const string LETTER_REG = "[a-zA-Z]";
 
         /// <summary>
-        /// 一些字符串常量
+        /// SignUser
+        /// </summary>
+        public const string SIGNUSER = "SignUser";
+
+        /// <summary>
+        /// UserId
+        /// </summary>
+        public const string USERID = "UserId";
+
+        /// <summary>
+        /// SignName
+        /// </summary>
+        public const string SIGNNAME = "SignName";
+        /// <summary>
+        /// PassWord
+        /// </summary>
+        public const string PASSWORD = "PassWord";
+
+
+        /// <summary>
+        /// 一些字符串常量 作废
         /// </summary>
         public static class Str
         {
             /// <summary>
+            /// SignUser
+            /// </summary>
+            public const string SIGNUSER = "SignUser";
+
+            /// <summary>
+            /// UserId
+            /// </summary>
+            public const string USERID = "UserId";
+
+            /// <summary>
             /// SignName
             /// </summary>
-            public const string SignName = "SignName";
+            public const string SIGNNAME = "SignName";
             /// <summary>
             /// PassWord
             /// </summary>
-            public const string PassWord = "PassWord";
+            public const string PASSWORD = "PassWord";
         }
     }
 }

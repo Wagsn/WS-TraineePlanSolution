@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WS.Core.Dto;
 
@@ -76,7 +76,7 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 批量
+        /// 批量 查询
         /// </summary>
         /// <param name="response"></param>
         /// <param name="request"></param>
@@ -118,6 +118,38 @@ namespace AuthorizationCenter.Managers
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 通过ID查询
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task ById([Required] ResponseMessage<UserBaseJson> response, [Required] ModelRequest<UserBaseJson> request)
+        {
+            response.Extension = Mapper.Map<UserBaseJson>(await Store.ById(request.Data.Id).FirstOrDefaultAsync());
+        }
+
+        /// <summary>
+        /// 存在 字段与运算
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool IsExistForName(UserBaseJson user)
+        {
+            UserBase userBase = new UserBase { SignName = user.SignName };
+            return Store.IsExistAnd(userBase);
+        }
+
+        /// <summary>
+        /// 存在
+        /// </summary>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public async Task<bool> Exist(Expression<Func<UserBaseJson, bool>> func)
+        {
+            return await Store.Context.Set<UserBase>().AnyAsync(Mapper.Map<Expression<Func<UserBase, bool>>>(func));
         }
     }
 }

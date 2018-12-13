@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Filters
 {
     /// <summary>
-    /// 权限检查过滤器，Controller的Method都是原子操作
+    /// 权限检查过滤器（异步权限检查）
     /// </summary>
     public class CheckPermission : IAsyncActionFilter
     {
@@ -58,16 +58,16 @@ namespace AuthorizationCenter.Filters
 
             // 2. 检查用户
 
-            UserBaseJson user = new UserBaseJson();
-            if (user == null)
-            {
-                context.Result = new ContentResult()
-                {
-                    Content = "当前用户无效",
-                    StatusCode = 403,
-                };
-                return;
-            }
+            //UserBaseJson user = new UserBaseJson();
+            //if (user == null)
+            //{
+            //    context.Result = new ContentResult()
+            //    {
+            //        Content = "当前用户无效",
+            //        StatusCode = 403,
+            //    };
+            //    return;
+            //}
 
             // 3. 检查权限
 

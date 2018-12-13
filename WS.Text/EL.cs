@@ -45,7 +45,7 @@ namespace WS.Text
         }
 
         /// <summary>
-        /// 表达式解析
+        /// 表达式解析 ${}
         /// </summary>
         /// <param name="template"></param>
         /// <param name="pairs"></param>

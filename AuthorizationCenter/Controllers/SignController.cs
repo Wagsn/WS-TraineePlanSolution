@@ -55,6 +55,7 @@ namespace AuthorizationCenter.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
+        [Filters.NoSign]
         public ViewResult Index(string returnUrl = null)
         {
             ViewData["returnUrl"] = returnUrl??"/User/Index";
@@ -66,6 +67,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Filters.NoSign]
         public async Task<IActionResult> SignUp([FromForm]ModelRequest<UserBaseJson> request)
         {
             // 响应体构建
@@ -93,6 +95,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="request">请求</param>
         /// <param name="returnUrl">返回URL（跳转）</param>
         /// <returns></returns>
+        [Filters.NoSign]
         [HttpPost]
         public async Task<IActionResult> SignIn([Required]SignInViewModel request, string returnUrl = null)
         {
@@ -114,33 +117,20 @@ namespace AuthorizationCenter.Controllers
             // 登陆成功
             if (await UserManager.Check(user))
             {
-                Session.SetString(Constants.Str.SignName, request.SignName);
-                Session.SetString(Constants.Str.PassWord, request.PassWord);
-                Console.WriteLine("SignInController->SignIn->ViewBag.SignUser: " + JsonUtil.ToJson(ViewBag.SignUser));
+                var dbuser = await UserManager.Store.Context.UserBases.Where(entity => entity.SignName == request.SignName).SingleOrDefaultAsync();
+                Session.SetString(Constants.Str.USERID, dbuser.Id);
+                Session.SetString(Constants.Str.SIGNNAME, request.SignName);
+                Session.SetString(Constants.Str.PASSWORD, request.PassWord);
+                //Console.WriteLine("SignInController->SignIn->ViewBag.SignUser: " + JsonUtil.ToJson(ViewBag.SignUser));
                 Logger.Trace("登陆成功");
 
-                // 重定向问题
-
-                //var services = HttpContext.RequestServices;
-                //var executor = services.GetRequiredService<ViewResultExecutor>();
-                //var viewEngine = services.GetRequiredService<IRazorViewEngine>();
-                //var view = viewEngine.GetView(null, "~/Pages/IeAlert.cshtml", true)?.View;
-                //if (view != null)
-                //{
-                //    using (view as IDisposable)
-                //    {
-                //        await executor.ExecuteAsync(ControllerContext, view, ViewData, TempData, "text/html; charset=utf-8", 200);
-                //    }
-                //    return new EmptyResult();
-                //}
                 if (returnUrl != null)
                 {
                     return RedirectToLocal(returnUrl);
-                    //return RedirectUrlToAction(returnUrl);
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
             }
             // 登陆失败
@@ -149,20 +139,22 @@ namespace AuthorizationCenter.Controllers
                 Logger.Trace("登陆失败");
                 ModelState.AddModelError("All", "用户名或密码错误");
                 return View(nameof(Index), request);
-                //return RedirectToLocal(Url.Action("Index", "Sign", new { ReturnUrl = returnUrl }));
             }
-            //return View("Index", new { request, returnUrl });
-            //return RedirectToRoute(new { controller = "UserBaseJsons", action = "Index"});
         }
 
         /// <summary>
-        /// 签出
+        /// 签出 Clear Session SignUser
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public Task<ResponseMessage<UserBaseJson>> SignOut(ModelRequest<UserBaseJson> request)
+        [Filters.NoSign]
+        public IActionResult SignOut(ModelRequest<UserBaseJson> request)
         {
-            return null;
+            // Clear Session SignUser
+            Session.Remove(Constants.Str.USERID);
+            Session.Remove(Constants.Str.SIGNNAME);
+            Session.Remove(Constants.Str.PASSWORD);
+            return View(nameof(Index));
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -174,7 +166,7 @@ namespace AuthorizationCenter.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
         }
 
@@ -201,7 +193,7 @@ namespace AuthorizationCenter.Controllers
             else
             {
                 // 不是本地地址的话就去主页
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
         }
     }

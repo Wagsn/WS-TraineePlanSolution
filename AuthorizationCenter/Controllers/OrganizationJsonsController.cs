@@ -39,7 +39,7 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 
+        /// 列表 MVC
         /// </summary>
         /// <returns></returns>
         [HttpGet("index", Name = "OrganizationIndex")]
@@ -49,6 +49,11 @@ namespace AuthorizationCenter.Controllers
             return View( Mapper.Map<List<OrganizationJson>>(await _context.Organizations.ToListAsync()));
         }
 
+        /// <summary>
+        /// 详情 MVC
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: OrganizationJsons/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -57,7 +62,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound(); 
             }
 
-            var organizationJson = await _context.OrganizationJson
+            var organizationJson = await _context.Organizations
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (organizationJson == null)
             {
@@ -67,12 +72,21 @@ namespace AuthorizationCenter.Controllers
             return View(organizationJson);
         }
 
+        /// <summary>
+        /// 创建 MVC
+        /// </summary>
+        /// <returns></returns>
         // GET: OrganizationJsons/Create
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// 创建 MVC
+        /// </summary>
+        /// <param name="organizationJson"></param>
+        /// <returns></returns>
         // POST: OrganizationJsons/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -90,7 +104,7 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 
+        /// 编辑
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -102,7 +116,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organizationJson = await _context.OrganizationJson.FindAsync(id);
+            var organizationJson = await _context.Organizations.FindAsync(id);
             if (organizationJson == null)
             {
                 return NotFound();
@@ -111,7 +125,7 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 
+        /// 编辑
         /// </summary>
         /// <param name="id"></param>
         /// <param name="organizationJson"></param>
@@ -151,6 +165,11 @@ namespace AuthorizationCenter.Controllers
             return View(organizationJson);
         }
 
+        /// <summary>
+        /// 删除 MVC
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: OrganizationJsons/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -159,7 +178,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organizationJson = await _context.OrganizationJson
+            var organizationJson = await _context.Organizations
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (organizationJson == null)
             {
@@ -169,20 +188,25 @@ namespace AuthorizationCenter.Controllers
             return View(organizationJson);
         }
 
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // POST: OrganizationJsons/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var organizationJson = await _context.OrganizationJson.FindAsync(id);
-            _context.OrganizationJson.Remove(organizationJson);
+            var organizationJson = await _context.Organizations.FindAsync(id);
+            _context.Organizations.Remove(organizationJson);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool OrganizationJsonExists(string id)
         {
-            return _context.OrganizationJson.Any(e => e.Id == id);
+            return _context.Organizations.Any(e => e.Id == id);
         }
     }
 }

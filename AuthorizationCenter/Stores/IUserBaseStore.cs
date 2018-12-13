@@ -12,5 +12,11 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public interface IUserBaseStore : INameStore<UserBase>
     {
+        /// <summary>
+        /// 存在与运算
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        bool IsExistAnd(UserBase user);
     }
 }

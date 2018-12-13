@@ -17,18 +17,26 @@ namespace AuthorizationCenter.Managers
     public interface IUserManager<IStore, TJson> where IStore : IUserBaseStore where TJson: UserBaseJson
     {
         ///// <summary>
-        ///// 查询 或运算 满足条件的都查询
+        ///// 查询 或运算 满足条件的都查询（null忽略）
         ///// </summary>
         ///// <param name="response">响应</param>
         ///// <param name="request">请求</param>
         //Task GetOr([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         ///// <summary>
-        ///// 查询 与运算 全部条件满足的查询
+        ///// 查询 与运算 全部条件满足的查询（null忽略）
         ///// </summary>
         ///// <param name="response">响应</param>
         ///// <param name="request">请求</param>
         //Task GetAnd([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+
+        /// <summary>
+        /// 通过ID查询
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task ById([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         /// <summary>
         /// 存储
@@ -40,6 +48,13 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="user"></param>
         Task<bool> Check(TJson user);
+
+        /// <summary>
+        /// 是否存在 每个属性都要匹配（null忽略）
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        bool IsExistForName(TJson user);
 
         /// <summary>
         /// 批量查询

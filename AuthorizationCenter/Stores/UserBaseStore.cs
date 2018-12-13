@@ -77,5 +77,42 @@ namespace AuthorizationCenter.Stores
 
             return result;
         }
+
+        /// <summary>
+        /// 存在 与运算 (null 忽略)
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool IsExistAnd(UserBase user)
+        {
+            Console.WriteLine("IsExistAnd user: "+JsonUtil.ToJson(user));
+            var query = from ub in Context.UserBases
+                        where (string.IsNullOrWhiteSpace(user.Id) ? true : ub.Id == user.Id)
+                        && (string.IsNullOrWhiteSpace(user.PassWord) ? true : ub.PassWord == user.PassWord)
+                        && (string.IsNullOrWhiteSpace(user.SignName) ? true : ub.SignName == user.SignName)
+                        select ub;
+            Console.WriteLine("IsExistAnd->User Count: "+ query.Count());
+            if (query.Count() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// TODO 
+        /// </summary>
+        /// <typeparam name="TNoNamee"></typeparam>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public bool IsExistAnd<TNoNamee>(Func<UserBase, TNoNamee> func)
+        {
+            // 遍历 TType 字段
+
+            return false;
+        }
     }
 }

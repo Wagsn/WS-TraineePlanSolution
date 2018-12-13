@@ -4,10 +4,18 @@ using System.Diagnostics;
 
 namespace AuthorizationCenter.Controllers
 {
+    /// <summary>
+    /// 主页控制器
+    /// </summary>
     public class HomeController : Controller
     {
         /// <summary>
-        /// 
+        /// Controller Name
+        /// </summary>
+        public const string Name = "Home";
+
+        /// <summary>
+        /// 主页
         /// </summary>
         /// <returns></returns>
         public IActionResult Index()

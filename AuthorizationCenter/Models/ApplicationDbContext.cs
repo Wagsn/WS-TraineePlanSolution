@@ -60,6 +60,7 @@ namespace AuthorizationCenter.Models
             builder.Entity<UserBase>(b =>
             {
                 b.ToTable("ws_userbase");
+                b.HasIndex(p => p.SignName).IsUnique();
             });
 
             builder.Entity<Role>(b =>
@@ -92,17 +93,5 @@ namespace AuthorizationCenter.Models
             // TODO: 采用配置文件的方式
             builder.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
         }
-
-        /// <summary>
-        /// 数据库配置
-        /// </summary>
-        /// <param name="builder">数据库上下文选项创建器</param>
-        public DbSet<AuthorizationCenter.Dto.Jsons.OrganizationJson> OrganizationJson { get; set; }
-
-        /// <summary>
-        /// 数据库配置
-        /// </summary>
-        /// <param name="builder">数据库上下文选项创建器</param>
-        public DbSet<AuthorizationCenter.Dto.Jsons.UserBaseJson> UserBaseJson { get; set; }
     }
 }
