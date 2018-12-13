@@ -9,5 +9,5 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 权限存储
     /// </summary>
-    public interface IPermissionStore : INameStore<Permission> { }
+    public interface IPermissionStore : IStore<Permission> { }
 }

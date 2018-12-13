@@ -10,7 +10,7 @@ namespace AuthorizationCenter.Stores
     /// 有Id和Name属性的单实体泛型接口
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface INameStore<TEntity> where TEntity : class
+    public interface IStore<TEntity> where TEntity : class
     {
         /// <summary>
         /// 数据库上下文 转移
@@ -31,39 +31,18 @@ namespace AuthorizationCenter.Stores
         IQueryable<TEntity> List(Func<TEntity, bool> predicate);
 
         /// <summary>
-        /// 查询 根据用户ID查询用户
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        IQueryable<TEntity> ById(string id);
-
-        /// <summary>
-        /// 查询 通过用户名查询用户
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        IQueryable<TEntity> ByName(string name);
-
-        /// <summary>
         /// 新建 创建用户
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<TEntity> Create(TEntity user);
+        Task<TEntity> Create(TEntity entity);
 
         /// <summary>
         /// 更新 更新用户
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<TEntity> Update(TEntity user);
-
-        /// <summary>
-        /// 删除 删除用户
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<IQueryable<TEntity>> DeleteById(string id);
+        Task<TEntity> Update(TEntity entity);
         
         /// <summary>
         /// 条件查询 -匹配函数

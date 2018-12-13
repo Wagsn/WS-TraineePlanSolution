@@ -9,5 +9,5 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 角色存储
     /// </summary>
-    public interface IRoleStore : INameStore<Role> { }
+    public interface IRoleStore : IStore<Role> { }
 }

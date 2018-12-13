@@ -11,7 +11,27 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 用户存储
     /// </summary>
-    public interface IUserBaseStore : INameStore<UserBase>
+    public interface IUserBaseStore : IStore<UserBase>
     {
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IQueryable<UserBase> ById(string id);
+
+        /// <summary>
+        /// 查询 通过用户名查询用户
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IQueryable<UserBase> ByName(string name);
+
+        /// <summary>
+        /// 删除 删除用户
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IQueryable<UserBase>> DeleteById(string id);
     }
 }

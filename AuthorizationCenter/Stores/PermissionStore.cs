@@ -9,7 +9,7 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 权限存储
     /// </summary>
-    public class PermissionStore : NameStoreBase<Permission>, IPermissionStore
+    public class PermissionStore : StoreBase<Permission>, IPermissionStore
     {
         /// <summary>
         /// 
