@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WS.Core.Dto;
 
@@ -130,26 +129,85 @@ namespace AuthorizationCenter.Managers
         {
             response.Extension = Mapper.Map<UserBaseJson>(await Store.ById(request.Data.Id).FirstOrDefaultAsync());
         }
-
+        
         /// <summary>
-        /// 存在 字段与运算
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public bool IsExistForName(UserBaseJson user)
-        {
-            UserBase userBase = new UserBase { SignName = user.SignName };
-            return Store.IsExistAnd(userBase);
-        }
-
-        /// <summary>
-        /// 存在
+        /// 条件查询 -异步
         /// </summary>
         /// <param name="func"></param>
         /// <returns></returns>
-        public async Task<bool> Exist(Expression<Func<UserBaseJson, bool>> func)
+        public async Task<List<UserBaseJson>> Find(Func<UserBaseJson, bool> func)
         {
-            return await Store.Context.Set<UserBase>().AnyAsync(Mapper.Map<Expression<Func<UserBase, bool>>>(func));
+            return Mapper.Map<List<UserBaseJson>>(await Store.Find(ub => func(Mapper.Map<UserBaseJson>(ub))).ToListAsync());
+        }
+
+        /// <summary>
+        /// 通过Id查询 -异步
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<UserBaseJson> FindById(string id)
+        {
+            return Mapper.Map<UserBaseJson>(await Store.Find(ub => ub.Id == id).FirstOrDefaultAsync());
+        }
+
+        /// <summary>
+        /// 更新 -异步
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public async Task<UserBaseJson> Update(UserBaseJson json)
+        {
+            return Mapper.Map<UserBaseJson>(await Store.Update(Mapper.Map<UserBase>(json)));
+        }
+
+        /// <summary>
+        /// 存在通过ID -异步
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Task<bool> ExistById(string id)
+        {
+            return Store.Exist(ub => ub.Id == id);
+        }
+
+        /// <summary>
+        /// 存在 -异步
+        /// </summary>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public Task<bool> Exist(Func<UserBaseJson, bool> func)
+        {
+            return Store.Exist(ub=>func(Mapper.Map<UserBaseJson>(ub)));
+        }
+
+        /// <summary>
+        /// 存在Name
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <returns></returns>
+        public Task<bool> ExistByName(string name)
+        {
+            return Store.Exist(ub => ub.SignName == name);
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public async Task Delete(UserBaseJson json)
+        {
+            await Store.DeleteById(json.Id);
+        }
+
+        /// <summary>
+        /// 通过ID删除 -异步
+        /// </summary>
+        /// <param name="id">ID</param>
+        /// <returns></returns>
+        public async Task DeleteById(string id)
+        {
+            await Store.DeleteById(id);
         }
     }
 }

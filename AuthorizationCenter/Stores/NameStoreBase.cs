@@ -37,6 +37,13 @@ namespace AuthorizationCenter.Stores
         public abstract IQueryable<TEntity> ByName(string name);
 
         /// <summary>
+        /// 条件删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public abstract Task<IQueryable<TEntity>> DeleteById(string id);
+
+        /// <summary>
         /// 创建
         /// </summary>
         /// <param name="user"></param>
@@ -62,13 +69,6 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 条件删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public abstract Task<IQueryable<TEntity>> DeleteIfId(string id);
-
-        /// <summary>
         /// 批量查询
         /// </summary>
         /// <returns></returns>
@@ -80,22 +80,21 @@ namespace AuthorizationCenter.Stores
         /// <summary>
         /// 条件查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public IQueryable<TEntity> List(Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
+        public IQueryable<TEntity> List(Func<TEntity, bool> predicate)
         {
-            return query.Invoke(Context.Set<TEntity>());
+            return Context.Set<TEntity>().Where(e => predicate(e));
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<TEntity> Update(TEntity user)
+        public async Task<TEntity> Update(TEntity entity)
         {
-            var entity = Context.Update(user).Entity;
-
+            var result = Context.Update(entity).Entity;
             try
             {
                 await Context.SaveChangesAsync();
@@ -105,7 +104,7 @@ namespace AuthorizationCenter.Stores
                 Logger.Error("更新实体失败：\r\n" + e);
                 throw e;
             }
-            return entity;
+            return result;
         }
     }
 }

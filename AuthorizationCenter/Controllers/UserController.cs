@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Core.Dto;
@@ -23,11 +24,6 @@ namespace AuthorizationCenter.Controllers
     /// </summary>
     public class UserController : Controller
     {
-        /// <summary>
-        /// 上下文
-        /// </summary>
-        private readonly ApplicationDbContext _context;
-
         /// <summary>
         /// 用户管理
         /// </summary>
@@ -46,12 +42,10 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="context">数据库上下文</param>
         /// <param name="userManager">用户管理</param>
         /// <param name="mapper">类型映射</param>
-        public UserController(ApplicationDbContext context, IUserManager<IUserBaseStore, UserBaseJson> userManager, IMapper mapper)
+        public UserController(IUserManager<IUserBaseStore, UserBaseJson> userManager, IMapper mapper)
         {
-            _context = context;
             UserManager = userManager;
             Mapper = mapper;
             Logger = LoggerManager.GetLogger(GetType().Name);
@@ -68,7 +62,7 @@ namespace AuthorizationCenter.Controllers
 
             await UserManager.List(response, new ModelRequest<UserBaseJson>());
 
-            ViewData[Constants.Str.SIGNUSER] = GetSignUser();
+            ViewData[Constants.Str.SIGNUSER] = SignUser;
 
             Console.WriteLine("ViewData[\"SignUser\"]: " + JsonUtil.ToJson(ViewData[Constants.Str.SIGNUSER]));
 
@@ -83,6 +77,7 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Details/5
         public async Task<IActionResult> Details(string id)
         {
+            Logger.Trace($"[{nameof(Details)}] 查看用户详情->用户ID: {id}");
             // 检查参数
             if (id == null)
             {
@@ -92,7 +87,7 @@ namespace AuthorizationCenter.Controllers
             ResponseMessage<UserBaseJson> response = new ResponseMessage<UserBaseJson>();
             ModelRequest<UserBaseJson> request = new ModelRequest<UserBaseJson>
             {
-                User = GetSignUser(),
+                User = SignUser,
                 Data = new UserBaseJson { Id = id }
             };
             // 业务处理
@@ -106,7 +101,7 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            // 返回到主列表
+            // 返回到用户列表
             return View(nameof(Index));
         }
 
@@ -117,6 +112,7 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Create
         public IActionResult Create()
         {
+            Logger.Trace($"[{nameof(Create)}] 跳转到用户新建界面");
             return View();
         }
 
@@ -134,7 +130,7 @@ namespace AuthorizationCenter.Controllers
         {
             if (ModelState.IsValid)
             {
-                Logger.Trace("User Create Request: "+JsonUtil.ToJson(userBaseJson));
+                Logger.Trace($"[{nameof(Create)}]User Create Request: "+JsonUtil.ToJson(userBaseJson));
                 // 检查参数
                 if (string.IsNullOrWhiteSpace(userBaseJson.SignName)|| string.IsNullOrWhiteSpace(userBaseJson.PassWord))
                 {
@@ -144,7 +140,7 @@ namespace AuthorizationCenter.Controllers
                 // 检查权限 - CheckPermissionFilter
                 
                 // 检查有效 被创建用户是否存在
-                if (UserManager.IsExistForName(userBaseJson))
+                if (await UserManager.ExistByName(userBaseJson.SignName))
                 {
                     ModelState.AddModelError("All", "创建的用户已经存在");
                     return View();
@@ -157,7 +153,7 @@ namespace AuthorizationCenter.Controllers
                     await UserManager.Create(response, new ModelRequest<UserBaseJson>
                     {
                         Data = userBaseJson,
-                        User = GetSignUser()
+                        User = SignUser
                     });
                     if (response.Code == ResponseDefine.SuccessCode)
                     {
@@ -186,24 +182,26 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
+            Logger.Trace($"[{nameof(Edit)}]进入编辑界面-编辑用户({id})");
             if (id == null)
             {
                 return NotFound();
             }
 
-            var userBase = await _context.UserBases.FindAsync(id);
+            var userBase = await UserManager.FindById(id);
             if (userBase == null)
             {
+                Logger.Trace($"[{nameof(Edit)}]进入编辑界面-用户不存在({id})");
                 return NotFound();
             }
             return View(Mapper.Map<UserBaseJson>(userBase));
         }
 
         /// <summary>
-        /// MVC 编辑
+        /// MVC 编辑 -修改数据库记录
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="userBaseJson"></param>
+        /// <param name="id">用户ID</param>
+        /// <param name="userBaseJson">用户</param>
         /// <returns></returns>
         // POST: UserBaseJsons/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -212,6 +210,7 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,SignName,PassWord")] UserBaseJson userBaseJson)
         {
+            Logger.Trace($"[{nameof(Edit)}] 编辑用户({id}) Request: \r\n"+JsonUtil.ToJson(userBaseJson));
             if (id != userBaseJson.Id)
             {
                 return NotFound();
@@ -221,22 +220,28 @@ namespace AuthorizationCenter.Controllers
             {
                 try
                 {
-                    _context.Update(Mapper.Map<UserBase>(userBaseJson));
-                    await _context.SaveChangesAsync();
+                    await UserManager.Update(userBaseJson);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception e)
                 {
-                    if (!UserBaseExists(userBaseJson.Id))
+#warning 存在异常风险 --先不管了
+                    if (! await UserManager.ExistById(userBaseJson.Id))
                     {
                         return NotFound();
                     }
                     else
                     {
-                        throw;
+                        Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
                     }
+                    ModelState.AddModelError("All", "用户信息更新失败");
+                    // 业务处理失败 -返回编辑界面
+                    return View(userBaseJson);
                 }
+                // 编辑成功 -跳转到用户列表
                 return RedirectToAction(nameof(Index));
             }
+            ModelState.AddModelError("All", "模型验证失败");
+            // 模型验证失败 -返回编辑界面
             return View(userBaseJson);
         }
 
@@ -244,24 +249,25 @@ namespace AuthorizationCenter.Controllers
         /// MVC 删除 -跳转到删除界面 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="errMsg">错误信息</param>
         /// <returns></returns>
         // GET: UserBaseJsons/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id, string errMsg = null)
         {
+            Logger.Trace($"[{nameof(Delete)}] 删除用户({id})");
             // 检查参数
             if (id == null)
             {
                 return NotFound();
             }
-            // 检查有效
-
-            var userBase = await _context.UserBases.FirstOrDefaultAsync(m => m.Id == id);
-            if (userBase == null)
+            // 业务处理
+            var userJson = await UserManager.FindById(id);
+            if (userJson == null)
             {
+                Logger.Trace($"[{nameof(Delete)}] 删除失败 用户未找到->用户ID: "+id);
                 return NotFound();
             }
-
-            return View(Mapper.Map<UserBaseJson>(userBase));
+            return View(userJson);
         }
 
         /// <summary>
@@ -274,37 +280,31 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var userBaseJson = await _context.UserBases.FindAsync(id);
-            _context.UserBases.Remove(userBaseJson);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        /// <summary>
-        /// 用户存在 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private bool UserBaseExists(string id)
-        {
-            return _context.UserBases.Any(e => e.Id == id);
-        }
-
-
-        /// <summary>
-        /// 获取登陆用户简要信息
-        /// </summary>
-        /// <returns></returns>
-        private UserBaseJson GetSignUser()
-        {
-            return new UserBaseJson
+            Logger.Trace($"[{nameof(DeleteConfirmed)}] 删除确认->用户ID: " + id);
+            try
             {
-                // Id
-                Id = HttpContext.Session.GetString(Constants.Str.USERID),
-                SignName = HttpContext.Session.GetString(Constants.Str.SIGNNAME),
-                PassWord = HttpContext.Session.GetString(Constants.Str.PASSWORD)
-            };
+                // 业务处理
+                await UserManager.DeleteById(id);
+                // 删除成功 -跳转到用户列表
+                return RedirectToAction(nameof(Index));
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(DeleteConfirmed)}] 用户删除失败：\r\n" + e);
+                // 跳转回删除界面 -需要在界面说明发生了错误 --不清楚routeValues式怎么匹配的需要了解一下
+                return RedirectToAction(nameof(Delete), new { id, errMsg = e.Message});
+            }
         }
 
+        /// <summary>
+        /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+        /// </summary>
+        /// <returns></returns>
+        private UserBaseJson SignUser => new UserBaseJson
+        {
+            Id = HttpContext.Session.GetString(Constants.Str.USERID),
+            SignName = HttpContext.Session.GetString(Constants.Str.SIGNNAME),
+            PassWord = HttpContext.Session.GetString(Constants.Str.PASSWORD)
+        };
     }
 }

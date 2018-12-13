@@ -26,9 +26,9 @@ namespace AuthorizationCenter.Stores
         /// <summary>
         /// 条件查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        IQueryable<TEntity> List(Func<IQueryable<TEntity>, IQueryable<TEntity>> query);
+        IQueryable<TEntity> List(Func<TEntity, bool> predicate);
 
         /// <summary>
         /// 查询 根据用户ID查询用户
@@ -63,6 +63,26 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IQueryable<TEntity>> DeleteIfId(string id);
+        Task<IQueryable<TEntity>> DeleteById(string id);
+        
+        /// <summary>
+        /// 条件查询 -匹配函数
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        IQueryable<TEntity> Find(Func<TEntity, bool> predicate);
+
+        /// <summary>
+        /// 存在 -通过TProperty存在的字段名称在UserBase表中查询
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> Exist<TProperty>(Func<TEntity, TProperty> func);
+
+        /// <summary>
+        /// 存在 -异步查询 -Lambda表达式（Any的参数类型）
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task<bool> Exist(Func<TEntity, bool> predicate);
     }
 }

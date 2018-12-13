@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 using System.Linq;
 
 namespace AuthorizationCenter.Filters
@@ -15,10 +16,10 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 当动作执行中 
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">动作执行上下文</param>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // 判断是否检查权限
+            // 判断是否需要检查权限
             var noNeedCheck = false;
             if (context.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
             {
@@ -36,6 +37,7 @@ namespace AuthorizationCenter.Filters
             // 检查登陆信息
             if (userid == null && signname == null)
             {
+                Console.WriteLine("用户未登陆");
                 // 用户未登陆
                 context.Result = new RedirectResult("/Sign/Index");
             }

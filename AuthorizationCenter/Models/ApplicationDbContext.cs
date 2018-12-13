@@ -67,6 +67,7 @@ namespace AuthorizationCenter.Models
             {
                 b.ToTable("ws_role");  //.HasIndex(i=>i.Name).IsUnique();
                 b.Property(p => p.Name);
+                //b.Property(p => new { p.Name, p.Id });
             });
 
             builder.Entity<Permission>(b =>

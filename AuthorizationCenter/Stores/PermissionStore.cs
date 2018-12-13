@@ -36,7 +36,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override Task<IQueryable<Permission>> DeleteIfId(string id)
+        public override Task<IQueryable<Permission>> DeleteById(string id)
         {
             throw new NotImplementedException();
         }

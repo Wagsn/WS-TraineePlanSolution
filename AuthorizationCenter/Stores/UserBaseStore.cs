@@ -1,7 +1,10 @@
 ﻿using AuthorizationCenter.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WS.Log;
 using WS.Text;
@@ -13,7 +16,6 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public class UserBaseStore : NameStoreBase<UserBase>, IUserBaseStore
     {
-        
         /// <summary>
         /// 构造器
         /// </summary>
@@ -55,11 +57,11 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override async Task<IQueryable<UserBase>> DeleteIfId(string id)
+        public override async Task<IQueryable<UserBase>> DeleteById(string id)
         {
             var result = from ub in Context.UserBases
-                        where ub.Id == id
-                        select ub;
+                         where ub.Id == id
+                         select ub;
             Context.RemoveRange(result);
 
             // 打印日志
@@ -79,40 +81,54 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 存在 与运算 (null 忽略)
+        /// 存在 -Lambda表达式
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public bool IsExistAnd(UserBase user)
+        public Task<bool> Exist(Func<UserBase, bool> predicate)
         {
-            Console.WriteLine("IsExistAnd user: "+JsonUtil.ToJson(user));
-            var query = from ub in Context.UserBases
-                        where (string.IsNullOrWhiteSpace(user.Id) ? true : ub.Id == user.Id)
-                        && (string.IsNullOrWhiteSpace(user.PassWord) ? true : ub.PassWord == user.PassWord)
-                        && (string.IsNullOrWhiteSpace(user.SignName) ? true : ub.SignName == user.SignName)
-                        select ub;
-            Console.WriteLine("IsExistAnd->User Count: "+ query.Count());
-            if (query.Count() == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return Context.Set<UserBase>().AnyAsync(ub => predicate(ub));
         }
 
         /// <summary>
-        /// TODO 
+        /// 存在 -暂时不用
         /// </summary>
-        /// <typeparam name="TNoNamee"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
         /// <param name="func"></param>
         /// <returns></returns>
-        public bool IsExistAnd<TNoNamee>(Func<UserBase, TNoNamee> func)
+        public Task<bool> Exist<TProperty>(Func<UserBase, TProperty> func)
         {
-            // 遍历 TType 字段
+            return Context.Set<UserBase>().AnyAsync(ub=> Compare(ub, func(ub)));
+        }
 
-            return false;
+        /// <summary>
+        /// 比较 -TProperty存在的字段与TSource中的同名字段进行比较
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <param name="src"></param>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        private bool Compare<TSource, TProperty>(TSource src, TProperty prop)
+        {
+            foreach (System.Reflection.PropertyInfo p in prop.GetType().GetProperties())
+            {
+                if (src.GetType().GetProperty(p.Name).GetValue(src).Equals(p.GetValue(prop)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 查询 -异步查询
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IQueryable<UserBase> Find(Func<UserBase, bool> predicate)
+        {
+            return Context.Set<UserBase>().Where(ub =>predicate(ub));
         }
     }
 }
