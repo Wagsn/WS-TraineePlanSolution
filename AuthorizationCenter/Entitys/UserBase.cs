@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthorizationCenter.Models
+namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 用户模型
+    /// 用户实体
     /// </summary>
     public class UserBase
     {

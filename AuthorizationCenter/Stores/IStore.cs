@@ -1,4 +1,4 @@
-﻿using AuthorizationCenter.Models;
+﻿using AuthorizationCenter.Entitys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +25,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         IQueryable<TEntity> Find(Func<TEntity, bool> predicate);
 
+        // 通过字段匹配查询
         //Task<bool> Find<TProperty>(Func<TEntity, TProperty> func);
 
         /// <summary>
@@ -39,14 +40,14 @@ namespace AuthorizationCenter.Stores
         /// <summary>
         /// 新建 创建用户
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entity">实体</param>
         /// <returns></returns>
         Task<TEntity> Create(TEntity entity);
 
         /// <summary>
         /// 更新 更新用户
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entity">实体</param>
         /// <returns></returns>
         Task<TEntity> Update(TEntity entity);
 
@@ -73,9 +74,9 @@ namespace AuthorizationCenter.Stores
         Task<bool> Exist<TProperty>(Func<TEntity, TProperty> select);
 
         /// <summary>
-        /// 存在 -异步查询 -Lambda表达式（Any的参数类型）
+        /// 存在 -异步查询 -条件表达式（Any的参数类型）
         /// </summary>
-        /// <param name="predicate"></param>
+        /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
         Task<bool> Exist(Func<TEntity, bool> predicate);
 

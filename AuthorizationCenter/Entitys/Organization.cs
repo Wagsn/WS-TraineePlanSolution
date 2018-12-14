@@ -5,34 +5,40 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthorizationCenter.Models
+namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 角色模型
+    /// 组织模型
     /// </summary>
-    public class Role
+    public class Organization
     {
+        //Code: Digit{12}
         /// <summary>
-        /// 角色GUID
+        /// 组织ID（GUID）
         /// </summary>
         [Key]
-        //[MaxLength(36)]
         [StringLength(36, MinimumLength =36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage =Constants.GUID_ERR)]
         public string Id { get; set; }
 
         /// <summary>
-        /// 角色名称
+        /// 父组织ID
         /// </summary>
-        //[MaxLength(15)]
+        [StringLength(36, MinimumLength = 36)]
+        [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
+        public string ParentId { get; set; }
+
+        /// <summary>
+        /// 组织名称
+        /// </summary>
         [StringLength(15, MinimumLength = 2)]
-        [RegularExpression(Constants.VISIBLE_REG, ErrorMessage =Constants.VISIBLE_ERR)]
+        [RegularExpression(Constants.VISIBLE_REG, ErrorMessage = Constants.VISIBLE_ERR)]
         public string Name { get; set; }
 
         /// <summary>
-        /// 角色描述
+        /// 组织描述
         /// </summary>
         [MaxLength(255)]
-        public string Decription { get; set; }
+        public string Description { get; set; }
     }
 }

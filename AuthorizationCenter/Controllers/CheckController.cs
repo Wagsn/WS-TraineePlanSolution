@@ -42,6 +42,7 @@ namespace AuthorizationCenter.Controllers
         /// 检查
         /// </summary>
         /// <returns></returns>
+        [Filters.NoSign]
         public ViewResult Check()
         {
             return View("Check");

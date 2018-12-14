@@ -2,7 +2,7 @@
 using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Managers;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using AuthorizationCenter.ViewModels.Sign;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,7 @@ using WS.Text;
 namespace AuthorizationCenter.Controllers
 {
     /// <summary>
-    /// 
+    /// 登陆控制器
     /// </summary>
     public class SignController : Controller
     {
@@ -112,17 +112,11 @@ namespace AuthorizationCenter.Controllers
                 ModelState.AddModelError("All", "用户名或密码不能为空");
                 return View(request);
             }
-            var user = new UserBaseJson { SignName = request.SignName, PassWord = request.PassWord };
-
             // 登陆成功
-            if (await UserManager.Check(user))
+            if (await UserManager.Exist(ubj=>ubj.SignName== request.SignName&&ubj.PassWord==request.PassWord))
             {
-                var dbuser = await UserManager.FindByName(request.SignName);
-                Session.SetString(Constants.Str.USERID, dbuser.Id);
-                Session.SetString(Constants.Str.SIGNNAME, request.SignName);
-                Session.SetString(Constants.Str.PASSWORD, request.PassWord);
+                SignUser = await UserManager.FindByName(request.SignName);
                 Logger.Trace("登陆成功");
-
                 if (returnUrl != null)
                 {
                     return RedirectToLocal(returnUrl);
@@ -142,6 +136,41 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
+        /// 登陆用户
+        /// </summary>
+        private UserBaseJson SignUser
+        {
+            get
+            {
+                if (Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                return new UserBaseJson
+                {
+                    Id= Session.GetString(Constants.USERID),
+                    SignName = Session.GetString(Constants.SIGNNAME),
+                    PassWord = Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                if (value == null)
+                {
+                    Session.Remove(Constants.Str.USERID);
+                    Session.Remove(Constants.Str.SIGNNAME);
+                    Session.Remove(Constants.Str.PASSWORD);
+                }
+                else
+                {
+                    Session.SetString(Constants.Str.USERID, value.Id);
+                    Session.SetString(Constants.Str.SIGNNAME, value.SignName);
+                    Session.SetString(Constants.Str.PASSWORD, value.PassWord);
+                }
+            }
+        }
+
+        /// <summary>
         /// 签出 Clear Session SignUser
         /// </summary>
         /// <param name="request"></param>
@@ -149,10 +178,7 @@ namespace AuthorizationCenter.Controllers
         [Filters.NoSign]
         public IActionResult SignOut(ModelRequest<UserBaseJson> request)
         {
-            // Clear Session SignUser
-            Session.Remove(Constants.Str.USERID);
-            Session.Remove(Constants.Str.SIGNNAME);
-            Session.Remove(Constants.Str.PASSWORD);
+            SignUser = null;
             return View(nameof(Index));
         }
 

@@ -1,5 +1,5 @@
 ﻿using AuthorizationCenter.Dto.Jsons;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;

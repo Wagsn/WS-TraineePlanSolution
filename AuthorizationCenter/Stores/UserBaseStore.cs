@@ -1,4 +1,4 @@
-﻿using AuthorizationCenter.Models;
+﻿using AuthorizationCenter.Entitys;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -70,15 +70,27 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 删除 用户核心信息
+        /// 删除 -通过用户ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">用户ID</param>
         /// <returns></returns>
         public Task<IQueryable<UserBase>> DeleteById(string id)
         {
             // 打印日志
             Logger.Trace($"[{nameof(DeleteById)}] 条件删除用户({id})");
             return Delete(ub => ub.Id == id);
+        }
+
+        /// <summary>
+        /// 删除 -通过用户名
+        /// </summary>
+        /// <param name="name">用户名</param>
+        /// <returns></returns>
+        public Task<IQueryable<UserBase>> DeleteByName(string name)
+        {
+            // 打印日志
+            Logger.Trace($"[{nameof(DeleteByName)}] 条件删除用户({name})");
+            return Delete(ub => ub.SignName == name);
         }
     }
 }

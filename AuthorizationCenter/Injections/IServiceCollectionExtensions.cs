@@ -1,6 +1,6 @@
 ﻿using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Managers;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using Microsoft.EntityFrameworkCore;
 using System;

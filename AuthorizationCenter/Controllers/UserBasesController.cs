@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 
 namespace AuthorizationCenter.Controllers
 {

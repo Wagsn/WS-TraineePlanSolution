@@ -1,6 +1,6 @@
 using System;
 
-namespace AuthorizationCenter.Models
+namespace AuthorizationCenter.ViewModels
 {
     /// <summary>
     /// ´íÎóÊÓÍ¼Ä£ĞÍ

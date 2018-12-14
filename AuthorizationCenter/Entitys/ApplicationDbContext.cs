@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AuthorizationCenter.Dto.Jsons;
 
-namespace AuthorizationCenter.Models
+namespace AuthorizationCenter.Entitys
 {
     /// <summary>
     /// 数据库上下文

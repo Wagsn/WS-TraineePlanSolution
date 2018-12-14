@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuthorizationCenter.Dto.Jsons;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 using AutoMapper;
 
 namespace AuthorizationCenter.Controllers

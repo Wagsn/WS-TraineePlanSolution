@@ -5,32 +5,34 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthorizationCenter.Models
+namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 权限模型
+    /// 角色实体
     /// </summary>
-    public class Permission
+    public class Role
     {
         /// <summary>
-        /// 权限ID
+        /// 角色GUID
         /// </summary>
         [Key]
+        //[MaxLength(36)]
         [StringLength(36, MinimumLength =36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage =Constants.GUID_ERR)]
         public string Id { get; set; }
 
         /// <summary>
-        /// 权限名称
+        /// 角色名称
         /// </summary>
-        [StringLength(15, MinimumLength =2)]
+        //[MaxLength(15)]
+        [StringLength(15, MinimumLength = 2)]
         [RegularExpression(Constants.VISIBLE_REG, ErrorMessage =Constants.VISIBLE_ERR)]
         public string Name { get; set; }
 
         /// <summary>
-        /// 权限描述
+        /// 角色描述
         /// </summary>
         [MaxLength(255)]
-        public string Description { get; set; }
+        public string Decription { get; set; }
     }
 }

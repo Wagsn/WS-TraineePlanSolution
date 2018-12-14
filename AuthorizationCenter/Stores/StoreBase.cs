@@ -1,4 +1,4 @@
-﻿using AuthorizationCenter.Models;
+﻿using AuthorizationCenter.Entitys;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;

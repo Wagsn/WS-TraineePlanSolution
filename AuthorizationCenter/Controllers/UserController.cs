@@ -2,7 +2,7 @@
 using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Managers;
-using AuthorizationCenter.Models;
+using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -300,11 +300,39 @@ namespace AuthorizationCenter.Controllers
         /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
         /// </summary>
         /// <returns></returns>
-        private UserBaseJson SignUser => new UserBaseJson
+        /// <summary>
+        /// 登陆用户
+        /// </summary>
+        private UserBaseJson SignUser
         {
-            Id = HttpContext.Session.GetString(Constants.Str.USERID),
-            SignName = HttpContext.Session.GetString(Constants.Str.SIGNNAME),
-            PassWord = HttpContext.Session.GetString(Constants.Str.PASSWORD)
-        };
+            get
+            {
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                return new UserBaseJson
+                {
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                if (value == null)
+                {
+                    HttpContext.Session.Remove(Constants.Str.USERID);
+                    HttpContext.Session.Remove(Constants.Str.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.Str.PASSWORD);
+                }
+                else
+                {
+                    HttpContext.Session.SetString(Constants.Str.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.Str.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.Str.PASSWORD, value.PassWord);
+                }
+            }
+        }
     }
 }
