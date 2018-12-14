@@ -27,7 +27,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<IUserBaseStore, UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserBaseJson> UserManager { get; set; }
         
         /// <summary>
         /// 类型映射
@@ -44,7 +44,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="userManager">用户管理</param>
         /// <param name="mapper">类型映射</param>
-        public UserController(IUserManager<IUserBaseStore, UserBaseJson> userManager, IMapper mapper)
+        public UserController(IUserManager<UserBaseJson> userManager, IMapper mapper)
         {
             UserManager = userManager;
             Mapper = mapper;

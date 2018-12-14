@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using WS.Core.Dto;
 
@@ -15,7 +16,7 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 用户管理实现
     /// </summary>
-    public class UserManager : IUserManager<IUserBaseStore, UserBaseJson>
+    public class UserManager : IUserManager<UserBaseJson>
     {
         /// <summary>
         /// 用户存储
@@ -81,7 +82,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="request"></param>
         public async Task List([Required] PagingResponseMessage<UserBaseJson> response, [Required] ModelRequest<UserBaseJson> request)
         {
-            response.Extension = Mapper.Map<List<UserBaseJson>>(await Store.List().ToListAsync());
+            response.Extension = await Store.Find().Select(ub => Mapper.Map<UserBaseJson>(ub)).ToListAsync();
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<bool> Check(UserBaseJson user)
         {
-            var userbase = await Store.ByName(user.SignName).FirstOrDefaultAsync();
+            var userbase = await Store.FindByName(user.SignName).FirstOrDefaultAsync();
 
             if (userbase == null)
             {
@@ -127,17 +128,18 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task ById([Required] ResponseMessage<UserBaseJson> response, [Required] ModelRequest<UserBaseJson> request)
         {
-            response.Extension = Mapper.Map<UserBaseJson>(await Store.ById(request.Data.Id).FirstOrDefaultAsync());
+            response.Extension = await Store.Find(ub => ub.Id == request.Data.Id, ub => Mapper.Map<UserBaseJson>(ub)).FirstOrDefaultAsync();
+            response.Extension = Mapper.Map<UserBaseJson>(await Store.FindById(request.Data.Id).FirstOrDefaultAsync());
         }
         
         /// <summary>
         /// 条件查询 -异步
         /// </summary>
-        /// <param name="func"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public async Task<List<UserBaseJson>> Find(Func<UserBaseJson, bool> func)
+        public Task<List<UserBaseJson>> Find(Func<UserBaseJson, bool> predicate)
         {
-            return Mapper.Map<List<UserBaseJson>>(await Store.Find(ub => func(Mapper.Map<UserBaseJson>(ub))).ToListAsync());
+            return Store.Find(ub => predicate(Mapper.Map<UserBaseJson>(ub)), ub=> Mapper.Map<UserBaseJson>(ub)).ToListAsync();
         }
 
         /// <summary>
@@ -145,9 +147,19 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<UserBaseJson> FindById(string id)
+        public Task<UserBaseJson> FindById(string id)
         {
-            return Mapper.Map<UserBaseJson>(await Store.Find(ub => ub.Id == id).FirstOrDefaultAsync());
+            return Store.FindById(id, ub => Mapper.Map<UserBaseJson>(ub)).SingleOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// 通过Name查询 -异步
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Task<UserBaseJson> FindByName(string name)
+        {
+            return Store.FindByName(name, ub => Mapper.Map<UserBaseJson>(ub)).SingleOrDefaultAsync();
         }
 
         /// <summary>
@@ -155,9 +167,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public async Task<UserBaseJson> Update(UserBaseJson json)
+        public  Task<UserBaseJson> Update(UserBaseJson json)
         {
-            return Mapper.Map<UserBaseJson>(await Store.Update(Mapper.Map<UserBase>(json)));
+            return Store.Update(Mapper.Map<UserBase>(json), ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>
@@ -173,11 +185,11 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 存在 -异步
         /// </summary>
-        /// <param name="func"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public Task<bool> Exist(Func<UserBaseJson, bool> func)
+        public Task<bool> Exist(Func<UserBaseJson, bool> predicate)
         {
-            return Store.Exist(ub=>func(Mapper.Map<UserBaseJson>(ub)));
+            return Store.Exist(ub=>predicate(Mapper.Map<UserBaseJson>(ub)));
         }
 
         /// <summary>
@@ -193,7 +205,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="json">Dto</param>
         /// <returns></returns>
         public async Task Delete(UserBaseJson json)
         {

@@ -41,7 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region << Manager >>
 
-            services.AddScoped<IUserManager<IUserBaseStore, UserBaseJson>, UserManager>();
+            services.AddScoped<IUserManager<UserBaseJson>, UserManager>();
 
             #endregion
 

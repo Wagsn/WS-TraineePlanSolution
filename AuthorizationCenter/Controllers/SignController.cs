@@ -35,7 +35,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<IUserBaseStore, UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserBaseJson> UserManager { get; set; }
 
         /// <summary>
         /// Session
@@ -46,13 +46,13 @@ namespace AuthorizationCenter.Controllers
         /// 构造器
         /// </summary>
         /// <param name="userManager"></param>
-        public SignController(IUserManager<IUserBaseStore, UserBaseJson> userManager)
+        public SignController(IUserManager<UserBaseJson> userManager)
         {
             UserManager = userManager;
         }
 
         /// <summary>
-        /// 
+        /// 登陆主页
         /// </summary>
         /// <returns></returns>
         [Filters.NoSign]
@@ -117,11 +117,10 @@ namespace AuthorizationCenter.Controllers
             // 登陆成功
             if (await UserManager.Check(user))
             {
-                var dbuser = await UserManager.Store.Context.UserBases.Where(entity => entity.SignName == request.SignName).SingleOrDefaultAsync();
+                var dbuser = await UserManager.FindByName(request.SignName);
                 Session.SetString(Constants.Str.USERID, dbuser.Id);
                 Session.SetString(Constants.Str.SIGNNAME, request.SignName);
                 Session.SetString(Constants.Str.PASSWORD, request.PassWord);
-                //Console.WriteLine("SignInController->SignIn->ViewBag.SignUser: " + JsonUtil.ToJson(ViewBag.SignUser));
                 Logger.Trace("登陆成功");
 
                 if (returnUrl != null)

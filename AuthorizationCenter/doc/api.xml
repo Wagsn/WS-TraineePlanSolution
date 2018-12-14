@@ -157,7 +157,7 @@
             Session
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.SignController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Stores.IUserBaseStore,AuthorizationCenter.Dto.Jsons.UserBaseJson})">
+        <member name="M:AuthorizationCenter.Controllers.SignController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserBaseJson})">
             <summary>
             构造器
             </summary>
@@ -291,7 +291,7 @@
             日志器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Stores.IUserBaseStore,AuthorizationCenter.Dto.Jsons.UserBaseJson},AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserBaseJson},AutoMapper.IMapper)">
             <summary>
             构造器
             </summary>
@@ -712,14 +712,12 @@
             <param name="request">请求</param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Managers.IUserManager`2">
+        <member name="T:AuthorizationCenter.Managers.IUserManager`1">
             <summary>
             用户管理
             </summary>
-            <typeparam name="IStore">存储</typeparam>
-            <typeparam name="TJson">Dto数据隔离映射模型</typeparam>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.ById(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.ById(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
             通过ID查询
             </summary>
@@ -727,32 +725,27 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="P:AuthorizationCenter.Managers.IUserManager`2.Store">
-            <summary>
-            存储
-            </summary>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Check(`1)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Check(`0)">
             <summary>
             检查用户密码是否正确
             </summary>
             <param name="user"></param>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.List(WS.Core.Dto.PagingResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.List(WS.Core.Dto.PagingResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
             批量查询
             </summary>
             <param name="response"></param>
             <param name="request"></param>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Create(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Create(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
             新建
             </summary>
             <param name="response">响应</param>
             <param name="request">请求</param>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Update(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Update(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
             更新
             </summary>
@@ -760,14 +753,14 @@
             <param name="request">请求</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Update(`1)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Update(`0)">
             <summary>
             更新
             </summary>
             <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Delete(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Delete(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
             删除
             </summary>
@@ -775,49 +768,56 @@
             <param name="request">请求</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Find(System.Func{`1,System.Boolean})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Find(System.Func{`0,System.Boolean})">
             <summary>
             条件查询 -异步查询
             </summary>
             <param name="func">表达式</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.FindById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindById(System.String)">
             <summary>
             通过ID查询 -异步查询 -只取第一个 -没有返回空
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.ExistById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindByName(System.String)">
+            <summary>
+            通过Name查询 -异步查询 -只取第一个 -没有返回空
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.ExistById(System.String)">
             <summary>
             通过ID判断存在 -异步
             </summary>
             <param name="id">ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Exist(System.Func{`1,System.Boolean})">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Exist(System.Func{`0,System.Boolean})">
             <summary>
             存在 -Lambda表达式
             </summary>
             <param name="func"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.ExistByName(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.ExistByName(System.String)">
             <summary>
             存在Name -异步
             </summary>
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.Delete(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Delete(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
             <summary>
             删除 -异步
             </summary>
             <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`2.DeleteById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.DeleteById(System.String)">
             <summary>
             通过ID删除 -异步
             </summary>
@@ -896,7 +896,7 @@
             <summary>
             条件查询 -异步
             </summary>
-            <param name="func"></param>
+            <param name="predicate"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.FindById(System.String)">
@@ -904,6 +904,13 @@
             通过Id查询 -异步
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.FindByName(System.String)">
+            <summary>
+            通过Name查询 -异步
+            </summary>
+            <param name="name"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.Update(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
@@ -924,7 +931,7 @@
             <summary>
             存在 -异步
             </summary>
-            <param name="func"></param>
+            <param name="predicate"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.ExistByName(System.String)">
@@ -938,7 +945,7 @@
             <summary>
             删除
             </summary>
-            <param name="json"></param>
+            <param name="json">Dto</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.DeleteById(System.String)">
@@ -1143,65 +1150,6 @@
             <param name="app"></param>
             <param name="env"></param>
         </member>
-        <member name="T:AuthorizationCenter.Stores.INameStore`1">
-            <summary>
-            有Id和Name属性的单实体泛型接口
-            </summary>
-            <typeparam name="TEntity"></typeparam>
-        </member>
-        <member name="P:AuthorizationCenter.Stores.INameStore`1.Context">
-            <summary>
-            数据库上下文 转移
-            </summary>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.List">
-            <summary>
-            批量查询
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.List(System.Func{`0,System.Boolean})">
-            <summary>
-            条件查询
-            </summary>
-            <param name="predicate"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.ById(System.String)">
-            <summary>
-            查询 根据用户ID查询用户
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.ByName(System.String)">
-            <summary>
-            查询 通过用户名查询用户
-            </summary>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.Create(`0)">
-            <summary>
-            新建 创建用户
-            </summary>
-            <param name="user"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.Update(`0)">
-            <summary>
-            更新 更新用户
-            </summary>
-            <param name="user"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.DeleteById(System.String)">
-            <summary>
-            删除 删除用户
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
         <member name="T:AuthorizationCenter.Stores.IOrganizationStore">
             <summary>
             组织存储
@@ -1217,100 +1165,139 @@
             角色存储
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Stores.IUserBaseStore">
+        <member name="T:AuthorizationCenter.Stores.IStore`1">
             <summary>
-            用户存储
+            存储接口 -这里放的全是接口方法
             </summary>
+            <typeparam name="TEntity">数据库实体</typeparam>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.IsExistAnd(AuthorizationCenter.Models.UserBase)">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Find">
             <summary>
-            存在与运算
+            批量查询
             </summary>
-            <param name="user"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.Find(System.Func{AuthorizationCenter.Models.UserBase,System.Boolean})">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Find(System.Func{`0,System.Boolean})">
             <summary>
-            条件查询 -匹配函数
+            条件查询 -条件表达式
             </summary>
-            <param name="predicate"></param>
+            <param name="predicate">条件表达式</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.Exist``1(System.Func{AuthorizationCenter.Models.UserBase,``0})">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Find``1(System.Func{`0,System.Boolean},System.Func{`0,``0})">
+            <summary>
+            条件查询 -将符合条件的元素映射成自己需要的元素 -条件表达式 -映射表达式
+            </summary>
+            <typeparam name="TProperty"></typeparam>
+            <param name="predicate">条件表达式</param>
+            <param name="map">映射表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Create(`0)">
+            <summary>
+            新建 创建用户
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Update(`0)">
+            <summary>
+            更新 更新用户
+            </summary>
+            <param name="entity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Update``1(`0,System.Func{`0,``0})">
+            <summary>
+            更新 更新用户
+            </summary>
+            <param name="entity">实体</param>
+            <param name="map">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Update(System.Func{`0,System.Boolean},System.Action{`0})">
+            <summary>
+            更新实体 -条件表达式 -动作表达式 -返回处理后的集合
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <param name="action">动作表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Exist``1(System.Func{`0,``0})">
             <summary>
             存在 -通过TProperty存在的字段名称在UserBase表中查询
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.Exist(System.Func{AuthorizationCenter.Models.UserBase,System.Boolean})">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Exist(System.Func{`0,System.Boolean})">
             <summary>
             存在 -异步查询 -Lambda表达式（Any的参数类型）
             </summary>
             <param name="predicate"></param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Stores.NameStoreBase`1">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.ExistAll(System.Func{`0,System.Boolean})">
             <summary>
-            包含Id和Name属性的抽象类
+            存在 -条件表达式 -集合所有元素满足条件表达式
             </summary>
-            <typeparam name="TEntity"></typeparam>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
         </member>
-        <member name="P:AuthorizationCenter.Stores.NameStoreBase`1.Context">
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Delete(System.Func{`0,System.Boolean})">
             <summary>
-            数据库上下文
+            删除 -条件表达式 -异步
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IStore`1.Delete(`0)">
+            <summary>
+            删除 -异步
+            </summary>
+            <param name="entity">实体</param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IUserBaseStore">
+            <summary>
+            用户存储
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Stores.NameStoreBase`1.Logger">
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.FindById(System.String)">
             <summary>
-            日志工具
-            </summary>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.ById(System.String)">
-            <summary>
-            Id
+            查询
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.ByName(System.String)">
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.FindById``1(System.String,System.Func{AuthorizationCenter.Models.UserBase,``0})">
             <summary>
-            Name
+            查询
+            </summary>
+            <typeparam name="TProperty"></typeparam>
+            <param name="id"></param>
+            <param name="map"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.FindByName(System.String)">
+            <summary>
+            查询 通过用户名查询用户
             </summary>
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.DeleteById(System.String)">
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.FindByName``1(System.String,System.Func{AuthorizationCenter.Models.UserBase,``0})">
             <summary>
-            条件删除
+            查询 通过用户名查询用户
+            </summary>
+            <param name="name"></param>
+            <param name="map"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserBaseStore.DeleteById(System.String)">
+            <summary>
+            删除 删除用户
             </summary>
             <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.Create(`0)">
-            <summary>
-            创建
-            </summary>
-            <param name="user"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.List">
-            <summary>
-            批量查询
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.List(System.Func{`0,System.Boolean})">
-            <summary>
-            条件查询
-            </summary>
-            <param name="predicate"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.NameStoreBase`1.Update(`0)">
-            <summary>
-            更新
-            </summary>
-            <param name="entity"></param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.PermissionStore">
@@ -1318,25 +1305,118 @@
             权限存储
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Stores.PermissionStore.ById(System.String)">
+        <member name="T:AuthorizationCenter.Stores.StoreBase`1">
             <summary>
-            
+            存储抽象类 
             </summary>
-            <param name="id"></param>
+            <typeparam name="TEntity">数据库实体</typeparam>
+        </member>
+        <member name="P:AuthorizationCenter.Stores.StoreBase`1.Context">
+            <summary>
+            数据库上下文
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Stores.StoreBase`1.Logger">
+            <summary>
+            日志工具
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Create(`0)">
+            <summary>
+            新建实体
+            </summary>
+            <param name="entity">实体</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.PermissionStore.ByName(System.String)">
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Find">
             <summary>
-            
+            批量查询
             </summary>
-            <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.PermissionStore.DeleteById(System.String)">
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Update(`0)">
             <summary>
-            
+            更新实体 -异步
             </summary>
-            <param name="id"></param>
+            <param name="entity">实体</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Update``1(`0,System.Func{`0,``0})">
+            <summary>
+            更新 更新用户
+            </summary>
+            <param name="entity">实体</param>
+            <param name="map">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Update(System.Func{`0,System.Boolean},System.Action{`0})">
+            <summary>
+            更新实体 -条件表达式 -动作表达式 -返回处理后的集合
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <param name="action">动作表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Find(System.Func{`0,System.Boolean})">
+            <summary>
+            查找 -条件表达式
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Find``1(System.Func{`0,System.Boolean},System.Func{`0,``0})">
+            <summary>
+            条件查询 -条件表达式 -映射表达式
+            </summary>
+            <typeparam name="TProperty"></typeparam>
+            <param name="predicate">条件表达式</param>
+            <param name="map">映射表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Exist``1(System.Func{`0,``0})">
+            <summary>
+            存在 -异步 -实体映射表达式 -比较映射实体存在的字段 -性能损失
+            </summary>
+            <typeparam name="TProperty"></typeparam>
+            <param name="func">实体映射表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Compare``2(``0,``1)">
+            <summary>
+            比较 -TProperty存在的字段与TSource中的同名字段进行比较 
+            </summary>
+            <typeparam name="TSource"></typeparam>
+            <typeparam name="TProperty"></typeparam>
+            <param name="src"></param>
+            <param name="prop"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Exist(System.Func{`0,System.Boolean})">
+            <summary>
+            存在 -条件表达式 -Any
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.ExistAll(System.Func{`0,System.Boolean})">
+            <summary>
+            存在 -条件表达式 -集合所有元素满足条件表达式
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Delete(System.Func{`0,System.Boolean})">
+            <summary>
+            删除 -条件表达式 -异步
+            </summary>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Delete(`0)">
+            <summary>
+            删除 -异步
+            </summary>
+            <param name="entity">实体</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.UserBaseStore">
@@ -1350,18 +1430,35 @@
             </summary>
             <param name="dbContext"></param>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.ById(System.String)">
+        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindById(System.String)">
             <summary>
             查询 通过ID
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.ByName(System.String)">
+        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindById``1(System.String,System.Func{AuthorizationCenter.Models.UserBase,``0})">
             <summary>
-            查询 通过名称
+            查询 -ID -映射表达式
+            </summary>
+            <typeparam name="TProperty"></typeparam>
+            <param name="id"></param>
+            <param name="map">映射表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindByName(System.String)">
+            <summary>
+            查询 -通过名称
             </summary>
             <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindByName``1(System.String,System.Func{AuthorizationCenter.Models.UserBase,``0})">
+            <summary>
+            查询 -通过名称 -映射表达式
+            </summary>
+            <param name="name">Name</param>
+            <param name="map">映射表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserBaseStore.DeleteById(System.String)">
@@ -1369,45 +1466,6 @@
             删除 用户核心信息
             </summary>
             <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.Exist(System.Func{AuthorizationCenter.Models.UserBase,System.Boolean})">
-            <summary>
-            存在 -Lambda表达式
-            </summary>
-            <param name="predicate"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.Exist``1(System.Func{AuthorizationCenter.Models.UserBase,``0})">
-            <summary>
-            存在 -暂时不用
-            </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="func"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.Compare``2(``0,``1)">
-            <summary>
-            比较 -TProperty存在的字段与TSource中的同名字段进行比较
-            </summary>
-            <typeparam name="TSource"></typeparam>
-            <typeparam name="TProperty"></typeparam>
-            <param name="src"></param>
-            <param name="prop"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.Find(System.Func{AuthorizationCenter.Models.UserBase,System.Boolean})">
-            <summary>
-            查询 -异步查询
-            </summary>
-            <param name="predicate"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.IsExistAnd(AuthorizationCenter.Models.UserBase)">
-            <summary>
-            存在 与运算 (null 忽略)
-            </summary>
-            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.ViewModels.Sign.SignInViewModel">

@@ -17,7 +17,7 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<IUserBaseStore, UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserBaseJson> UserManager { get; set; }
 
         /// <summary>
         /// 权限管理

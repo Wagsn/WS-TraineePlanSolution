@@ -31,25 +31,42 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override IQueryable<UserBase> ById(string id)
+        public IQueryable<UserBase> FindById(string id)
         {
-            var query = from ub in Context.UserBases
-                        where ub.Id == id
-                        select ub;
-            return query;
+            return Find(ub => ub.Id == id);
         }
 
         /// <summary>
-        /// 查询 通过名称
+        /// 查询 -ID -映射表达式
+        /// </summary>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="map">映射表达式</param>
+        /// <returns></returns>
+        public IQueryable<TProperty> FindById<TProperty>(string id, Func<UserBase, TProperty> map)
+        {
+            return Find(ub => ub.Id == id, ub => map(ub));
+        }
+
+        /// <summary>
+        /// 查询 -通过名称
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override IQueryable<UserBase> ByName(string name)
+        public IQueryable<UserBase> FindByName(string name)
         {
-            var query = from ub in Context.UserBases
-                        where ub.SignName == name
-                        select ub;
-            return query;
+            return Find(ub => ub.SignName == name);
+        }
+
+        /// <summary>
+        /// 查询 -通过名称 -映射表达式
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="map">映射表达式</param>
+        /// <returns></returns>
+        public IQueryable<TProperty> FindByName<TProperty>(string name, Func<UserBase, TProperty> map)
+        {
+            return Find(ub => ub.SignName == name, ub => map(ub));
         }
 
         /// <summary>
@@ -57,27 +74,11 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override async Task<IQueryable<UserBase>> DeleteById(string id)
+        public Task<IQueryable<UserBase>> DeleteById(string id)
         {
-            var result = from ub in Context.UserBases
-                         where ub.Id == id
-                         select ub;
-            Context.RemoveRange(result);
-
             // 打印日志
-            Logger.Trace($"批量删除用户\r\n{JsonUtil.ToJson(result)}");
-
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.ToString());
-                throw e;
-            }
-
-            return result;
+            Logger.Trace($"[{nameof(DeleteById)}] 条件删除用户({id})");
+            return Delete(ub => ub.Id == id);
         }
     }
 }

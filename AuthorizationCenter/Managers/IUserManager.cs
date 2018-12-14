@@ -15,9 +15,7 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 用户管理
     /// </summary>
-    /// <typeparam name="IStore">存储</typeparam>
-    /// <typeparam name="TJson">Dto数据隔离映射模型</typeparam>
-    public interface IUserManager<IStore, TJson> where IStore : IUserBaseStore where TJson: UserBaseJson
+    public interface IUserManager<TJson> where TJson: UserBaseJson
     {
         ///// <summary>
         ///// 查询 或运算 满足条件的都查询（null忽略）
@@ -41,10 +39,10 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         Task ById([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
-        /// <summary>
-        /// 存储
-        /// </summary>
-        IStore Store { get; set; }
+        ///// <summary>
+        ///// 存储
+        ///// </summary>
+        //IStore Store { get; set; }
 
         /// <summary>
         /// 检查用户密码是否正确
@@ -119,6 +117,14 @@ namespace AuthorizationCenter.Managers
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TJson> FindById(string id);
+
+
+        /// <summary>
+        /// 通过Name查询 -异步查询 -只取第一个 -没有返回空
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<TJson> FindByName(string name);
 
         /// <summary>
         /// 通过ID判断存在 -异步
