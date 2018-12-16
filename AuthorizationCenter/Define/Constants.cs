@@ -11,9 +11,14 @@ namespace AuthorizationCenter.Define
     public static class Constants
     {
         /// <summary>
-        /// GUID 正则表达式
+        /// 字符 -十六进制
         /// </summary>
-        public const string GUID_REG = @"^([0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})?$";
+        public const string HEX_REG = @"[0-9a-fA-F]";
+
+        /// <summary>
+        /// GUID -正则表达式 -单行匹配
+        /// </summary>
+        public const string GUID_REG = "^("+HEX_REG+"{8}(-"+ HEX_REG + "{4}){3}-"+ HEX_REG + "{12})?$";
 
         /// <summary>
         /// GUID 格式错误消息

@@ -36,6 +36,11 @@ namespace AuthorizationCenter.Entitys
         public DbSet<Role> Roles { get; set; }
 
         /// <summary>
+        /// 用户角色
+        /// </summary>
+        public DbSet<UserRole> UserRoles { get; set; }
+
+        /// <summary>
         /// 权限数据集
         /// </summary>
         public DbSet<Permission> Permissions { get; set; }
@@ -69,6 +74,15 @@ namespace AuthorizationCenter.Entitys
                 b.Property(p => p.Name);
                 //b.Property(p => new { p.Name, p.Id });
             });
+
+            builder.Entity<UserRole>(b =>
+            {
+                b.ToTable("ws_userrole");
+                // 多对多关联
+                b.HasOne(e => e.User).WithMany(u => u.UserRoles);
+                b.HasOne(e => e.Role).WithMany(r => r.UserRoles);
+            });
+
 
             builder.Entity<Permission>(b =>
             {

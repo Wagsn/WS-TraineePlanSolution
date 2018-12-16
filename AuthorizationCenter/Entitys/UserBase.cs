@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,5 +34,11 @@ namespace AuthorizationCenter.Entitys
         [MaxLength(63)]
         [RegularExpression(Constants.PASSWORD_REG, ErrorMessage = Constants.PASSWORD_ERR)]
         public string PassWord { get; set; }
+
+        /// <summary>
+        /// 用户角色
+        /// </summary>
+        [NotMapped]
+        public List<UserRole> UserRoles { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,5 +35,11 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         [MaxLength(255)]
         public string Decription { get; set; }
+        
+        /// <summary>
+        /// 用户角色
+        /// </summary>
+        [NotMapped]
+        public List<UserRole> UserRoles { get; set; }
     }
 }
