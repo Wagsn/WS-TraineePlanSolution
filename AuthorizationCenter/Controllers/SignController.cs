@@ -85,7 +85,6 @@ namespace AuthorizationCenter.Controllers
                 Logger.Error("用户创建失败" + e);
             }
 
-
             return RedirectToRoute(new { controller = "UserBaseJsons", action = "Index" });
         }
 
@@ -136,16 +135,18 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 登陆用户
+        /// 登陆用户信息
         /// </summary>
         private UserBaseJson SignUser
         {
             get
             {
+                // 判断是否存在登陆信息
                 if (Session.GetString(Constants.USERID) == null)
                 {
                     return null;
                 }
+                // 返回登陆信息
                 return new UserBaseJson
                 {
                     Id= Session.GetString(Constants.USERID),
@@ -155,17 +156,19 @@ namespace AuthorizationCenter.Controllers
             }
             set
             {
+                // 清除登陆信息
                 if (value == null)
                 {
-                    Session.Remove(Constants.Str.USERID);
-                    Session.Remove(Constants.Str.SIGNNAME);
-                    Session.Remove(Constants.Str.PASSWORD);
+                    Session.Remove(Constants.USERID);
+                    Session.Remove(Constants.SIGNNAME);
+                    Session.Remove(Constants.PASSWORD);
                 }
+                // 添加登陆信息
                 else
                 {
-                    Session.SetString(Constants.Str.USERID, value.Id);
-                    Session.SetString(Constants.Str.SIGNNAME, value.SignName);
-                    Session.SetString(Constants.Str.PASSWORD, value.PassWord);
+                    Session.SetString(Constants.USERID, value.Id);
+                    Session.SetString(Constants.SIGNNAME, value.SignName);
+                    Session.SetString(Constants.PASSWORD, value.PassWord);
                 }
             }
         }

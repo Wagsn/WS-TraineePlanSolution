@@ -30,12 +30,14 @@ namespace AuthorizationCenter.Entitys
         /// 用户
         /// </summary>
         [NotMapped]
+        [ForeignKey("UserId")]
         public UserBase User { get; set; }
 
         /// <summary>
         /// 角色
         /// </summary>
         [NotMapped]
+        [ForeignKey("RoleId")]
         public Role Role { get; set; }
     }
 }

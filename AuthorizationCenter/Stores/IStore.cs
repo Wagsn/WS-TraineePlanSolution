@@ -45,6 +45,14 @@ namespace AuthorizationCenter.Stores
         Task<TEntity> Create(TEntity entity);
 
         /// <summary>
+        /// 新建 创建用户
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="map">映射表达式</param>
+        /// <returns></returns>
+        Task<TProperty> Create<TProperty>(TEntity entity, Func<TEntity, TProperty> map);
+
+        /// <summary>
         /// 更新 更新用户
         /// </summary>
         /// <param name="entity">实体</param>

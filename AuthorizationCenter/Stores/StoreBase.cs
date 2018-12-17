@@ -227,5 +227,33 @@ namespace AuthorizationCenter.Stores
             }
             return result;
         }
+
+        /// <summary>
+        /// 新建
+        /// </summary>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="map"></param>
+        /// <returns></returns>
+        public async Task<TProperty> Create<TProperty>(TEntity entity, Func<TEntity, TProperty> map)
+        {
+            if (Context.Set<TEntity>().Contains(entity))
+            {
+                throw new Exception("实体已经存在不可以重复添加");
+            }
+            var result = Context.Add(entity).Entity;
+
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Create)}] 新建实体失败：\r\n" + e);
+                throw e;
+            }
+            return map(result);
+
+        }
     }
 }

@@ -137,6 +137,74 @@
             角色控制
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            构造器
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Index">
+            <summary>
+            角色列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Details(System.String)">
+            <summary>
+            详情
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Create">
+            <summary>
+            新增
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Create(AuthorizationCenter.Entitys.Role)">
+            <summary>
+            新增
+            </summary>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Edit(System.String)">
+            <summary>
+            编辑
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Edit(System.String,AuthorizationCenter.Entitys.Role)">
+            <summary>
+            编辑
+            </summary>
+            <param name="id"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Delete(System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.DeleteConfirmed(System.String)">
+            <summary>
+            删除确认
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RolesController.RoleExists(System.String)">
+            <summary>
+            存在
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Controllers.SignController">
             <summary>
             登陆控制器
@@ -186,7 +254,7 @@
         </member>
         <member name="P:AuthorizationCenter.Controllers.SignController.SignUser">
             <summary>
-            登陆用户
+            登陆用户信息
             </summary>
         </member>
         <member name="M:AuthorizationCenter.Controllers.SignController.SignOut(AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserBaseJson})">
@@ -1172,12 +1240,29 @@
             </summary>
             <param name="args"></param>
         </member>
-        <member name="M:AuthorizationCenter.Program.BuildWebHost(System.String[])">
+        <member name="T:AuthorizationCenter.ConfigManager">
             <summary>
-            站点生成器
+            配置文件初始化
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.ConfigManager.GetConfig(System.String[])">
+            <summary>
+            获取配置文件
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.ConfigManager.HostInit(System.String[],System.String)">
+            <summary>
+            
             </summary>
             <param name="args"></param>
+            <param name="port"></param>
             <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.ConfigManager.Init">
+            <summary>
+            初始化
+            </summary>
         </member>
         <member name="T:AuthorizationCenter.Properties.Resources">
             <summary>

@@ -23,7 +23,13 @@ namespace AuthorizationCenter
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
+            // 读取配置文件
+            var configuration = ConfigManager.GetConfig(args);
+
+            // 配置文件设置端口号，检查是否符合端口规范，默认端口 5000
+            string port = configuration["Port"] ?? "5000";
+            var host = ConfigManager.HostInit(args, port);
+
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -42,16 +48,57 @@ namespace AuthorizationCenter
 
             host.Run();
         }
+    }
+
+    /// <summary>
+    /// 配置文件初始化
+    /// </summary>
+    public class ConfigManager
+    {
+        /// <summary>
+        /// 获取配置文件
+        /// </summary>
+        /// <returns></returns>
+        public static IConfigurationRoot GetConfig(string[] args)
+        {
+            return new ConfigurationBuilder()
+                .AddJsonFile("./cfg/config.json")
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .Build();
+        }
 
         /// <summary>
-        /// 站点生成器
+        /// 
         /// </summary>
         /// <param name="args"></param>
+        /// <param name="port"></param>
         /// <returns></returns>
-        public static IWebHost BuildWebHost(string[] args) =>
-               WebHost.CreateDefaultBuilder(args)
-                   .UseStartup<Startup>()
-                   .Build();
+        public static IWebHost HostInit(string[] args, string port)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseUrls($"http://*:{port}")
+                .Build();
+        }
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public static void Init()
+        {
+
+        }
     }
+
+    ///// <summary>
+    ///// 
+    ///// </summary>
+    //public class HostInitConfig
+    //{
+    //    /// <summary>
+    //    /// 端口
+    //    /// </summary>
+    //    public string Port { get; set; }
+    //}
 }

@@ -152,7 +152,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        Task Delete(UserBaseJson json);
+        Task Delete(TJson json);
 
         /// <summary>
         /// 通过ID删除 -异步

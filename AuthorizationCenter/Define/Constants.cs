@@ -48,7 +48,7 @@ namespace AuthorizationCenter.Define
         /// <summary>
         /// 可见字符 正则表达式
         /// </summary>
-        public const string VISIBLE_REG = @"\S";
+        public const string VISIBLE_REG = @"\S+";
 
         /// <summary>
         /// 可见字符 格式错误，不能包含空格以及制表符等不可见字符"

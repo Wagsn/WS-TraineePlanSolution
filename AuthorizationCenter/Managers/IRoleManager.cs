@@ -14,31 +14,114 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 角色管理
     /// </summary>
-    /// <typeparam name="IStore">存储</typeparam>
     /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
-    public interface IRoleManager<IStore, TJson> where IStore : IRoleStore where TJson : RoleJson
+    public interface IRoleManager<TJson> where TJson : RoleJson
     {
+        ///// <summary>
+        ///// 新建 API
+        ///// </summary>
+        ///// <param name="response">响应</param>
+        ///// <param name="request">请求</param>
+        //Task Create([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+
+        ///// <summary>
+        ///// 更新 API
+        ///// </summary>
+        ///// <param name="response">响应</param>
+        ///// <param name="request">请求</param>
+        ///// <returns></returns>
+        //Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+
+        ///// <summary>
+        ///// 删除 API
+        ///// </summary>
+        ///// <param name="response">响应</param>
+        ///// <param name="request">请求</param>
+        ///// <returns></returns>
+        //Task Delete([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+
         /// <summary>
-        /// 新建
+        /// 创建
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
-        Task Create([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        /// <param name="json"></param>
+        /// <returns></returns>
+        Task<TJson> Create(TJson json);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
+        /// <param name="json"></param>
         /// <returns></returns>
-        Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        Task<TJson> Update(TJson json);
+
+        ///// <summary>
+        ///// 更新
+        ///// </summary>
+        ///// <param name="prevate"></param>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //Task<IQueryable<TJson>> Update(Func<TJson, bool> prevate, Action<TJson> action);
 
         /// <summary>
-        /// 删除
+        /// 查询
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
         /// <returns></returns>
-        Task Delete([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        IQueryable<TJson> Find();
+        
+        /// <summary>
+        /// 条件查询 -异步查询
+        /// </summary>
+        /// <param name="predicate">表达式</param>
+        /// <returns></returns>
+        IQueryable<TJson> Find(Func<TJson, bool> predicate);
+
+        /// <summary>
+        /// 通过ID查询 -异步查询 -只取第一个 -没有返回空
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<TJson> FindById(string id);
+        
+        /// <summary>
+        /// 通过Name查询 -异步查询 -只取第一个 -没有返回空
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<TJson> FindByName(string name);
+
+        /// <summary>
+        /// 通过ID判断存在 -异步
+        /// </summary>
+        /// <param name="id">ID</param>
+        /// <returns></returns>
+        Task<bool> ExistById(string id);
+
+        /// <summary>
+        /// 存在 -Lambda表达式
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task<bool> Exist(Func<TJson, bool> predicate);
+
+        /// <summary>
+        /// 存在Name -异步
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task<bool> ExistByName(string name);
+
+        /// <summary>
+        /// 删除 -异步
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        Task Delete(TJson json);
+
+        /// <summary>
+        /// 通过ID删除 -异步
+        /// </summary>
+        /// <param name="id">ID</param>
+        /// <returns></returns>
+        Task DeleteById(string id);
     }
 }
