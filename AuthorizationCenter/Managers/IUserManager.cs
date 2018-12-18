@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WS.Core.Dto;
@@ -105,11 +106,17 @@ namespace AuthorizationCenter.Managers
         //Task<List<TJson>> Find<TProperty>(Expression<Func<UserBaseJson, TProperty>> lambda);
 
         /// <summary>
+        /// 查询所有 用户
+        /// </summary>
+        /// <returns></returns>
+        IQueryable<TJson> Find();
+
+        /// <summary>
         /// 条件查询 -异步查询
         /// </summary>
         /// <param name="func">表达式</param>
         /// <returns></returns>
-        Task<List<TJson>> Find(Func<TJson, bool> func);
+        IQueryable<TJson> Find(Func<TJson, bool> func);
 
         /// <summary>
         /// 通过ID查询 -异步查询 -只取第一个 -没有返回空

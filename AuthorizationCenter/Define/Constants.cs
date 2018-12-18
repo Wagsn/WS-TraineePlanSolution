@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Define
 {
     /// <summary>
-    /// 常量
+    /// 公共常量集
     /// </summary>
     public static class Constants
     {

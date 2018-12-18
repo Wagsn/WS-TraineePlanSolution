@@ -131,15 +131,24 @@ namespace AuthorizationCenter.Managers
             response.Extension = await Store.Find(ub => ub.Id == request.Data.Id, ub => Mapper.Map<UserBaseJson>(ub)).FirstOrDefaultAsync();
             response.Extension = Mapper.Map<UserBaseJson>(await Store.FindById(request.Data.Id).FirstOrDefaultAsync());
         }
+
+        /// <summary>
+        /// 找到所有
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<UserBaseJson> Find()
+        {
+            return Store.Find(u=>true, u=>Mapper.Map<UserBaseJson>(u));
+        }
         
         /// <summary>
         /// 条件查询 -异步
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public Task<List<UserBaseJson>> Find(Func<UserBaseJson, bool> predicate)
+        public IQueryable<UserBaseJson> Find(Func<UserBaseJson, bool> predicate)
         {
-            return Store.Find(ub => predicate(Mapper.Map<UserBaseJson>(ub)), ub=> Mapper.Map<UserBaseJson>(ub)).ToListAsync();
+            return Store.Find(ub => predicate(Mapper.Map<UserBaseJson>(ub)), ub=> Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>

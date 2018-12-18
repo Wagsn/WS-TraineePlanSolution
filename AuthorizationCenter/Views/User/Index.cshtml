@@ -1,4 +1,4 @@
-﻿@model PagingResponseMessage<UserBaseJson>
+﻿@model IEnumerable<UserBaseJson>
 @* 分页查询 *@
 @{
     ViewData["Title"] = "Index";
@@ -15,7 +15,7 @@
     <a asp-action="Create">Create New User</a>
 </p>
 @{
-    var users = Model.Extension;
+    var users = Model;
     // 判断是否登陆
 }
 <table class="table">
@@ -51,3 +51,10 @@
         }
     </tbody>
 </table>
+@* 分页跳转 *@
+<form asp-action="Index">
+    <input id="pageIndex" name="pageIndex" type="number" placeholder="分页索引(0-base)"/>
+    <input id="pageSize" name="pageSize" type="number" placeholder="每页尺寸"/>
+    <input type="submit" value="跳转"/>
+    @*<input type="submit" value="下一页"/>*@
+</form>

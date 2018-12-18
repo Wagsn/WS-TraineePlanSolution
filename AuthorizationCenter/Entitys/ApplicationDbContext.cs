@@ -77,13 +77,12 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserRole>(b =>
             {
-                b.ToTable("ws_userrole");
+                b.ToTable("ws_userrole"); // .HasKey(prop => new { prop.RoleId, prop.UserId });
                 // 多对多关联
                 b.HasOne(e => e.User).WithMany(u => u.UserRoles);
                 b.HasOne(e => e.Role).WithMany(r => r.UserRoles);
             });
-
-
+            
             builder.Entity<Permission>(b =>
             {
                 b.ToTable("ws_permission");

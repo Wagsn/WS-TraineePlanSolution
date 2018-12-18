@@ -56,17 +56,14 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserBaseJsons
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex =0, int pageSize =20)
         {
-            PagingResponseMessage<UserBaseJson> response = new PagingResponseMessage<UserBaseJson>();
-
-            await UserManager.List(response, new ModelRequest<UserBaseJson>());
+            // 分页查询用户列表
+            var users = await Functions.Page(UserManager.Find(), pageIndex, pageSize).ToListAsync();
 
             ViewData[Constants.Str.SIGNUSER] = SignUser;
 
-            Console.WriteLine("ViewData[\"SignUser\"]: " + JsonUtil.ToJson(ViewData[Constants.Str.SIGNUSER]));
-
-            return View(response);  //Mapper.Map<UserBaseJson>(await _context.UserBases.ToListAsync())
+            return View(users);  //Mapper.Map<UserBaseJson>(await _context.UserBases.ToListAsync())
         }
 
         /// <summary>

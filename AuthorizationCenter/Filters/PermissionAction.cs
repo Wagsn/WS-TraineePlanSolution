@@ -27,7 +27,7 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 角色管理
         /// </summary>
-        public IRoleManager<IRoleStore, RoleJson> RoleManager { get; set; }
+        public IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
         /// 组织管理
