@@ -106,7 +106,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<RoleJson> Find(Func<RoleJson, bool> predicate)
         {
-            return  Store.Find(role => predicate(Mapper.Map<RoleJson>(role)), role=>Mapper.Map<RoleJson>(role));
+            return  Store.Find(role => predicate(Mapper.Map<RoleJson>(role))).Select(role=>Mapper.Map<RoleJson>(role));
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<RoleJson> FindById(string id)
         {
-            return Store.Find(role => role.Id == id, role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
+            return Store.Find(role => role.Id == id).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<RoleJson> FindByName(string name)
         {
-            return Store.Find(role => role.Name == name, role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
+            return Store.Find(role => role.Name == name).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<RoleJson> Find()
         {
-            return Store.Find(role=>true, role=> Mapper.Map<RoleJson>(role));
+            return Store.Find(role=>true).Select(role=> Mapper.Map<RoleJson>(role));
         }
 
         ///// <summary>

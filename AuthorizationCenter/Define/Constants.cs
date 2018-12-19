@@ -88,31 +88,5 @@ namespace AuthorizationCenter.Define
         /// PassWord
         /// </summary>
         public const string PASSWORD = "PassWord";
-
-
-        /// <summary>
-        /// 一些字符串常量 作废
-        /// </summary>
-        public static class Str
-        {
-            /// <summary>
-            /// SignUser
-            /// </summary>
-            public const string SIGNUSER = "SignUser";
-
-            /// <summary>
-            /// UserId
-            /// </summary>
-            public const string USERID = "UserId";
-
-            /// <summary>
-            /// SignName
-            /// </summary>
-            public const string SIGNNAME = "SignName";
-            /// <summary>
-            /// PassWord
-            /// </summary>
-            public const string PASSWORD = "PassWord";
-        }
     }
 }

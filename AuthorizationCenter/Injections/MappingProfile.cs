@@ -24,6 +24,9 @@ namespace AuthorizationCenter.Injections
 
             CreateMap<Organization, OrganizationJson>();
             CreateMap<OrganizationJson, Organization>();
+
+            CreateMap<Role, RoleJson>();
+            CreateMap<RoleJson, Role>();
         }
     }
 }

@@ -2,13 +2,26 @@
 
 @{
     ViewData["Title"] = "Details";
+    // 伪造数据, 仅显示看看效果
+    var roles = new List<RoleJson>();
+    for(int i=0; i<10; i++)
+    {
+        roles.Add(new RoleJson
+        {
+            Id = i.ToString(),
+            Name = i.ToString(),
+            Decription = i.ToString()
+        });
+    }
 }
 
 <h2>Details</h2>
 
 <div>
     <h4>UserBaseJson</h4>
+    <p>TODO 所属组织<span>游民</span> </p>
     <hr />
+    <p>用户详细信息</p>
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.SignName)
@@ -23,6 +36,40 @@
             @Html.DisplayFor(model => model.PassWord)
         </dd>
     </dl>
+    <p>TODO 该用户的角色列表（每个角色旁边有修改角色，删除绑定，角色详情按钮）</p>
+    <table class="table" border="1">
+        <thead>
+            <tr>
+                <th>
+                    Role Name
+                    @*@Html.DisplayNameFor(model => model.Name)*@
+                </th>
+                <th>
+                    Decription
+                    @*@Html.DisplayNameFor(model => model.Decription)*@
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in roles)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => role.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => role.Decription)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@role.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@role.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@role.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |

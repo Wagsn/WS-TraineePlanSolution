@@ -45,7 +45,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<TProperty> FindById<TProperty>(string id, Func<UserBase, TProperty> map)
         {
-            return Find(ub => ub.Id == id, ub => map(ub));
+            return Find(ub => ub.Id == id).Select(ub => map(ub));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<TProperty> FindByName<TProperty>(string name, Func<UserBase, TProperty> map)
         {
-            return Find(ub => ub.SignName == name, ub => map(ub));
+            return Find(ub => ub.SignName == name).Select(ub => map(ub));
         }
 
         /// <summary>

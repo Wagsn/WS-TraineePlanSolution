@@ -16,7 +16,6 @@ namespace AuthorizationCenter.Controllers
     /// </summary>
     public class RolesController : Controller
     {
-        private readonly ApplicationDbContext _context;
 
         /// <summary>
         /// 角色管理
@@ -26,11 +25,13 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="context"></param>
-        public RolesController(ApplicationDbContext context)
+        /// <param name="roleManager"></param>
+        public RolesController(IRoleManager<RoleJson> roleManager)
         {
-            _context = context;
+            RoleManager = roleManager;
         }
+
+
 
         /// <summary>
         /// 角色列表

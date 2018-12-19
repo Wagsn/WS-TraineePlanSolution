@@ -17,7 +17,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <returns></returns>
         IQueryable<TEntity> Find();
-        
+
         /// <summary>
         /// 条件查询 -条件表达式
         /// </summary>
@@ -25,17 +25,13 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         IQueryable<TEntity> Find(Func<TEntity, bool> predicate);
 
-        // 通过字段匹配查询
-        //Task<bool> Find<TProperty>(Func<TEntity, TProperty> func);
-
         /// <summary>
-        /// 条件查询 -将符合条件的元素映射成自己需要的元素 -条件表达式 -映射表达式
+        /// 条件查询 -通过字段匹配查询
         /// </summary>
         /// <typeparam name="TProperty"></typeparam>
-        /// <param name="predicate">条件表达式</param>
-        /// <param name="map">映射表达式</param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        IQueryable<TProperty> Find<TProperty>(Func<TEntity, bool> predicate, Func<TEntity, TProperty> map);
+        IQueryable<TEntity> Find<TProperty>(Func<TEntity, TProperty> predicate);
 
         /// <summary>
         /// 新建 创建用户
@@ -76,13 +72,8 @@ namespace AuthorizationCenter.Stores
         Task<IQueryable<TEntity>> Update(Func<TEntity, bool> predicate, Action<TEntity> action);
 
         /// <summary>
-        /// 存在 -通过TProperty存在的字段名称在UserBase表中查询
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> Exist<TProperty>(Func<TEntity, TProperty> select);
-
-        /// <summary>
         /// 存在 -异步查询 -条件表达式（Any的参数类型）
+        /// 如果数据库没有数据会返回
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>

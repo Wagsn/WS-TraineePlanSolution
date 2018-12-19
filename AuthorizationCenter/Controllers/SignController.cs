@@ -114,7 +114,7 @@ namespace AuthorizationCenter.Controllers
             // 登陆成功
             if (await UserManager.Exist(ubj=>ubj.SignName== request.SignName&&ubj.PassWord==request.PassWord))
             {
-                SignUser = await UserManager.FindByName(request.SignName);
+                SignUser = await UserManager.FindByName(request.SignName).SingleOrDefaultAsync();
                 Logger.Trace("登陆成功");
                 if (returnUrl != null)
                 {

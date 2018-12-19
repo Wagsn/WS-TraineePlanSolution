@@ -123,7 +123,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TJson> FindById(string id);
+        IQueryable<TJson> FindById(string id);
 
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        Task<TJson> FindByName(string name);
+        IQueryable<TJson> FindByName(string name);
 
         /// <summary>
         /// 通过ID判断存在 -异步

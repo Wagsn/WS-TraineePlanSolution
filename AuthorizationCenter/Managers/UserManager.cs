@@ -101,23 +101,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<bool> Check(UserBaseJson user)
+        public Task<bool> Check(UserBaseJson user)
         {
-            var userbase = await Store.FindByName(user.SignName).FirstOrDefaultAsync();
-
-            if (userbase == null)
-            {
-                return false;
-            }
-
-            if (userbase.PassWord == user.PassWord)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return Store.Exist(u => user.SignName == u.SignName && user.PassWord == u.PassWord);
         }
 
         /// <summary>
@@ -128,8 +114,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task ById([Required] ResponseMessage<UserBaseJson> response, [Required] ModelRequest<UserBaseJson> request)
         {
-            response.Extension = await Store.Find(ub => ub.Id == request.Data.Id, ub => Mapper.Map<UserBaseJson>(ub)).FirstOrDefaultAsync();
-            response.Extension = Mapper.Map<UserBaseJson>(await Store.FindById(request.Data.Id).FirstOrDefaultAsync());
+            response.Extension = await Store.Find(ub => ub.Id == request.Data.Id).Select(ub => Mapper.Map<UserBaseJson>(ub)).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -138,7 +123,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserBaseJson> Find()
         {
-            return Store.Find(u=>true, u=>Mapper.Map<UserBaseJson>(u));
+            return Store.Find().Select(user => Mapper.Map<UserBaseJson>(user));
         }
         
         /// <summary>
@@ -148,7 +133,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserBaseJson> Find(Func<UserBaseJson, bool> predicate)
         {
-            return Store.Find(ub => predicate(Mapper.Map<UserBaseJson>(ub)), ub=> Mapper.Map<UserBaseJson>(ub));
+            return Store.Find(ub => predicate(Mapper.Map<UserBaseJson>(ub))).Select(ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>
@@ -156,9 +141,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<UserBaseJson> FindById(string id)
+        public IQueryable<UserBaseJson> FindById(string id)
         {
-            return Store.FindById(id, ub => Mapper.Map<UserBaseJson>(ub)).SingleOrDefaultAsync();
+            return Store.FindById(id, ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>
@@ -166,9 +151,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Task<UserBaseJson> FindByName(string name)
+        public IQueryable<UserBaseJson> FindByName(string name)
         {
-            return Store.FindByName(name, ub => Mapper.Map<UserBaseJson>(ub)).SingleOrDefaultAsync();
+            return Store.FindByName(name, ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>

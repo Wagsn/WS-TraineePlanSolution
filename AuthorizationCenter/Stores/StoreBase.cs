@@ -113,7 +113,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 查找 -条件表达式
+        /// 条件查找 -条件表达式
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
@@ -123,26 +123,14 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 条件查询 -条件表达式 -映射表达式
+        /// 通过字段匹配查询
         /// </summary>
         /// <typeparam name="TProperty"></typeparam>
-        /// <param name="predicate">条件表达式</param>
-        /// <param name="map">映射表达式</param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public IQueryable<TProperty> Find<TProperty>(Func<TEntity, bool> predicate, Func<TEntity, TProperty> map)
+        public IQueryable<TEntity> Find<TProperty>(Func<TEntity, TProperty> predicate)
         {
-            return Context.Set<TEntity>().Where(e => predicate(e)).Select(e => map(e));
-        }
-
-        /// <summary>
-        /// 存在 -异步 -实体映射表达式 -比较映射实体存在的字段 -性能损失
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="func">实体映射表达式</param>
-        /// <returns></returns>
-        public Task<bool> Exist<TProperty>(Func<TEntity, TProperty> func)
-        {
-            return Context.Set<TEntity>().AnyAsync(ub => Compare(ub, func(ub)));
+            return Context.Set<TEntity>().Where(entity => Compare(entity, predicate(entity)));
         }
 
         /// <summary>

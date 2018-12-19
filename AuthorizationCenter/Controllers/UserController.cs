@@ -61,7 +61,7 @@ namespace AuthorizationCenter.Controllers
             // 分页查询用户列表
             var users = await Functions.Page(UserManager.Find(), pageIndex, pageSize).ToListAsync();
 
-            ViewData[Constants.Str.SIGNUSER] = SignUser;
+            ViewData[Constants.SIGNUSER] = SignUser;
 
             return View(users);  //Mapper.Map<UserBaseJson>(await _context.UserBases.ToListAsync())
         }
@@ -185,7 +185,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var userBase = await UserManager.FindById(id);
+            var userBase = await UserManager.FindById(id).SingleOrDefaultAsync();
             if (userBase == null)
             {
                 Logger.Trace($"[{nameof(Edit)}]进入编辑界面-用户不存在({id})");
@@ -258,7 +258,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
             // 业务处理
-            var userJson = await UserManager.FindById(id);
+            var userJson = await UserManager.FindById(id).SingleOrDefaultAsync();
             if (userJson == null)
             {
                 Logger.Trace($"[{nameof(Delete)}] 删除失败 用户未找到->用户ID: "+id);
@@ -319,15 +319,15 @@ namespace AuthorizationCenter.Controllers
             {
                 if (value == null)
                 {
-                    HttpContext.Session.Remove(Constants.Str.USERID);
-                    HttpContext.Session.Remove(Constants.Str.SIGNNAME);
-                    HttpContext.Session.Remove(Constants.Str.PASSWORD);
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
                 }
                 else
                 {
-                    HttpContext.Session.SetString(Constants.Str.USERID, value.Id);
-                    HttpContext.Session.SetString(Constants.Str.SIGNNAME, value.SignName);
-                    HttpContext.Session.SetString(Constants.Str.PASSWORD, value.PassWord);
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
                 }
             }
         }

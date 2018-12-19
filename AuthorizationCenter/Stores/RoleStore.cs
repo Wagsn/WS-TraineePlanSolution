@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WS.Log;
 
 namespace AuthorizationCenter.Stores
 {
@@ -11,6 +12,16 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public class RoleStore : StoreBase<Role>, IRoleStore
     {
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="context"></param>
+        public RoleStore(ApplicationDbContext context)
+        {
+            Context = context;
+            Logger = LoggerManager.GetLogger(GetType().Name);
+        }
+
         /// <summary>
         /// 通过ID删除
         /// </summary>
@@ -50,7 +61,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<TProperty> FindById<TProperty>(string id, Func<Role, TProperty> map)
         {
-            return Find(role => role.Id == id, role => map(role));
+            return Find(role => role.Id == id).Select(role => map(role));
         }
 
         /// <summary>
@@ -72,7 +83,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<TProperty> FindByName<TProperty>(string name, Func<Role, TProperty> map)
         {
-            return Find(role => role.Name == name, role => map(role));
+            return Find(role => role.Name == name).Select(role => map(role));
         }
     }
 }

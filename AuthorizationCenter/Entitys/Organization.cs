@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,9 +25,16 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 父组织ID
         /// </summary>
+        //[ForeignKey("")]
         [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string ParentId { get; set; }
+
+        /// <summary>
+        /// 父组织
+        /// </summary>
+        [NotMapped]
+        public Organization Parent { get; set; }
 
         /// <summary>
         /// 组织名称

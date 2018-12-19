@@ -23,7 +23,6 @@ namespace AuthorizationCenter.Define
         {
             // 总数
             var count = data.Count();
-
             // 判断索引有效
             int pIndex = pageIndex;
             if (pageIndex > (int)Math.Ceiling((double)count / pageSize) - 1)

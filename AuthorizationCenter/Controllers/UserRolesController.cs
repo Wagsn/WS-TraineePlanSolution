@@ -6,25 +6,63 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuthorizationCenter.Entitys;
+using AuthorizationCenter.Managers;
+using AuthorizationCenter.Dto.Jsons;
 
 namespace AuthorizationCenter.Controllers
 {
+    /// <summary>
+    /// 用户角色绑定控制
+    /// </summary>
     public class UserRolesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public UserRolesController(ApplicationDbContext context)
+        /// <summary>
+        /// 用户角色管理
+        /// </summary>
+        public IUserRoleManager UserRoleManager { get; set; }
+
+        /// <summary>
+        /// 用户管理
+        /// </summary>
+        public IUserManager<UserBaseJson> UserManager { get; set; }
+
+        /// <summary>
+        /// 角色管理
+        /// </summary>
+        public IRoleManager<RoleJson> RoleManager { get; set; }
+
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="userRoleManager"></param>
+        /// <param name="userManager"></param>
+        /// <param name="roleManager"></param>
+        public UserRolesController(ApplicationDbContext context, IUserRoleManager userRoleManager, IUserManager<UserBaseJson> userManager, IRoleManager<RoleJson> roleManager)
         {
             _context = context;
+            UserRoleManager = userRoleManager;
+            UserManager = userManager;
+            RoleManager = roleManager;
         }
-
+        
+        /// <summary>
+        /// 主页
+        /// </summary>
+        /// <returns></returns>
         // GET: UserRoles
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.UserRoles.Include(u => u.Role).Include(u => u.User);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await UserRoleManager.Find().ToListAsync());
         }
 
+        /// <summary>
+        /// 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: UserRoles/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -32,11 +70,8 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-
-            var userRole = await _context.UserRoles
-                .Include(u => u.Role)
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            
+            var userRole = await UserRoleManager.FindById(id).FirstOrDefaultAsync();
             if (userRole == null)
             {
                 return NotFound();
@@ -45,14 +80,24 @@ namespace AuthorizationCenter.Controllers
             return View(userRole);
         }
 
+        /// <summary>
+        /// 新增 用户角色关联
+        /// </summary>
+        /// <returns></returns>
         // GET: UserRoles/Create
         public IActionResult Create()
         {
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.UserBases, "Id", "Id");
+            // 查询 所有的用户角色
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name");
+            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName");
             return View();
         }
 
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="userRole"></param>
+        /// <returns></returns>
         // POST: UserRoles/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -62,15 +107,23 @@ namespace AuthorizationCenter.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(userRole);
-                await _context.SaveChangesAsync();
+                await UserRoleManager.Create(userRole);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.UserBases, "Id", "Id", userRole.UserId);
+            //ViewData["Roles"] = _context.Roles;
+            //ViewData["Users"] = _context.UserBases;
+
+            // 这个东东很奇特啊，显示的是Name字段，得到的是？
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
             return View(userRole);
         }
 
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: UserRoles/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -78,17 +131,23 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-
-            var userRole = await _context.UserRoles.FindAsync(id);
+            
+            var userRole = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
             if (userRole == null)
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.UserBases, "Id", "Id", userRole.UserId);
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
             return View(userRole);
         }
 
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userRole"></param>
+        /// <returns></returns>
         // POST: UserRoles/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -105,12 +164,22 @@ namespace AuthorizationCenter.Controllers
             {
                 try
                 {
-                    _context.Update(userRole);
-                    await _context.SaveChangesAsync();
+                    // 重复判断 是否存在UserId和RoleId的关系
+                    if(await UserRoleManager.Exist(ur=> ur.RoleId==userRole.RoleId && ur.UserId == userRole.UserId))
+                    {
+                        ModelState.AddModelError("All", "角色已经被绑定在该用户上");
+                        ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
+                        ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
+                        return View(userRole);
+                    }
+                    else
+                    {
+                        await UserRoleManager.Update(userRole);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserRoleExists(userRole.Id))
+                    if (!await UserRoleManager.Exist(ur => ur.Id == userRole.Id))
                     {
                         return NotFound();
                     }
@@ -121,11 +190,16 @@ namespace AuthorizationCenter.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.UserBases, "Id", "Id", userRole.UserId);
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
             return View(userRole);
         }
 
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id">UserRole.Id</param>
+        /// <returns></returns>
         // GET: UserRoles/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -133,33 +207,27 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-
-            var userRole = await _context.UserRoles
-                .Include(u => u.Role)
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (userRole == null)
+            var urs = await UserRoleManager.FindById(id).ToListAsync();
+            if (urs == null)
             {
                 return NotFound();
             }
 
-            return View(userRole);
+            return View(urs);
         }
 
+        /// <summary>
+        /// 删除确认
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // POST: UserRoles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var userRole = await _context.UserRoles.FindAsync(id);
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
+            await UserRoleManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool UserRoleExists(string id)
-        {
-            return _context.UserRoles.Any(e => e.Id == id);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model AuthorizationCenter.Dto.Jsons.UserBaseJson
+﻿@model AuthorizationCenter.Entitys.Organization
 
 @{
     ViewData["Title"] = "Delete";
@@ -8,20 +8,26 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>删除确认</h4>
+    <h4>Organization</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.SignName)
+            @Html.DisplayNameFor(model => model.ParentId)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.SignName)
+            @Html.DisplayFor(model => model.ParentId)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.PassWord)
+            @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.PassWord)
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
         </dd>
     </dl>
     

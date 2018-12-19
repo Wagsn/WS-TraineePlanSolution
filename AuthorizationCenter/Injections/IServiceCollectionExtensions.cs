@@ -36,12 +36,16 @@ namespace Microsoft.Extensions.DependencyInjection
             #region << Store >>
 
             services.AddScoped<IUserBaseStore, UserBaseStore>();
+            services.AddScoped<IUserRoleStore, UserRoleStore>();
+            services.AddScoped<IRoleStore, RoleStore>();
 
             #endregion
 
             #region << Manager >>
 
             services.AddScoped<IUserManager<UserBaseJson>, UserManager>();
+            services.AddScoped<IRoleManager<RoleJson>, RoleManger>();
+            services.AddScoped<IUserRoleManager, UserRoleManager>();
 
             #endregion
 
