@@ -1,4 +1,5 @@
 ﻿using AuthorizationCenter.Define;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -25,7 +26,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 父组织ID
         /// </summary>
-        //[ForeignKey("")]
+        //[ForeignKey("ParentId")]
         [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string ParentId { get; set; }
@@ -34,7 +35,14 @@ namespace AuthorizationCenter.Entitys
         /// 父组织
         /// </summary>
         [NotMapped]
+        [JsonIgnore]
         public Organization Parent { get; set; }
+
+        /// <summary>
+        /// 子组织
+        /// </summary>
+        [NotMapped]
+        public List<Organization> Childs { get; set; }
 
         /// <summary>
         /// 组织名称

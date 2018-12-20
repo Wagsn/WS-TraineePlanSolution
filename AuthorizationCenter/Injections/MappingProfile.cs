@@ -27,6 +27,8 @@ namespace AuthorizationCenter.Injections
 
             CreateMap<Role, RoleJson>();
             CreateMap<RoleJson, Role>();
+
+            //CreateMap
         }
     }
 }

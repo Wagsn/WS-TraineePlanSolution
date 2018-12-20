@@ -9,5 +9,5 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 组织存储
     /// </summary>
-    public interface IOrganizationStore : IStore<Organization> { }
+    public interface IOrganizationStore : INameStore<Organization> { }
 }

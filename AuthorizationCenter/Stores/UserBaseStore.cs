@@ -37,18 +37,6 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 查询 -ID -映射表达式
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="id"></param>
-        /// <param name="map">映射表达式</param>
-        /// <returns></returns>
-        public IQueryable<TProperty> FindById<TProperty>(string id, Func<UserBase, TProperty> map)
-        {
-            return Find(ub => ub.Id == id).Select(ub => map(ub));
-        }
-
-        /// <summary>
         /// 查询 -通过名称
         /// </summary>
         /// <param name="name"></param>
@@ -56,17 +44,6 @@ namespace AuthorizationCenter.Stores
         public IQueryable<UserBase> FindByName(string name)
         {
             return Find(ub => ub.SignName == name);
-        }
-
-        /// <summary>
-        /// 查询 -通过名称 -映射表达式
-        /// </summary>
-        /// <param name="name">Name</param>
-        /// <param name="map">映射表达式</param>
-        /// <returns></returns>
-        public IQueryable<TProperty> FindByName<TProperty>(string name, Func<UserBase, TProperty> map)
-        {
-            return Find(ub => ub.SignName == name).Select(ub => map(ub));
         }
 
         /// <summary>

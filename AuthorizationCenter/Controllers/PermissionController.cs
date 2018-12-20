@@ -5,102 +5,92 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Entitys;
-using AutoMapper;
+using AuthorizationCenter.Managers;
+using AuthorizationCenter.Dto.Jsons;
 
 namespace AuthorizationCenter.Controllers
 {
     /// <summary>
-    /// 
+    /// 权限控制
     /// </summary>
-    [Route("[controller]")]
-    public class OrganizationJsonsController : Controller
+    public class PermissionController : Controller
     {
         /// <summary>
-        /// 
+        /// 权限管理
         /// </summary>
-        public ApplicationDbContext _context { get; set; }
+        protected IPermissionManager<PermissionJson> PermissionManager { get; set; }
 
         /// <summary>
-        /// 类型映射
-        /// </summary>
-        public IMapper Mapper { get; set; }
-
-        /// <summary>
-        /// 构造器
+        /// 控制器
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="mapper"></param>
-        public OrganizationJsonsController(ApplicationDbContext context, IMapper mapper)
+        /// <param name="permissionManager"></param>
+        public PermissionController(ApplicationDbContext context, IPermissionManager<PermissionJson> permissionManager)
         {
-            _context = context;
-            Mapper = mapper;
+            PermissionManager = permissionManager;
         }
 
         /// <summary>
-        /// 列表 MVC
+        /// 列表
         /// </summary>
         /// <returns></returns>
-        [HttpGet("index", Name = "OrganizationIndex")]
-        // GET: OrganizationJsons
+        // GET: Permission
         public async Task<IActionResult> Index()
         {
-            return View( Mapper.Map<List<OrganizationJson>>(await _context.Organizations.ToListAsync()));
+            return View(await PermissionManager.Find().ToListAsync());
         }
 
         /// <summary>
-        /// 详情 MVC
+        /// 详情
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // GET: OrganizationJsons/Details/5
+        // GET: Permission/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
-            var organizationJson = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (organizationJson == null)
+            var per = await PermissionManager.FindById(id).FirstOrDefaultAsync();
+            if (per == null)
             {
                 return NotFound();
             }
 
-            return View(organizationJson);
+            return View(per);
         }
 
         /// <summary>
-        /// 创建 MVC
+        /// 创建
         /// </summary>
         /// <returns></returns>
-        // GET: OrganizationJsons/Create
+        // GET: Permission/Create
         public IActionResult Create()
         {
             return View();
         }
 
         /// <summary>
-        /// 创建 MVC
+        /// 创建
         /// </summary>
-        /// <param name="organizationJson"></param>
+        /// <param name="permission"></param>
         /// <returns></returns>
-        // POST: OrganizationJsons/Create
+        // POST: Permission/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost(Name = "OrganizationCreate")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ParentId,Name,Description")] OrganizationJson organizationJson)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] PermissionJson permission)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(organizationJson);
-                await _context.SaveChangesAsync();
+                await PermissionManager.Create(permission);
                 return RedirectToAction(nameof(Index));
             }
-            return View(organizationJson);
+            return View(permission);
         }
 
         /// <summary>
@@ -108,7 +98,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // GET: OrganizationJsons/Edit/5
+        // GET: Permission/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -116,28 +106,28 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organizationJson = await _context.Organizations.FindAsync(id);
-            if (organizationJson == null)
+            var per = await PermissionManager.FindById(id).FirstOrDefaultAsync();
+            if (per == null)
             {
                 return NotFound();
             }
-            return View(organizationJson);
+            return View(per);
         }
 
         /// <summary>
         /// 编辑
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="organizationJson"></param>
+        /// <param name="permission"></param>
         /// <returns></returns>
-        // POST: OrganizationJsons/Edit/5
+        // POST: Permission/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,ParentId,Name,Description")] OrganizationJson organizationJson)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Description")] PermissionJson permission)
         {
-            if (id != organizationJson.Id)
+            if (id != permission.Id)
             {
                 return NotFound();
             }
@@ -146,12 +136,11 @@ namespace AuthorizationCenter.Controllers
             {
                 try
                 {
-                    _context.Update(organizationJson);
-                    await _context.SaveChangesAsync();
+                    await PermissionManager.Update(permission);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrganizationJsonExists(organizationJson.Id))
+                    if (!await PermissionManager.Exist(per => per.Id==permission.Id))
                     {
                         return NotFound();
                     }
@@ -162,30 +151,7 @@ namespace AuthorizationCenter.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(organizationJson);
-        }
-
-        /// <summary>
-        /// 删除 MVC
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        // GET: OrganizationJsons/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var organizationJson = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (organizationJson == null)
-            {
-                return NotFound();
-            }
-
-            return View(organizationJson);
+            return View(permission);
         }
 
         /// <summary>
@@ -193,20 +159,35 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        // POST: OrganizationJsons/Delete/5
+        // GET: Permission/Delete/5
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var permission = await PermissionManager.FindById(id).SingleOrDefaultAsync();
+            if (permission == null)
+            {
+                return NotFound();
+            }
+
+            return View(permission);
+        }
+
+        /// <summary>
+        /// 删除确认
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        // POST: Permission/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var organizationJson = await _context.Organizations.FindAsync(id);
-            _context.Organizations.Remove(organizationJson);
-            await _context.SaveChangesAsync();
+            await PermissionManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool OrganizationJsonExists(string id)
-        {
-            return _context.Organizations.Any(e => e.Id == id);
         }
     }
 }

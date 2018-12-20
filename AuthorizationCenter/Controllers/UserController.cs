@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using WS.Core.Dto;
 using WS.Log;
 using WS.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -28,6 +29,16 @@ namespace AuthorizationCenter.Controllers
         /// 用户管理
         /// </summary>
         public IUserManager<UserBaseJson> UserManager { get; set; }
+
+        /// <summary>
+        /// 角色管理
+        /// </summary>
+        public IRoleManager<RoleJson> RoleManager { get; set; }
+
+        /// <summary>
+        /// 用户角色关联管理
+        /// </summary>
+        public IUserRoleManager UserRoleManager { get; set; }
         
         /// <summary>
         /// 类型映射
@@ -42,11 +53,15 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="userManager">用户管理</param>
-        /// <param name="mapper">类型映射</param>
-        public UserController(IUserManager<UserBaseJson> userManager, IMapper mapper)
+        /// <param name="userManager"></param>
+        /// <param name="roleManager"></param>
+        /// <param name="userRoleManager"></param>
+        /// <param name="mapper"></param>
+        public UserController(IUserManager<UserBaseJson> userManager, IRoleManager<RoleJson> roleManager, IUserRoleManager userRoleManager, IMapper mapper)
         {
             UserManager = userManager;
+            RoleManager = roleManager;
+            UserRoleManager = userRoleManager;
             Mapper = mapper;
             Logger = LoggerManager.GetLogger(GetType().Name);
         }
@@ -56,14 +71,12 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserBaseJsons
-        public async Task<IActionResult> Index(int pageIndex =0, int pageSize =20)
+        public async Task<IActionResult> Index(int pageIndex =0, int pageSize =10)
         {
-            // 分页查询用户列表
-            var users = await Functions.Page(UserManager.Find(), pageIndex, pageSize).ToListAsync();
-
             ViewData[Constants.SIGNUSER] = SignUser;
 
-            return View(users);  //Mapper.Map<UserBaseJson>(await _context.UserBases.ToListAsync())
+            // 分页查询用户列表
+            return View(await Functions.Page(UserManager.Find(), pageIndex, pageSize).ToListAsync());
         }
 
         /// <summary>
@@ -92,6 +105,10 @@ namespace AuthorizationCenter.Controllers
             // MVC 响应构造
             if (response.Code == ResponseDefine.SuccessCode)
             {
+                // 查询成功
+                // 再查询用户绑定的角色列表
+                ViewData[Constants.ROLES] =await RoleManager.FindByUserId(id).ToListAsync();
+                ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
                 return View(response.Extension);
             }
             else if(response.Code == ResponseDefine.NotFound)

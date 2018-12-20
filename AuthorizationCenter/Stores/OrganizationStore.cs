@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Entitys;
+﻿
+using AuthorizationCenter.Entitys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,58 +9,58 @@ using WS.Log;
 namespace AuthorizationCenter.Stores
 {
     /// <summary>
-    /// 权限存储
+    /// 组织存储
     /// </summary>
-    public class PermissionStore : StoreBase<Permission>, INameStore<Permission>, IPermissionStore
+    public class OrganizationStore : StoreBase<Organization>, IOrganizationStore
     {
         /// <summary>
-        /// 构造器
+        /// 组织存储
         /// </summary>
         /// <param name="context"></param>
-        public PermissionStore(ApplicationDbContext context)
+        public OrganizationStore(ApplicationDbContext context)
         {
             Context = context;
             Logger = LoggerManager.GetLogger(GetType().Name);
         }
 
         /// <summary>
-        /// 通过ID删除
+        /// 删除通过ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<IQueryable<Permission>> DeleteById(string id)
+        public Task<IQueryable<Organization>> DeleteById(string id)
         {
-            return Delete(perm => perm.Id == id);
+            return Delete(org => org.Id == id);
         }
 
         /// <summary>
-        /// 通过名称删除
+        /// 删除通过名称
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Task<IQueryable<Permission>> DeleteByName(string name)
+        public Task<IQueryable<Organization>> DeleteByName(string name)
         {
-            return Delete(per => per.Name == name);
+            return Delete(org => org.Name == name);
         }
 
         /// <summary>
-        /// 通过ID查询
+        /// 查询通过ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<Permission> FindById(string id)
+        public IQueryable<Organization> FindById(string id)
         {
-            return Find(per => per.Id == id);
+            return Find(org => org.Id == id);
         }
 
         /// <summary>
-        /// 通过名称查询
+        /// 查询通过名称
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IQueryable<Permission> FindByName(string name)
+        public IQueryable<Organization> FindByName(string name)
         {
-            return Find(per => per.Name == name);
+            return Find(org => org.Id == name);
         }
     }
 }

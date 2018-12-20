@@ -18,28 +18,11 @@ namespace AuthorizationCenter.Stores
         IQueryable<TEntity> FindById(string id);
 
         /// <summary>
-        /// 查询 -通过ID查询 -映射表达式
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="id">ID</param>
-        /// <param name="map">映射表达式</param>
-        /// <returns></returns>
-        IQueryable<TProperty> FindById<TProperty>(string id, Func<TEntity, TProperty> map);
-
-        /// <summary>
         /// 查询 -通过名称查询
         /// </summary>
         /// <param name="name">名称</param>
         /// <returns></returns>
         IQueryable<TEntity> FindByName(string name);
-
-        /// <summary>
-        /// 查询 -通过名称查询
-        /// </summary>
-        /// <param name="name">名称</param>
-        /// <param name="map">映射表达式</param>
-        /// <returns></returns>
-        IQueryable<TProperty> FindByName<TProperty>(string name, Func<TEntity, TProperty> map);
 
         /// <summary>
         /// 删除 -通过ID删除

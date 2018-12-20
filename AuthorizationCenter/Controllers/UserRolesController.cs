@@ -207,7 +207,7 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            var urs = await UserRoleManager.FindById(id).ToListAsync();
+            var urs = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
             if (urs == null)
             {
                 return NotFound();

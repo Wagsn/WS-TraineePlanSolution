@@ -55,87 +55,148 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Controllers.OrganizationJsonsController">
+        <member name="T:AuthorizationCenter.Controllers.OrganizationController">
             <summary>
-            
+            组织控制
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Controllers.OrganizationJsonsController._context">
+        <member name="P:AuthorizationCenter.Controllers.OrganizationController.OrganizationManager">
             <summary>
-            
+            管理
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Controllers.OrganizationJsonsController.Mapper">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.#ctor(AuthorizationCenter.Managers.IOrganizationManager{AuthorizationCenter.Dto.Jsons.OrganizationJson})">
             <summary>
-            类型映射
+            组织管理
             </summary>
+            <param name="organizationManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index">
             <summary>
-            构造器
-            </summary>
-            <param name="context"></param>
-            <param name="mapper"></param>
-        </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Index">
-            <summary>
-            列表 MVC
+            列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Details(System.String)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Details(System.String)">
             <summary>
-            详情 MVC
+            详情
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Create">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Create">
             <summary>
-            创建 MVC
+            创建
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Create(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Create(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            创建 MVC
+            创建
             </summary>
-            <param name="organizationJson"></param>
+            <param name="organization"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Edit(System.String)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Edit(System.String)">
             <summary>
             编辑
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Edit(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Edit(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
             编辑
             </summary>
             <param name="id"></param>
-            <param name="organizationJson"></param>
+            <param name="organization"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.Delete(System.String)">
-            <summary>
-            删除 MVC
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationJsonsController.DeleteConfirmed(System.String)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Delete(System.String)">
             <summary>
             删除
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Controllers.RoleController">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.DeleteConfirmed(System.String)">
             <summary>
-            角色控制
+            删除确认
             </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Controllers.PermissionController">
+            <summary>
+            权限控制
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Controllers.PermissionController.PermissionManager">
+            <summary>
+            权限管理
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Managers.IPermissionManager{AuthorizationCenter.Dto.Jsons.PermissionJson})">
+            <summary>
+            控制器
+            </summary>
+            <param name="context"></param>
+            <param name="permissionManager"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Index">
+            <summary>
+            列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Details(System.String)">
+            <summary>
+            详情
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Create">
+            <summary>
+            创建
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Create(AuthorizationCenter.Dto.Jsons.PermissionJson)">
+            <summary>
+            创建
+            </summary>
+            <param name="permission"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Edit(System.String)">
+            <summary>
+            编辑
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Edit(System.String,AuthorizationCenter.Dto.Jsons.PermissionJson)">
+            <summary>
+            编辑
+            </summary>
+            <param name="id"></param>
+            <param name="permission"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Delete(System.String)">
+            <summary>
+            删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.DeleteConfirmed(System.String)">
+            <summary>
+            删除确认
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Controllers.RolesController">
             <summary>
@@ -357,6 +418,16 @@
             用户管理
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Controllers.UserController.RoleManager">
+            <summary>
+            角色管理
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Controllers.UserController.UserRoleManager">
+            <summary>
+            用户角色关联管理
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Controllers.UserController.Mapper">
             <summary>
             类型映射
@@ -367,12 +438,14 @@
             日志器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserBaseJson},AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserBaseJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson},AuthorizationCenter.Managers.IUserRoleManager,AutoMapper.IMapper)">
             <summary>
             构造器
             </summary>
-            <param name="userManager">用户管理</param>
-            <param name="mapper">类型映射</param>
+            <param name="userManager"></param>
+            <param name="roleManager"></param>
+            <param name="userRoleManager"></param>
+            <param name="mapper"></param>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserController.Index(System.Int32,System.Int32)">
             <summary>
@@ -619,6 +692,16 @@
             PassWord
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLES">
+            <summary>
+            角色 复数
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.USERROLES">
+            <summary>
+            用户角色 复数
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Define.Functions">
             <summary>
             公共函数集
@@ -649,6 +732,16 @@
             父组织ID
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Parent">
+            <summary>
+            父组织
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Childs">
+            <summary>
+            子组织
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Name">
             <summary>
             组织名称
@@ -662,6 +755,21 @@
         <member name="T:AuthorizationCenter.Dto.Jsons.PermissionJson">
             <summary>
             权限Dto
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Id">
+            <summary>
+            权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Name">
+            <summary>
+            权限名称
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Description">
+            <summary>
+            权限描述
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.RoleJson">
@@ -783,12 +891,6 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:AuthorizationCenter.Entitys.ApplicationDbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
-            <summary>
-            数据库配置
-            </summary>
-            <param name="builder">数据库上下文选项创建器</param>
-        </member>
         <member name="T:AuthorizationCenter.Entitys.Organization">
             <summary>
             组织模型
@@ -807,6 +909,11 @@
         <member name="P:AuthorizationCenter.Entitys.Organization.Parent">
             <summary>
             父组织
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.Organization.Childs">
+            <summary>
+            子组织
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Entitys.Organization.Name">
@@ -949,26 +1056,6 @@
             权限检查过滤器（异步权限检查）
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Filters.CheckPermission.UserManager">
-            <summary>
-            用户管理
-            </summary>
-        </member>
-        <member name="P:AuthorizationCenter.Filters.CheckPermission.PermissionManager">
-            <summary>
-            权限管理
-            </summary>
-        </member>
-        <member name="P:AuthorizationCenter.Filters.CheckPermission.RoleManager">
-            <summary>
-            角色管理
-            </summary>
-        </member>
-        <member name="P:AuthorizationCenter.Filters.CheckPermission.OrganizationManager">
-            <summary>
-            组织管理
-            </summary>
-        </member>
         <member name="M:AuthorizationCenter.Filters.CheckPermission.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
             <summary>
             异步过滤
@@ -1008,64 +1095,98 @@
             管理接口 TODO
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Managers.IOrganizationManager`2">
+        <member name="T:AuthorizationCenter.Managers.IOrganizationManager`1">
             <summary>
             组织管理
             </summary>
-            <typeparam name="IStore">存储</typeparam>
             <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`2.Create(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Find">
             <summary>
-            新建
+            查询
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`2.Update(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindById(System.String)">
+            <summary>
+            查询通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Create(`0)">
+            <summary>
+            创建
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Update(`0)">
             <summary>
             更新
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`2.Delete(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Exist(System.Func{AuthorizationCenter.Dto.Jsons.OrganizationJson,System.Boolean})">
             <summary>
-            删除
+            存在
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <param name="predicate"></param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Managers.IPermissionManager`2">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.DeleteById(System.String)">
+            <summary>
+            删除通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Managers.IPermissionManager`1">
             <summary>
             权限管理
             </summary>
-            <typeparam name="IStore">存储</typeparam>
             <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IPermissionManager`2.Create(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.Find">
             <summary>
-            新建
+            查询所有
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IPermissionManager`2.Update(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.FindById(System.String)">
+            <summary>
+            通过ID查询
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.Create(`0)">
+            <summary>
+            创建
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.Update(`0)">
             <summary>
             更新
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IPermissionManager`2.Delete(WS.Core.Dto.ResponseMessage{`1},AuthorizationCenter.Dto.Requests.ModelRequest{`1})">
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.Exist(System.Func{`0,System.Boolean})">
             <summary>
-            删除
+            条件存在
             </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IPermissionManager`1.DeleteById(System.String)">
+            <summary>
+            通过ID删除
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.IRoleManager`1">
@@ -1104,6 +1225,13 @@
         <member name="M:AuthorizationCenter.Managers.IRoleManager`1.FindById(System.String)">
             <summary>
             通过ID查询 -异步查询 -只取第一个 -没有返回空
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleManager`1.FindByUserId(System.String)">
+            <summary>
+            查询通过用户ID
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -1162,12 +1290,6 @@
             <param name="response"></param>
             <param name="request"></param>
             <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Check(`0)">
-            <summary>
-            检查用户密码是否正确
-            </summary>
-            <param name="user"></param>
         </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.List(WS.Core.Dto.PagingResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
             <summary>
@@ -1286,6 +1408,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IUserRoleManager.FindByUserId(System.String)">
+            <summary>
+            通过用户ID查询
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IUserRoleManager.Create(AuthorizationCenter.Entitys.UserRole)">
             <summary>
             创建用户角色关联
@@ -1314,6 +1443,132 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="T:AuthorizationCenter.Managers.OrganizationManager">
+            <summary>
+            组织管理
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Managers.OrganizationManager.Store">
+            <summary>
+            存储
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Managers.OrganizationManager.Mapper">
+            <summary>
+            类型映射
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.#ctor(AuthorizationCenter.Stores.IOrganizationStore,AutoMapper.IMapper)">
+            <summary>
+            构造器
+            </summary>
+            <param name="store"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.Create(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
+            <summary>
+            创建
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.DeleteById(System.String)">
+            <summary>
+            删除通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.Exist(System.Func{AuthorizationCenter.Dto.Jsons.OrganizationJson,System.Boolean})">
+            <summary>
+            存在
+            </summary>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.Find">
+            <summary>
+            查询所有
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindById(System.String)">
+            <summary>
+            查询通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.Update(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
+            <summary>
+            更新
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Managers.PermissionManager">
+            <summary>
+            权限管理
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Managers.PermissionManager.Store">
+            <summary>
+            存储
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Managers.PermissionManager.Mapper">
+            <summary>
+            类型映射
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.#ctor(AuthorizationCenter.Stores.IPermissionStore,AutoMapper.IMapper)">
+            <summary>
+            构造器
+            </summary>
+            <param name="store"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.Find">
+            <summary>
+            查询所有
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.FindById(System.String)">
+            <summary>
+            通过ID查询
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.Create(AuthorizationCenter.Dto.Jsons.PermissionJson)">
+            <summary>
+            新增
+            </summary>
+            <param name="userRole"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.Update(AuthorizationCenter.Dto.Jsons.PermissionJson)">
+            <summary>
+            更新用户角色
+            </summary>
+            <param name="userRole"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.Exist(System.Func{AuthorizationCenter.Dto.Jsons.PermissionJson,System.Boolean})">
+            <summary>
+            存在
+            </summary>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.DeleteById(System.String)">
+            <summary>
+            通过ID删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Managers.RoleManger">
             <summary>
             角色管理
@@ -1324,17 +1579,23 @@
             角色管理
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Managers.RoleManger.UserRoleStore">
+            <summary>
+            用户角色关联存储
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Managers.RoleManger.Mapper">
             <summary>
             类型映射
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.RoleManger.#ctor(AuthorizationCenter.Stores.IRoleStore,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Managers.RoleManger.#ctor(AuthorizationCenter.Stores.IRoleStore,AutoMapper.IMapper,AuthorizationCenter.Stores.IUserRoleStore)">
             <summary>
             构造器
             </summary>
             <param name="store"></param>
             <param name="mapper"></param>
+            <param name="userRoleStore"></param>
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.Create(AuthorizationCenter.Dto.Jsons.RoleJson)">
             <summary>
@@ -1390,6 +1651,13 @@
             通过ID查询
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleManger.FindByUserId(System.String)">
+            <summary>
+            查询通过用户ID
+            </summary>
+            <param name="userId"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.FindByName(System.String)">
@@ -1463,13 +1731,6 @@
             </summary>
             <param name="response"></param>
             <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.UserManager.Check(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
-            <summary>
-            检查用户密码否错误
-            </summary>
-            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.ById(WS.Core.Dto.ResponseMessage{AuthorizationCenter.Dto.Jsons.UserBaseJson},AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserBaseJson})">
@@ -1576,6 +1837,13 @@
             通过ID查询
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserRoleManager.FindByUserId(System.String)">
+            <summary>
+            通过用户ID查询
+            </summary>
+            <param name="id">用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserRoleManager.Create(AuthorizationCenter.Entitys.UserRole)">
@@ -1698,28 +1966,11 @@
             <param name="id">ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.FindById``1(System.String,System.Func{`0,``0})">
-            <summary>
-            查询 -通过ID查询 -映射表达式
-            </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="id">ID</param>
-            <param name="map">映射表达式</param>
-            <returns></returns>
-        </member>
         <member name="M:AuthorizationCenter.Stores.INameStore`1.FindByName(System.String)">
             <summary>
             查询 -通过名称查询
             </summary>
             <param name="name">名称</param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.INameStore`1.FindByName``1(System.String,System.Func{`0,``0})">
-            <summary>
-            查询 -通过名称查询
-            </summary>
-            <param name="name">名称</param>
-            <param name="map">映射表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.INameStore`1.DeleteById(System.String)">
@@ -1751,11 +2002,23 @@
             角色存储
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore.FindByUserId(System.String)">
+            <summary>
+            通过用户ID查询角色
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IStore`1">
             <summary>
             存储接口 -这里放的全是接口方法
             </summary>
             <typeparam name="TEntity">数据库实体</typeparam>
+        </member>
+        <member name="P:AuthorizationCenter.Stores.IStore`1.Context">
+            <summary>
+            数据库上下文
+            </summary>
         </member>
         <member name="M:AuthorizationCenter.Stores.IStore`1.Find">
             <summary>
@@ -1855,10 +2118,83 @@
             用户角色存储
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Stores.OrganizationStore">
+            <summary>
+            组织存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            组织存储
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteById(System.String)">
+            <summary>
+            删除通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteByName(System.String)">
+            <summary>
+            删除通过名称
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindById(System.String)">
+            <summary>
+            查询通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindByName(System.String)">
+            <summary>
+            查询通过名称
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.PermissionStore">
             <summary>
             权限存储
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.PermissionStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            构造器
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.PermissionStore.DeleteById(System.String)">
+            <summary>
+            通过ID删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.PermissionStore.DeleteByName(System.String)">
+            <summary>
+            通过名称删除
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.PermissionStore.FindById(System.String)">
+            <summary>
+            通过ID查询
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.PermissionStore.FindByName(System.String)">
+            <summary>
+            通过名称查询
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.RoleStore">
             <summary>
@@ -1892,15 +2228,6 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.RoleStore.FindById``1(System.String,System.Func{AuthorizationCenter.Entitys.Role,``0})">
-            <summary>
-            通过ID查询
-            </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="id"></param>
-            <param name="map"></param>
-            <returns></returns>
-        </member>
         <member name="M:AuthorizationCenter.Stores.RoleStore.FindByName(System.String)">
             <summary>
             通过名称查询
@@ -1908,13 +2235,11 @@
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.RoleStore.FindByName``1(System.String,System.Func{AuthorizationCenter.Entitys.Role,``0})">
+        <member name="M:AuthorizationCenter.Stores.RoleStore.FindByUserId(System.String)">
             <summary>
-            通过名称查询
+            通过用户ID查询角色
             </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="name"></param>
-            <param name="map"></param>
+            <param name="userId"></param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.StoreBase`1">
@@ -2049,28 +2374,11 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindById``1(System.String,System.Func{AuthorizationCenter.Entitys.UserBase,``0})">
-            <summary>
-            查询 -ID -映射表达式
-            </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="id"></param>
-            <param name="map">映射表达式</param>
-            <returns></returns>
-        </member>
         <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindByName(System.String)">
             <summary>
             查询 -通过名称
             </summary>
             <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindByName``1(System.String,System.Func{AuthorizationCenter.Entitys.UserBase,``0})">
-            <summary>
-            查询 -通过名称 -映射表达式
-            </summary>
-            <param name="name">Name</param>
-            <param name="map">映射表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserBaseStore.DeleteById(System.String)">

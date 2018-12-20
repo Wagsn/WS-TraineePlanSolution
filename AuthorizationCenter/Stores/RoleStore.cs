@@ -53,18 +53,6 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 通过ID查询
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="id"></param>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        public IQueryable<TProperty> FindById<TProperty>(string id, Func<Role, TProperty> map)
-        {
-            return Find(role => role.Id == id).Select(role => map(role));
-        }
-
-        /// <summary>
         /// 通过名称查询
         /// </summary>
         /// <param name="name"></param>
@@ -75,15 +63,17 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 通过名称查询
+        /// 通过用户ID查询角色
         /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="name"></param>
-        /// <param name="map"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public IQueryable<TProperty> FindByName<TProperty>(string name, Func<Role, TProperty> map)
+        public IQueryable<Role> FindByUserId(string userId)
         {
-            return Find(role => role.Name == name).Select(role => map(role));
+            return from r in Context.Roles
+                   where (from ur in Context.UserRoles
+                          where ur.UserId == userId
+                          select ur.RoleId).Contains(r.Id)
+                   select r;
         }
     }
 }

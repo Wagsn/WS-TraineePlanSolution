@@ -25,6 +25,13 @@ namespace AuthorizationCenter.Managers
         IQueryable<UserRole> FindById(string id);
 
         /// <summary>
+        /// 通过用户ID查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IQueryable<UserRole> FindByUserId(string id);
+
+        /// <summary>
         /// 创建用户角色关联
         /// </summary>
         /// <param name="userRole"></param>

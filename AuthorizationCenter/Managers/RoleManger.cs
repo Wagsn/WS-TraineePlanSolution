@@ -24,6 +24,11 @@ namespace AuthorizationCenter.Managers
         IRoleStore Store { get; set; }
 
         /// <summary>
+        /// 用户角色关联存储
+        /// </summary>
+        IUserRoleStore UserRoleStore { get; set; }
+
+        /// <summary>
         /// 类型映射
         /// </summary>
         IMapper Mapper { get; set; }
@@ -33,10 +38,12 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="store"></param>
         /// <param name="mapper"></param>
-        public RoleManger(IRoleStore store, IMapper mapper)
+        /// <param name="userRoleStore"></param>
+        public RoleManger(IRoleStore store, IMapper mapper, IUserRoleStore userRoleStore)
         {
             Store = store;
             Mapper = mapper;
+            UserRoleStore = userRoleStore;
         }
         
         /// <summary>
@@ -44,9 +51,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public Task<RoleJson> Create(RoleJson json)
+        public async Task<RoleJson> Create(RoleJson json)
         {
-            return Store.Create(Mapper.Map<Role>(json), role => Mapper.Map<RoleJson>(role));
+            return Mapper.Map<RoleJson>(await Store.Create(Mapper.Map<Role>(json)));
         }
 
         /// <summary>
@@ -117,6 +124,29 @@ namespace AuthorizationCenter.Managers
         public Task<RoleJson> FindById(string id)
         {
             return Store.Find(role => role.Id == id).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// 查询通过用户ID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public IQueryable<RoleJson> FindByUserId(string userId)
+        {
+            return Store.FindByUserId(userId).Select(r => Mapper.Map<RoleJson>(r));
+
+            //var query = from r in Store.Find()
+            //            where (from ur in UserRoleStore.Find()
+            //                   where ur.UserId == id
+            //                   select ur.RoleId).Contains(r.Id)
+            //            select Mapper.Map<RoleJson>(r);
+            //return query;
+
+            // 这里是两条语句，分别SQL之后再在程序中执行关联
+            //return UserRoleStore.Find(it => it.UserId == id).Join(Store.Context.Roles, a => a.RoleId, b => b.Id, (a, b) => b).Select(r => Mapper.Map<RoleJson>(r));
+            ;
+            //var roleids = UserRoleStore.Context.UserRoles.Where(ur => ur.UserId == id).Select(ur => ur.RoleId);
+            //return Store.Find(r => roleids.Contains(r.Id)).Select(r => Mapper.Map<RoleJson>(r));
         }
 
         /// <summary>

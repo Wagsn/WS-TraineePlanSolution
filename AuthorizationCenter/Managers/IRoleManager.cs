@@ -81,7 +81,14 @@ namespace AuthorizationCenter.Managers
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TJson> FindById(string id);
-        
+
+        /// <summary>
+        /// 查询通过用户ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IQueryable<TJson> FindByUserId(string id);
+
         /// <summary>
         /// 通过Name查询 -异步查询 -只取第一个 -没有返回空
         /// </summary>

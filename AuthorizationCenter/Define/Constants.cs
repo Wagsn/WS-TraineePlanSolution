@@ -88,5 +88,15 @@ namespace AuthorizationCenter.Define
         /// PassWord
         /// </summary>
         public const string PASSWORD = "PassWord";
+
+        /// <summary>
+        /// 角色 复数
+        /// </summary>
+        public const string ROLES = "Roles";
+
+        /// <summary>
+        /// 用户角色 复数
+        /// </summary>
+        public const string USERROLES = "UserRoles";
     }
 }

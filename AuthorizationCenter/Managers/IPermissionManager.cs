@@ -14,31 +14,48 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 权限管理
     /// </summary>
-    /// <typeparam name="IStore">存储</typeparam>
     /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
-    public interface IPermissionManager<IStore, TJson> where IStore : IPermissionStore where TJson : PermissionJson
+    public interface IPermissionManager<TJson> where TJson : PermissionJson
     {
         /// <summary>
-        /// 新建
+        /// 查询所有
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
-        Task Create([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        /// <returns></returns>
+        IQueryable<TJson> Find();
+
+        /// <summary>
+        /// 通过ID查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IQueryable<TJson> FindById(string id);
+
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        Task Create(TJson json);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
+        /// <param name="json"></param>
         /// <returns></returns>
-        Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        Task Update(TJson json);
 
         /// <summary>
-        /// 删除
+        /// 条件存在
         /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        Task Delete([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
+        Task<bool> Exist(Func<TJson, bool> predicate);
+
+        /// <summary>
+        /// 通过ID删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IQueryable<TJson>> DeleteById(string id);
     }
 }

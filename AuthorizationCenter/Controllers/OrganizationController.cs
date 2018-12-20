@@ -6,24 +6,50 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuthorizationCenter.Entitys;
+using WS.Text;
+using AuthorizationCenter.Dto.Jsons;
+using AuthorizationCenter.Managers;
 
 namespace AuthorizationCenter.Controllers
 {
+    /// <summary>
+    /// 组织控制
+    /// </summary>
     public class OrganizationController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        /// <summary>
+        /// 管理
+        /// </summary>
+        public IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
 
-        public OrganizationController(ApplicationDbContext context)
+        /// <summary>
+        /// 组织管理
+        /// </summary>
+        /// <param name="organizationManager"></param>
+        public OrganizationController(IOrganizationManager<OrganizationJson> organizationManager)
         {
-            _context = context;
+            OrganizationManager = organizationManager;
         }
 
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <returns></returns>
         // GET: Organization
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Organizations.ToListAsync());
+            var orgs = await OrganizationManager.Find().ToListAsync();
+
+            Console.WriteLine(JsonUtil.ToJson(orgs));
+            
+            return View(orgs);
         }
 
+        /// <summary>
+        /// 详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: Organization/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -32,8 +58,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
             if (organization == null)
             {
                 return NotFound();
@@ -42,28 +67,41 @@ namespace AuthorizationCenter.Controllers
             return View(organization);
         }
 
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <returns></returns>
         // GET: Organization/Create
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
         // POST: Organization/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ParentId,Name,Description")] Organization organization)
+        public async Task<IActionResult> Create([Bind("Id,ParentId,Name,Description")] OrganizationJson organization)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(organization);
-                await _context.SaveChangesAsync();
+                await OrganizationManager.Create(organization);
                 return RedirectToAction(nameof(Index));
             }
             return View(organization);
         }
 
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: Organization/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -72,7 +110,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations.FindAsync(id);
+            var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
             if (organization == null)
             {
                 return NotFound();
@@ -80,12 +118,18 @@ namespace AuthorizationCenter.Controllers
             return View(organization);
         }
 
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organization"></param>
+        /// <returns></returns>
         // POST: Organization/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,ParentId,Name,Description")] Organization organization)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,ParentId,Name,Description")] OrganizationJson organization)
         {
             if (id != organization.Id)
             {
@@ -96,12 +140,11 @@ namespace AuthorizationCenter.Controllers
             {
                 try
                 {
-                    _context.Update(organization);
-                    await _context.SaveChangesAsync();
+                    await OrganizationManager.Update(organization);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrganizationExists(organization.Id))
+                    if (!await OrganizationManager.Exist(org => org.Id ==id))
                     {
                         return NotFound();
                     }
@@ -115,6 +158,11 @@ namespace AuthorizationCenter.Controllers
             return View(organization);
         }
 
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: Organization/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -123,8 +171,7 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
             if (organization == null)
             {
                 return NotFound();
@@ -133,20 +180,18 @@ namespace AuthorizationCenter.Controllers
             return View(organization);
         }
 
+        /// <summary>
+        /// 删除确认
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // POST: Organization/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var organization = await _context.Organizations.FindAsync(id);
-            _context.Organizations.Remove(organization);
-            await _context.SaveChangesAsync();
+            await OrganizationManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool OrganizationExists(string id)
-        {
-            return _context.Organizations.Any(e => e.Id == id);
         }
     }
 }

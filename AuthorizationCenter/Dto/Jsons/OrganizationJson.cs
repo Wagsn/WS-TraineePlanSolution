@@ -1,17 +1,20 @@
 ﻿using AuthorizationCenter.Define;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AuthorizationCenter.Dto.Jsons
 {
     /// <summary>
-    /// 组织Dto
+    /// 组织Dto -ViewModel
     /// </summary>
     public class OrganizationJson
     {
+        //Code: Digit{12}
         /// <summary>
         /// 组织ID（GUID）
         /// </summary>
@@ -23,9 +26,23 @@ namespace AuthorizationCenter.Dto.Jsons
         /// <summary>
         /// 父组织ID
         /// </summary>
+        //[ForeignKey("ParentId")]
         [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string ParentId { get; set; }
+
+        /// <summary>
+        /// 父组织
+        /// </summary>
+        [NotMapped]
+        [JsonIgnore]
+        public OrganizationJson Parent { get; set; }
+
+        /// <summary>
+        /// 子组织
+        /// </summary>
+        [NotMapped]
+        public List<OrganizationJson> Childs { get; set; }
 
         /// <summary>
         /// 组织名称

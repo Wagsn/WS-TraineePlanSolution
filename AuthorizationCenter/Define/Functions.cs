@@ -19,19 +19,18 @@ namespace AuthorizationCenter.Define
         /// <param name="pageIndex">分页索引，从0开始</param>
         /// <param name="pageSize">每页数量{0,}</param>
         /// <returns></returns>
-        public static IQueryable<TEle> Page<TEle>(IQueryable<TEle> data, int pageIndex, [Range(1, 50, ErrorMessage ="每页数量在1到50之间")]int pageSize)
+        public static IQueryable<TEle> Page<TEle>(IQueryable<TEle> data, int pageIndex, int pageSize)
         {
             // 总数
-            var count = data.Count();
+            int count = data.Count();
             // 判断索引有效
             int pIndex = pageIndex;
-            if (pageIndex > (int)Math.Ceiling((double)count / pageSize) - 1)
-            {
-                // 默认超限选择第一页
-                pIndex = 0;
-            }
+            int pSize = pageSize > 50 ? 10 : pageSize;
+            if (pageSize <= 0) pSize = 10;
+            int pageNum = (int)Math.Ceiling((double)count / pSize);
+            pIndex = (pageIndex % pageNum + pageNum) % pageNum;
             // 获取数据
-            return data.Skip(pIndex * pageSize).Take(pageSize);
+            return data.Skip(pIndex * pSize).Take(pSize);
         }
     }
 }

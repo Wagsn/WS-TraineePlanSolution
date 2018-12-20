@@ -14,25 +14,25 @@ namespace AuthorizationCenter.Filters
     /// </summary>
     public class CheckPermission : IAsyncActionFilter
     {
-        /// <summary>
-        /// 用户管理
-        /// </summary>
-        public IUserManager<UserBaseJson> UserManager { get; set; }
+        ///// <summary>
+        ///// 用户管理
+        ///// </summary>
+        //public IUserManager<UserBaseJson> UserManager { get; set; }
 
-        /// <summary>
-        /// 权限管理
-        /// </summary>
-        public IPermissionManager<IPermissionStore, PermissionJson> PermissionManager { get; set; }
+        ///// <summary>
+        ///// 权限管理
+        ///// </summary>
+        //public IPermissionManager<PermissionJson> PermissionManager { get; set; }
 
-        /// <summary>
-        /// 角色管理
-        /// </summary>
-        public IRoleManager<RoleJson> RoleManager { get; set; }
+        ///// <summary>
+        ///// 角色管理
+        ///// </summary>
+        //public IRoleManager<RoleJson> RoleManager { get; set; }
 
-        /// <summary>
-        /// 组织管理
-        /// </summary>
-        public IOrganizationManager<IOrganizationStore, OrganizationJson> OrganizationManager { get; set; }
+        ///// <summary>
+        ///// 组织管理
+        ///// </summary>
+        //public IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
 
         /// <summary>
         /// 异步过滤

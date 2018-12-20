@@ -97,16 +97,6 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 检查用户密码否错误
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public Task<bool> Check(UserBaseJson user)
-        {
-            return Store.Exist(u => user.SignName == u.SignName && user.PassWord == u.PassWord);
-        }
-
-        /// <summary>
         /// 通过ID查询
         /// </summary>
         /// <param name="response"></param>
@@ -143,7 +133,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserBaseJson> FindById(string id)
         {
-            return Store.FindById(id, ub => Mapper.Map<UserBaseJson>(ub));
+            return Store.FindById(id).Select(ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>
@@ -153,7 +143,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserBaseJson> FindByName(string name)
         {
-            return Store.FindByName(name, ub => Mapper.Map<UserBaseJson>(ub));
+            return Store.FindByName(name).Select(ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>

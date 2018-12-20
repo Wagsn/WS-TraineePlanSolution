@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Filters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -65,6 +67,11 @@ namespace AuthorizationCenter
                 var xmlPath = Path.Combine("./doc/", "api.xml");
                 c.IncludeXmlComments(xmlPath);
                 //c.OperationFilter<HttpHeaderOperation>(); // 添加httpHeader参数
+            });
+
+            services.AddDbContext<ApplicationDbContext>(it =>
+            {
+                it.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
             });
         }
 

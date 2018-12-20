@@ -13,6 +13,11 @@ namespace AuthorizationCenter.Stores
     public interface IStore<TEntity> where TEntity : class
     {
         /// <summary>
+        /// 数据库上下文
+        /// </summary>
+        ApplicationDbContext Context { get; set; }
+
+        /// <summary>
         /// 批量查询
         /// </summary>
         /// <returns></returns>

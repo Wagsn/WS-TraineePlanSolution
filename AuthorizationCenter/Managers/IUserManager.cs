@@ -46,12 +46,6 @@ namespace AuthorizationCenter.Managers
         //IStore Store { get; set; }
 
         /// <summary>
-        /// 检查用户密码是否正确
-        /// </summary>
-        /// <param name="user"></param>
-        Task<bool> Check(TJson user);
-
-        /// <summary>
         /// 批量查询
         /// </summary>
         /// <param name="response"></param>

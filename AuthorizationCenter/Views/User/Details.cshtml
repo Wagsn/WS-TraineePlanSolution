@@ -1,18 +1,35 @@
-﻿@model AuthorizationCenter.Dto.Jsons.UserBaseJson
+﻿@model UserBaseJson
 
 @{
     ViewData["Title"] = "Details";
     // 伪造数据, 仅显示看看效果
-    var roles = new List<RoleJson>();
-    for(int i=0; i<10; i++)
-    {
-        roles.Add(new RoleJson
-        {
-            Id = i.ToString(),
-            Name = i.ToString(),
-            Decription = i.ToString()
-        });
-    }
+    //var roles = new List<RoleJson>(); // ViewBag.Roles;
+    var roles = (List<RoleJson>)ViewBag.Roles;
+    //for (int i=0; i<10; i++)
+    //{
+    //    roles.Add(new RoleJson
+    //    {
+    //        Id = i.ToString(),
+    //        Name = i.ToString(),
+    //        Decription = i.ToString()
+    //    });
+    //}
+    //var urs = new List<UserRole>();
+    //for (int i = 0; i < 10; i++)
+    //{
+    //    urs.Add(new UserRole
+    //    {
+    //        Role = new Role
+    //        {
+    //            Id = i.ToString(),
+    //            Name = i.ToString(),
+    //            Decription = i.ToString()
+    //        }
+    //    });
+    //}
+
+    var userRoles = (List<UserRole>)ViewBag.UserRoles;
+
 }
 
 <h2>Details</h2>
@@ -36,6 +53,10 @@
             @Html.DisplayFor(model => model.PassWord)
         </dd>
     </dl>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
     <p>TODO 该用户的角色列表（每个角色旁边有修改角色，删除绑定，角色详情按钮）</p>
     <table class="table" border="1">
         <thead>
@@ -52,26 +73,22 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var role in roles)
+            @foreach (var userRole in userRoles)
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => role.Name)
+                        @Html.DisplayFor(modelItem => userRole.Role.Name)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => role.Decription)
+                        @Html.DisplayFor(modelItem => userRole.Role.Decription)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@role.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@role.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@role.Id">Delete</a>
+                        <a asp-action="Edit" asp-controller="Roles" asp-route-id="@userRole.Role.Id">Edit</a> |
+                        <a asp-action="Details" asp-controller="Roles" asp-route-id="@userRole.Role.Id">Details</a> |
+                        <a asp-action="Delete" asp-controller="UserRoles" asp-route-id="@userRole.Id">Delete</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
 </div>

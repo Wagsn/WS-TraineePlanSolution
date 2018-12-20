@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuthorizationCenter.Dto.Jsons;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AuthorizationCenter.Entitys
 {
@@ -91,21 +92,22 @@ namespace AuthorizationCenter.Entitys
             builder.Entity<Organization>(b =>
             {
                 b.ToTable("ws_organization");
+                b.HasOne(e => e.Parent).WithMany(org => org.Childs);
             });
 
             #endregion
         }
 
-        /// <summary>
-        /// 数据库配置
-        /// </summary>
-        /// <param name="builder">数据库上下文选项创建器</param>
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            base.OnConfiguring(builder);
-            // Pomelo.EntityFrameworkCore.MySql 
-            // TODO: 采用配置文件的方式
-            builder.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
-        }
+        ///// <summary>
+        ///// 数据库配置 -迁移到Startup.cs -生成基架时取消注释
+        ///// </summary>
+        ///// <param name="builder">数据库上下文选项创建器</param>
+        //protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        //{
+        //    base.OnConfiguring(builder);
+        //    // Pomelo.EntityFrameworkCore.MySql 
+        //    // TODO: 采用配置文件的方式
+        //    builder.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
+        //}
     }
 }
