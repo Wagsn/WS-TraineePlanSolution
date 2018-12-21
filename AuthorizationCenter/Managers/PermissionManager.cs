@@ -58,13 +58,13 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="userRole"></param>
+        /// <param name="permission"></param>
         /// <returns></returns>
-        public async Task Create(PermissionJson userRole)
+        public async Task Create(PermissionJson permission)
         {
             // 前端没有传Id上来
-            userRole.Id = Guid.NewGuid().ToString();
-            await Store.Create(Mapper.Map<Permission>(userRole));
+            permission.Id = Guid.NewGuid().ToString();
+            await Store.Create(Mapper.Map<Permission>(permission));
         }
 
         /// <summary>

@@ -11,5 +11,5 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 用户存储
     /// </summary>
-    public interface IUserBaseStore : INameStore<UserBase> {}
+    public interface IUserBaseStore : INameStore<User> {}
 }

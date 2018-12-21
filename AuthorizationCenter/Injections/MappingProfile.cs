@@ -19,11 +19,11 @@ namespace AuthorizationCenter.Injections
         /// </summary>
         public MappingProfile()
         {
-            CreateMap<UserBase, UserBaseJson>();
-            CreateMap<UserBaseJson, UserBase>();
+            CreateMap<User, UserBaseJson>();
+            CreateMap<UserBaseJson, User>();
 
-            CreateMap<Organization, OrganizationJson>();
-            CreateMap<OrganizationJson, Organization>();
+            CreateMap<Organization, OrganizationJson>(); //.ForMember(o => o.Parent, m => m.Ignore());
+            CreateMap<OrganizationJson, Organization>(); //.ForMember(o => o.Parent, m => m.Ignore());
 
             CreateMap<Role, RoleJson>();
             CreateMap<RoleJson, Role>();

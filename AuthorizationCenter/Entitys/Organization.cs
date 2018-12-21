@@ -24,9 +24,9 @@ namespace AuthorizationCenter.Entitys
         public string Id { get; set; }
 
         /// <summary>
-        /// 父组织ID
+        /// 父组织ID -在没有标注为外键时必须要与Parent属性名称对应才能被自动作为外键
         /// </summary>
-        //[ForeignKey("ParentId")]
+        //[ForeignKey("Parent")]
         [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string ParentId { get; set; }
@@ -34,6 +34,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 父组织
         /// </summary>
+        //[ForeignKey("ParentId")]  // 指定外键
         [NotMapped]
         [JsonIgnore]
         public Organization Parent { get; set; }
@@ -42,7 +43,7 @@ namespace AuthorizationCenter.Entitys
         /// 子组织
         /// </summary>
         [NotMapped]
-        public List<Organization> Childs { get; set; }
+        public List<Organization> Children { get; set; }
 
         /// <summary>
         /// 组织名称
@@ -50,6 +51,11 @@ namespace AuthorizationCenter.Entitys
         [StringLength(15, MinimumLength = 2)]
         [RegularExpression(Constants.VISIBLE_REG, ErrorMessage = Constants.VISIBLE_ERR)]
         public string Name { get; set; }
+
+        ///// <summary>
+        ///// 组织类型 -个人、俱乐部、协会等等
+        ///// </summary>
+        //public string Type { get; set; }
 
         /// <summary>
         /// 组织描述

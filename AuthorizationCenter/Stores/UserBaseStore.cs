@@ -14,7 +14,7 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 用户核心表存储实现
     /// </summary>
-    public class UserBaseStore : StoreBase<UserBase>, IUserBaseStore
+    public class UserBaseStore : StoreBase<User>, IUserBaseStore
     {
         /// <summary>
         /// 构造器
@@ -31,7 +31,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<UserBase> FindById(string id)
+        public IQueryable<User> FindById(string id)
         {
             return Find(ub => ub.Id == id);
         }
@@ -41,7 +41,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IQueryable<UserBase> FindByName(string name)
+        public IQueryable<User> FindByName(string name)
         {
             return Find(ub => ub.SignName == name);
         }
@@ -51,7 +51,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns></returns>
-        public Task<IQueryable<UserBase>> DeleteById(string id)
+        public Task<IQueryable<User>> DeleteById(string id)
         {
             // 打印日志
             Logger.Trace($"[{nameof(DeleteById)}] 条件删除用户({id})");
@@ -63,7 +63,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name">用户名</param>
         /// <returns></returns>
-        public Task<IQueryable<UserBase>> DeleteByName(string name)
+        public Task<IQueryable<User>> DeleteByName(string name)
         {
             // 打印日志
             Logger.Trace($"[{nameof(DeleteByName)}] 条件删除用户({name})");

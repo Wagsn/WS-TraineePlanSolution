@@ -9,15 +9,14 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 角色组织权限关联
+    /// 用户组织关联表
     /// </summary>
-    public class RoleOrgPerm
+    public class UserOrg
     {
         /// <summary>
-        /// 关联ID - 便于修改
+        /// 关联ID
         /// </summary>
         [Key]
-        //[MaxLength(36)]
         [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string Id { get; set; }
@@ -25,21 +24,29 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 用户ID
         /// </summary>
-        [ForeignKey("UserId")]
         public string UserId { get; set; }
 
-        //public
+        /// <summary>
+        /// 用户
+        /// </summary>
+        [ForeignKey("UserId")]
+        public User User { get; set; }
 
         /// <summary>
         /// 组织ID
         /// </summary>
-        [ForeignKey("OrgId")]
         public string OrgId { get; set; }
 
         /// <summary>
-        /// 权限ID
+        /// 组织
         /// </summary>
-        [ForeignKey("PemId")]
-        public string PemId { get; set; }
+        [ForeignKey("OrgId")]
+        public Organization Org { get; set; }
+
+        /// <summary>
+        /// 关系类型 -所有、从属、管理、访客 
+        /// </summary>
+        [StringLength(31, MinimumLength =3, ErrorMessage ="类型格式错误，长度在3-15之间")]
+        public string Type { get; set; }
     }
 }

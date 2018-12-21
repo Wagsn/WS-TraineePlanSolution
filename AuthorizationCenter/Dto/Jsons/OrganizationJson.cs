@@ -42,7 +42,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// 子组织
         /// </summary>
         [NotMapped]
-        public List<OrganizationJson> Childs { get; set; }
+        public List<OrganizationJson> Children { get; set; }
 
         /// <summary>
         /// 组织名称

@@ -11,7 +11,7 @@ namespace AuthorizationCenter.Entitys
     /// <summary>
     /// 用户实体
     /// </summary>
-    public class UserBase
+    public class User
     {
         /// <summary>
         /// 用户ID

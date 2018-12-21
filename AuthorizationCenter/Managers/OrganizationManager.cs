@@ -36,6 +36,22 @@ namespace AuthorizationCenter.Managers
             Mapper = mapper;
         }
 
+        private OrganizationJson Map(Organization organization)
+        {
+            var json = new OrganizationJson
+            {
+                Id = organization.Id,
+                Name = organization.Name,
+                Description = organization.Description,
+                ParentId = organization.ParentId,
+                Children = new List<OrganizationJson>()
+            };
+            foreach(var org in organization.Children)
+            {
+                json.Children.Add(Map(org));
+            }
+            return json;
+        }
 
 
         /// <summary>
@@ -85,6 +101,24 @@ namespace AuthorizationCenter.Managers
         public IQueryable<OrganizationJson> FindById(string id)
         {
             return Store.Find(org => org.Id == id).Include(org => org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
+        }
+
+        /// <summary>
+        /// 查询通过用户ID -先找角色-再找组织
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IQueryable<OrganizationJson> FindByUserId(string id)
+        {
+            return (from org in Store.Context.Organizations
+                   where (from rop in Store.Context.RoleOrgPers
+                          where (from ur in Store.Context.UserRoles
+                                 where ur.UserId == id
+                                 select ur.RoleId).Contains(rop.RoleId)
+                          select rop.OrgId).Contains(org.Id)
+                   select org).Include(org =>org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
+
+            //return Store.Find(org => Store.Context.RoleOrgPers.Where(rop = rop))
         }
 
         /// <summary>

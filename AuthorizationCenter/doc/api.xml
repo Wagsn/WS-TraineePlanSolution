@@ -126,6 +126,15 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="P:AuthorizationCenter.Controllers.OrganizationController.SignUser">
+            <summary>
+            获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+            </summary>
+            <returns></returns>
+            <summary>
+            登陆用户
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Controllers.PermissionController">
             <summary>
             权限控制
@@ -337,76 +346,58 @@
             <param name="routeValues"></param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Controllers.UserBasesController">
+        <member name="T:AuthorizationCenter.Controllers.SignUser">
             <summary>
-            控制器
+            登陆用户
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Controllers.UserBasesController._context">
+        <member name="P:AuthorizationCenter.Controllers.SignUser.Session">
             <summary>
-            数据库上下文
+            Serssion
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
-            <summary>
-            构造器
-            </summary>
-            <param name="context"></param>
-        </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Index">
+        <member name="M:AuthorizationCenter.Controllers.SignUser.#ctor">
             <summary>
             
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Details(System.String)">
+        <member name="M:AuthorizationCenter.Controllers.SignUser.#ctor(Microsoft.AspNetCore.Http.ISession)">
             <summary>
-            详情
+            登陆用户
             </summary>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="session"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Create">
+        <member name="M:AuthorizationCenter.Controllers.SignUser.Set(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
             <summary>
-            新建
+            设置
             </summary>
-            <returns></returns>
+            <param name="user"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Create(AuthorizationCenter.Entitys.UserBase)">
+        <member name="M:AuthorizationCenter.Controllers.SignUser.SetSession(Microsoft.AspNetCore.Http.ISession)">
             <summary>
-            新建
+            
             </summary>
-            <param name="userBase"></param>
-            <returns></returns>
+            <param name="session"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Edit(System.String)">
+        <member name="M:AuthorizationCenter.Controllers.SignUser.Clear">
             <summary>
-            编辑
+            清除
             </summary>
-            <param name="id"></param>
-            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Edit(System.String,AuthorizationCenter.Entitys.UserBase)">
+        <member name="P:AuthorizationCenter.Controllers.SignUser.Id">
             <summary>
-            编辑
+            用户ID
             </summary>
-            <param name="id"></param>
-            <param name="userBase"></param>
-            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.Delete(System.String)">
+        <member name="P:AuthorizationCenter.Controllers.SignUser.SignName">
             <summary>
-            删除
+            用户签名
             </summary>
-            <param name="id"></param>
-            <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserBasesController.DeleteConfirmed(System.String)">
+        <member name="P:AuthorizationCenter.Controllers.SignUser.PassWord">
             <summary>
-            删除确认
+            用户密码
             </summary>
-            <param name="id"></param>
-            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Controllers.UserController">
             <summary>
@@ -719,7 +710,7 @@
         </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.OrganizationJson">
             <summary>
-            组织Dto
+            组织Dto -ViewModel
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Id">
@@ -737,7 +728,7 @@
             父组织
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Childs">
+        <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Children">
             <summary>
             子组织
             </summary>
@@ -760,6 +751,16 @@
         <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Id">
             <summary>
             权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.ParentId">
+            <summary>
+            父权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Parent">
+            <summary>
+            父权限
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.PermissionJson.Name">
@@ -885,6 +886,11 @@
             组织数据集
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.RoleOrgPers">
+            <summary>
+            角色组织权限
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Entitys.ApplicationDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <summary>
             在模型创建时
@@ -903,7 +909,7 @@
         </member>
         <member name="P:AuthorizationCenter.Entitys.Organization.ParentId">
             <summary>
-            父组织ID
+            父组织ID -在没有标注为外键时必须要与Parent属性名称对应才能被自动作为外键
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Entitys.Organization.Parent">
@@ -911,7 +917,7 @@
             父组织
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.Organization.Childs">
+        <member name="P:AuthorizationCenter.Entitys.Organization.Children">
             <summary>
             子组织
             </summary>
@@ -934,6 +940,16 @@
         <member name="P:AuthorizationCenter.Entitys.Permission.Id">
             <summary>
             权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.Permission.ParentId">
+            <summary>
+            父权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.Permission.Parent">
+            <summary>
+            父权限
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Entitys.Permission.Name">
@@ -971,54 +987,104 @@
             用户角色
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Entitys.RoleOrgPerm">
+        <member name="T:AuthorizationCenter.Entitys.RoleOrgPer">
             <summary>
             角色组织权限关联
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.RoleOrgPerm.Id">
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.Id">
             <summary>
             关联ID - 便于修改
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.RoleOrgPerm.UserId">
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.RoleId">
             <summary>
             用户ID
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.RoleOrgPerm.OrgId">
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.Role">
+            <summary>
+            用户
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.OrgId">
             <summary>
             组织ID
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.RoleOrgPerm.PemId">
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.Org">
+            <summary>
+            组织
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.PerId">
             <summary>
             权限ID
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Entitys.UserBase">
+        <member name="P:AuthorizationCenter.Entitys.RoleOrgPer.Per">
+            <summary>
+            权限
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Entitys.User">
             <summary>
             用户实体
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.UserBase.Id">
+        <member name="P:AuthorizationCenter.Entitys.User.Id">
             <summary>
             用户ID
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.UserBase.SignName">
+        <member name="P:AuthorizationCenter.Entitys.User.SignName">
             <summary>
             用户签名
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.UserBase.PassWord">
+        <member name="P:AuthorizationCenter.Entitys.User.PassWord">
             <summary>
             用户密码
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.UserBase.UserRoles">
+        <member name="P:AuthorizationCenter.Entitys.User.UserRoles">
             <summary>
             用户角色
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Entitys.UserOrg">
+            <summary>
+            用户组织关联表
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.Id">
+            <summary>
+            关联ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.UserId">
+            <summary>
+            用户ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.User">
+            <summary>
+            用户
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.OrgId">
+            <summary>
+            组织ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.Org">
+            <summary>
+            组织
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserOrg.Type">
+            <summary>
+            关系类型 -所有、从属、管理、访客 
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Entitys.UserRole">
@@ -1110,6 +1176,13 @@
         <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindById(System.String)">
             <summary>
             查询通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindByUserId(System.String)">
+            <summary>
+            查询通过用户ID -先找角色-再找组织
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -1499,6 +1572,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindByUserId(System.String)">
+            <summary>
+            查询通过用户ID -先找角色-再找组织
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.Update(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
             更新
@@ -1545,7 +1625,7 @@
             <summary>
             新增
             </summary>
-            <param name="userRole"></param>
+            <param name="permission"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.PermissionManager.Update(AuthorizationCenter.Dto.Jsons.PermissionJson)">

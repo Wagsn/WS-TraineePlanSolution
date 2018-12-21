@@ -88,8 +88,8 @@ namespace AuthorizationCenter.Controllers
         public IActionResult Create()
         {
             // 查询 所有的用户角色
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name");
-            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName");
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name));
+            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName));
             return View();
         }
 
@@ -113,9 +113,9 @@ namespace AuthorizationCenter.Controllers
             //ViewData["Roles"] = _context.Roles;
             //ViewData["Users"] = _context.UserBases;
 
-            // 这个东东很奇特啊，显示的是Name字段，得到的是？
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
+            // 生成选择框数据
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
             return View(userRole);
         }
 
@@ -137,8 +137,8 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
             return View(userRole);
         }
 
@@ -168,8 +168,8 @@ namespace AuthorizationCenter.Controllers
                     if(await UserRoleManager.Exist(ur=> ur.RoleId==userRole.RoleId && ur.UserId == userRole.UserId))
                     {
                         ModelState.AddModelError("All", "角色已经被绑定在该用户上");
-                        ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
-                        ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
+                        ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+                        ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
                         return View(userRole);
                     }
                     else
@@ -190,8 +190,8 @@ namespace AuthorizationCenter.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), "Id", "Name", userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), "Id", "SignName", userRole.UserId);
+            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
             return View(userRole);
         }
 

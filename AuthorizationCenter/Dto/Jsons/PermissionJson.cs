@@ -21,6 +21,16 @@ namespace AuthorizationCenter.Dto.Jsons
         public string Id { get; set; }
 
         /// <summary>
+        /// 父权限ID
+        /// </summary>
+        public string ParentId { get; set; }
+
+        /// <summary>
+        /// 父权限
+        /// </summary>
+        public PermissionJson Parent { get; set; }
+
+        /// <summary>
         /// 权限名称
         /// </summary>
         [StringLength(15, MinimumLength = 2)]

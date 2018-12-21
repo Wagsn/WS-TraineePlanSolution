@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,17 @@ namespace AuthorizationCenter.Entitys
         [StringLength(36, MinimumLength =36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage =Constants.GUID_ERR)]
         public string Id { get; set; }
+
+        /// <summary>
+        /// 父权限ID
+        /// </summary>
+        public string ParentId { get; set; }
+
+        /// <summary>
+        /// 父权限
+        /// </summary>
+        [ForeignKey("ParentId")]
+        public Permission Parent { get; set; }
 
         /// <summary>
         /// 权限名称

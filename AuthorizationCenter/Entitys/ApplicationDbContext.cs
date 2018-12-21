@@ -29,7 +29,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 用户数据集
         /// </summary>
-        public DbSet<UserBase> UserBases { get; set; }
+        public DbSet<User> UserBases { get; set; }
 
         /// <summary>
         /// 角色数据集
@@ -51,6 +51,11 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         public DbSet<Organization> Organizations { get; set; }
 
+        /// <summary>
+        /// 角色组织权限
+        /// </summary>
+        public DbSet<RoleOrgPer> RoleOrgPers { get; set; }
+
         #endregion
 
         /// <summary>
@@ -63,7 +68,7 @@ namespace AuthorizationCenter.Entitys
 
             #region << 模型映射 >>
 
-            builder.Entity<UserBase>(b =>
+            builder.Entity<User>(b =>
             {
                 b.ToTable("ws_userbase");
                 b.HasIndex(p => p.SignName).IsUnique();
@@ -92,7 +97,13 @@ namespace AuthorizationCenter.Entitys
             builder.Entity<Organization>(b =>
             {
                 b.ToTable("ws_organization");
-                b.HasOne(e => e.Parent).WithMany(org => org.Childs);
+                b.HasOne(e => e.Parent).WithMany(org => org.Children);
+            });
+
+            builder.Entity<RoleOrgPer>(b =>
+            {
+                b.ToTable("ws_role_org_per");
+                //b.Property(p => p.Id).ValueGeneratedOnAddOrUpdate();
             });
 
             #endregion

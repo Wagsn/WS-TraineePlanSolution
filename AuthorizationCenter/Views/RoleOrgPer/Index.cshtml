@@ -1,10 +1,10 @@
-﻿@model IEnumerable<PermissionJson>
+﻿@model IEnumerable<AuthorizationCenter.Entitys.RoleOrgPer>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>权限管理</h2>
+<h2>授权管理</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,10 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Role)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @nameof(Organization)
+            </th>
+            <th>
+                @nameof(Permission)
             </th>
             <th></th>
         </tr>
@@ -25,10 +28,13 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Role.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                @Html.DisplayFor(modelItem => item.Org.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Per.Name)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

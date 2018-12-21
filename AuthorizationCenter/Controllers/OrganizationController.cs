@@ -9,6 +9,8 @@ using AuthorizationCenter.Entitys;
 using WS.Text;
 using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Managers;
+using AuthorizationCenter.Define;
+using Microsoft.AspNetCore.Http;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -21,7 +23,7 @@ namespace AuthorizationCenter.Controllers
         /// 管理
         /// </summary>
         public IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
-
+        
         /// <summary>
         /// 组织管理
         /// </summary>
@@ -38,7 +40,9 @@ namespace AuthorizationCenter.Controllers
         // GET: Organization
         public async Task<IActionResult> Index()
         {
-            var orgs = await OrganizationManager.Find().ToListAsync();
+            // TODO 筛选出登陆用户可见的组织 -根据用户找到角色 -根据角色找到组织 -根据父组织找到所有子组织
+            var orgs = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
+            var organizations = await OrganizationManager.Find().ToListAsync();
 
             Console.WriteLine(JsonUtil.ToJson(orgs));
             
@@ -72,8 +76,9 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Organization/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewData["OrgId"] = new SelectList(OrganizationManager.Find(), nameof(Organization.Id), nameof(Organization.Name), await OrganizationManager.Find().FirstOrDefaultAsync());
             return View();
         }
 
@@ -91,6 +96,7 @@ namespace AuthorizationCenter.Controllers
         {
             if (ModelState.IsValid)
             {
+                // 检查是否存在循环（允许有向无环图的产生，而不仅仅是树形结构）
                 await OrganizationManager.Create(organization);
                 return RedirectToAction(nameof(Index));
             }
@@ -192,6 +198,45 @@ namespace AuthorizationCenter.Controllers
         {
             await OrganizationManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// 登陆用户
+        /// </summary>
+        private UserBaseJson SignUser
+        {
+            get
+            {
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                return new UserBaseJson
+                {
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                if (value == null)
+                {
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
+                }
+                else
+                {
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
+                }
+            }
         }
     }
 }

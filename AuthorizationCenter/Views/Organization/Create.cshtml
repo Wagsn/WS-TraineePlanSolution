@@ -13,8 +13,10 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="ParentId" class="control-label"></label>
-                <input asp-for="ParentId" class="form-control" />
+                @* 这里写一个SelectList *@
+                <label class="control-label">Parent Name</label>
+                <select name="ParentId" class="form-control" asp-items="ViewBag.OrgId"></select>
+                @*<input asp-for="ParentId" class="form-control" />*@
                 <span asp-validation-for="ParentId" class="text-danger"></span>
             </div>
             <div class="form-group">

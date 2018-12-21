@@ -48,7 +48,7 @@ namespace AuthorizationCenter.Managers
         public async Task Create([Required] ResponseMessage<UserBaseJson> response, [Required] ModelRequest<UserBaseJson> request)
         {
             // 构建模型
-            var ub = Mapper.Map<UserBase>(request.Data);
+            var ub = Mapper.Map<User>(request.Data);
             ub.Id = Guid.NewGuid().ToString();
 
             // 存储
@@ -153,7 +153,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public  Task<UserBaseJson> Update(UserBaseJson json)
         {
-            return Store.Update(Mapper.Map<UserBase>(json), ub => Mapper.Map<UserBaseJson>(ub));
+            return Store.Update(Mapper.Map<User>(json), ub => Mapper.Map<UserBaseJson>(ub));
         }
 
         /// <summary>

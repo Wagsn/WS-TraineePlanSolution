@@ -36,15 +36,14 @@ namespace AuthorizationCenter
             //    return;
             //}
 
-            if (!context.UserBases.Any())
+            if (!context.UserBases.Any(u => u.SignName =="Wagsn"))
             {
-                context.Add(new UserBase
+                context.Add(new User
                 {
                     Id = Guid.NewGuid().ToString(),
                     SignName = "Wagsn",
                     PassWord = "123456"
                 });
-
                 try
                 {
                     context.SaveChanges();
@@ -54,6 +53,28 @@ namespace AuthorizationCenter
                     Console.WriteLine("数据库初始化时插入核心用户失败：\r\n" + e);
                 }
             }
+            if (!context.Roles.Any(r => r.Name=="SuperRoot"))
+            {
+                context.Add(new Role
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "SuperRoot",
+                    Decription = "系统最高用户"
+                });
+                context.SaveChanges();
+                
+            }
+            if(!context.UserRoles.Any(ur => ur.RoleId == context.Roles.Where(r => r.Name == "SuperRoot").Single().Id&&ur.UserId== context.UserBases.Where(u => u.SignName == "Wagsn").Single().Id))
+            {
+                context.Add(new UserRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    RoleId = context.Roles.Where(r => r.Name == "SuperRoot").Single().Id,
+                    UserId = context.UserBases.Where(u => u.SignName == "Wagsn").Single().Id
+                });
+                context.SaveChanges();
+            }
+            
 
             
 

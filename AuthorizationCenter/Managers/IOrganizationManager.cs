@@ -30,6 +30,13 @@ namespace AuthorizationCenter.Managers
         IQueryable<TJson> FindById(string id);
 
         /// <summary>
+        /// 查询通过用户ID -先找角色-再找组织
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IQueryable<TJson> FindByUserId(string id);
+
+        /// <summary>
         /// 创建
         /// </summary>
         /// <param name="json"></param>
