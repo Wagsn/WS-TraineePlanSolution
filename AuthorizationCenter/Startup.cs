@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthorizationCenter.Define;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Filters;
 using AutoMapper;
@@ -43,6 +44,11 @@ namespace AuthorizationCenter
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(Constants.CONFIGPATH)
+                .AddEnvironmentVariables()
+                .Build();
+
             services.AddMvc(config => config.Filters.Add(typeof(SignFilter))).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSession();
@@ -64,14 +70,15 @@ namespace AuthorizationCenter
                 c.IgnoreObsoleteActions();
                 //Set the comments path for the swagger json and ui.
                 //var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-                var xmlPath = Path.Combine("./doc/", "api.xml");
+                var xmlPath = Path.Combine(Constants.DOCDIR, "api.xml");
                 c.IncludeXmlComments(xmlPath);
                 //c.OperationFilter<HttpHeaderOperation>(); // 添加httpHeader参数
             });
 
             services.AddDbContext<ApplicationDbContext>(it =>
             {
-                it.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
+                it.UseMySql(configuration["Data:DefaultConnection:ConnectionString"] ?? "server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
+                //it.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
             });
         }
 

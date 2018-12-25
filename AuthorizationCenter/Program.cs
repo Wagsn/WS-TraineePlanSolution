@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthorizationCenter.Define;
 using AuthorizationCenter.Entitys;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -61,8 +62,9 @@ namespace AuthorizationCenter
         /// <returns></returns>
         public static IConfigurationRoot GetConfig(string[] args)
         {
+            // 检查配置文件??
             return new ConfigurationBuilder()
-                .AddJsonFile("./cfg/config.json")
+                .AddJsonFile(Constants.CONFIGPATH)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();

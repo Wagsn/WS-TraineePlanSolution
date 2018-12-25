@@ -90,7 +90,9 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<OrganizationJson> Find()
         {
-            return Store.Find().Include(org => org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
+            return Store.Find()
+                .Include(org => org.Parent)
+                .Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
         /// <summary>
@@ -100,7 +102,9 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<OrganizationJson> FindById(string id)
         {
-            return Store.Find(org => org.Id == id).Include(org => org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
+            return Store.Find(org => org.Id == id)
+                .Include(org => org.Parent)
+                .Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
         /// <summary>
@@ -111,12 +115,13 @@ namespace AuthorizationCenter.Managers
         public IQueryable<OrganizationJson> FindByUserId(string id)
         {
             return (from org in Store.Context.Organizations
-                   where (from rop in Store.Context.RoleOrgPers
-                          where (from ur in Store.Context.UserRoles
-                                 where ur.UserId == id
-                                 select ur.RoleId).Contains(rop.RoleId)
-                          select rop.OrgId).Contains(org.Id)
-                   select org).Include(org =>org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
+                    where (from rop in Store.Context.RoleOrgPers
+                           where (from ur in Store.Context.UserRoles
+                                  where ur.UserId == id
+                                  select ur.RoleId).Contains(rop.RoleId)
+                           select rop.OrgId).Contains(org.Id)
+                    select org).Select(org => Mapper.Map<OrganizationJson>(org));
+            //select org).Include(org =>org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
 
             //return Store.Find(org => Store.Context.RoleOrgPers.Where(rop = rop))
         }
@@ -128,7 +133,8 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task Update(OrganizationJson json)
         {
-            await Store.Update(Mapper.Map<Organization>(json));
+            var organization = Mapper.Map<Organization>(json);
+            await Store.Update(organization);
         }
     }
 }

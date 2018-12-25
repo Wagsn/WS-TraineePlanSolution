@@ -41,12 +41,13 @@ namespace AuthorizationCenter.Controllers
         public async Task<IActionResult> Index()
         {
             // TODO 筛选出登陆用户可见的组织 -根据用户找到角色 -根据角色找到组织 -根据父组织找到所有子组织
-            var orgs = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
-            var organizations = await OrganizationManager.Find().ToListAsync();
+            var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
 
-            Console.WriteLine(JsonUtil.ToJson(orgs));
+            Console.WriteLine(JsonUtil.ToJson(orgnazitions));
+
+            ViewData["list"] = WS.Text.JsonUtil.ToJson(orgnazitions);
             
-            return View(orgs);
+            return View(orgnazitions);
         }
 
         /// <summary>

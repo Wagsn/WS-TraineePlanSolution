@@ -663,6 +663,11 @@
             英文字母 正则表达式
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Define.Constants.IdLengthErrMsg">
+            <summary>
+            Id的字符数不能超过36 const静态常量（编译期决定值） readonly动态常量
+            </summary>
+        </member>
         <member name="F:AuthorizationCenter.Define.Constants.SIGNUSER">
             <summary>
             SignUser
@@ -691,6 +696,16 @@
         <member name="F:AuthorizationCenter.Define.Constants.USERROLES">
             <summary>
             用户角色 复数
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.CONFIGPATH">
+            <summary>
+            配置文件路径
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.DOCDIR">
+            <summary>
+            文档文件夹
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Define.Functions">
@@ -1027,6 +1042,46 @@
             权限
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Entitys.TodoItem">
+            <summary>
+            待办项
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.Id">
+            <summary>
+            待办ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.Name">
+            <summary>
+            待办名
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.Content">
+            <summary>
+            待办内容
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.IsComplete">
+            <summary>
+            是否完成
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.BuildTime">
+            <summary>
+            创建时间
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.ExpectTime">
+            <summary>
+            预期完成时间
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.TodoItem.ActualTime">
+            <summary>
+            实际完成时间
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Entitys.User">
             <summary>
             用户实体
@@ -1350,6 +1405,11 @@
             </summary>
             <param name="id">ID</param>
             <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Managers.ITodoItemManager">
+            <summary>
+            待办项管理接口
+            </summary>
         </member>
         <member name="T:AuthorizationCenter.Managers.IUserManager`1">
             <summary>
@@ -2188,6 +2248,11 @@
             <param name="entity">实体</param>
             <returns></returns>
         </member>
+        <member name="T:AuthorizationCenter.Stores.ITodoItemStore">
+            <summary>
+            待办项存储
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IUserBaseStore">
             <summary>
             用户存储
@@ -2434,6 +2499,39 @@
             <typeparam name="TProperty"></typeparam>
             <param name="entity"></param>
             <param name="map"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.TodoItemStore">
+            <summary>
+            待办项存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.TodoItemStore.DeleteById(System.String)">
+            <summary>
+            通过ID删除
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.TodoItemStore.DeleteByName(System.String)">
+            <summary>
+            通过名称删除
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.TodoItemStore.FindById(System.String)">
+            <summary>
+            通过ID查询
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.TodoItemStore.FindByName(System.String)">
+            <summary>
+            通过名称查询
+            </summary>
+            <param name="name"></param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.UserBaseStore">

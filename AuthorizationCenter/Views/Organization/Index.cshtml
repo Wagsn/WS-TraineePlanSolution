@@ -26,23 +26,137 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Parent.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Parent.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+@* 在这里创建一个组织显示树 *@
+<link rel="stylesheet" href="/css/bootstrapStyle.css" type="text/css">
+
+<h1>zTree - bootstrap 风格</h1>
+<ul id="treeDemo" class="ztree">
+
+</ul>
+@section Scripts{
+    <script type="text/javascript">
+        // 创建一个zTree树
+        function createTree2(url, treeId) {
+            var zTree; //用于保存创建的树节点
+            var setting = { //设置
+                check: {
+                    enable: true
+                },
+                view: {
+                    showLine: true, //显示辅助线
+                    dblClickExpand: true,
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "parentId",
+                        rootPId: null
+                    }
+                }
+            };
+            $.ajax({ //请求数据,创建树
+                type: 'GET',
+                url: url,
+                dataType: "json", //返回的结果为json  
+                success: function (data) {
+                    zTree = $.fn.zTree.init($(treeId), setting, data); //创建树
+                },
+                error: function (data) {
+                    alert("创建树失败!" + data);
+                }
+            });
+        }
+        /**
+         * 创建一棵树
+         * @@param treeId HtmlDoc ID
+         */
+        function createTree(treeId) {
+            var setting = { //设置
+                check: {
+                    enable: true
+                },
+                view: {
+                    addHoverDom: addHoverDom,
+                    removeHoverDom: removeHoverDom,
+                    selectedMulti: false
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "parentId"
+                    }
+                },
+                edit: {
+                    enable: true
+                }
+            };
+            data = JSON.parse(`@Html.Raw(WS.Text.JsonUtil.ToJson(Model))`);
+            console.log(data);
+            $.fn.zTree.init($(treeId), setting, data);
+        }
+        var setting = {
+            view: {
+                addHoverDom: addHoverDom,
+                removeHoverDom: removeHoverDom,
+                selectedMulti: false
+            },
+            // 点击分支时动态刷新数据??
+            check: {
+                enable: true
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            edit: {
+                enable: true
+            }
+        };
+        $(document).ready(function () {
+            createTree("#treeDemo");
+        });
+
+        var newCount = 1;
+        function addHoverDom(treeId, treeNode) {
+            var sObj = $("#" + treeNode.tId + "_span");
+            if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                + "' title='add node' onfocus='this.blur();'></span>";
+            sObj.after(addStr);
+            var btn = $("#addBtn_" + treeNode.tId);
+            if (btn) btn.bind("click", function () {
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                zTree.addNodes(treeNode, { id: (100 + newCount), pId: treeNode.id, name: "new node" + (newCount++) });
+                return false;
+            });
+        };
+        function removeHoverDom(treeId, treeNode) {
+            $("#addBtn_" + treeNode.tId).unbind().remove();
+        };
+
+    </script>
+}

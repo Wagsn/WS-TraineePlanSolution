@@ -10,6 +10,8 @@ namespace AuthorizationCenter.Define
     /// </summary>
     public static class Constants
     {
+        #region << 正则表达式及其错误提示 >>
+
         /// <summary>
         /// 字符 -十六进制
         /// </summary>
@@ -23,7 +25,7 @@ namespace AuthorizationCenter.Define
         /// <summary>
         /// GUID 格式错误消息
         /// </summary>
-        public const string GUID_ERR = "GUID输入错误";
+        public const string GUID_ERR = "GUID格式错误";
 
         /// <summary>
         /// 签名 正则表达式
@@ -71,6 +73,13 @@ namespace AuthorizationCenter.Define
         public const string LETTER_REG = "[a-zA-Z]";
 
         /// <summary>
+        /// Id的字符数不能超过36 const静态常量（编译期决定值） readonly动态常量
+        /// </summary>
+        public const string IdLengthErrMsg = "Id的字符数不能超过36";
+
+        #endregion
+
+        /// <summary>
         /// SignUser
         /// </summary>
         public const string SIGNUSER = "SignUser";
@@ -98,5 +107,19 @@ namespace AuthorizationCenter.Define
         /// 用户角色 复数
         /// </summary>
         public const string USERROLES = "UserRoles";
+
+        #region << 文件路径 >>
+
+        /// <summary>
+        /// 配置文件路径
+        /// </summary>
+        public const string CONFIGPATH = "./cfg/config.json";
+
+        /// <summary>
+        /// 文档文件夹
+        /// </summary>
+        public const string DOCDIR = "./doc/";
+
+        #endregion
     }
 }
