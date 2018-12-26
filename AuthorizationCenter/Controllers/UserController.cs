@@ -101,22 +101,28 @@ namespace AuthorizationCenter.Controllers
                 Data = new UserBaseJson { Id = id }
             };
             // 业务处理
-            await UserManager.ById(response, request);
-            // MVC 响应构造
-            if (response.Code == ResponseDefine.SuccessCode)
+            try
             {
-                // 查询成功
-                // 再查询用户绑定的角色列表
-                ViewData[Constants.ROLES] =await RoleManager.FindByUserId(id).ToListAsync();
-                ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
-                return View(response.Extension);
+                var user = await UserManager.FindById(id).SingleOrDefaultAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    // 查询成功
+                    // 再查询用户绑定的角色列表
+                    ViewData[Constants.ROLES] = await RoleManager.FindByUserId(id).ToListAsync();
+                    ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
+                    return View(user);
+                }
             }
-            else if(response.Code == ResponseDefine.NotFound)
+            catch (Exception e)
             {
-                return NotFound();
+                Logger.Error(e);
+                return View(nameof(Index));
             }
-            // 返回到用户列表
-            return View(nameof(Index));
+            
         }
 
         /// <summary>

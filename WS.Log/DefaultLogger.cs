@@ -40,10 +40,15 @@ namespace WS.Log
             Log(Config, LogLevels.Error, message);
         }
 
+        public void Error(object message)
+        {
+            Error(message?.ToString());
+        }
+
         public void Error(string formatString, params object[] args)
         {
 
-            Log(Config, LogLevels.Error, formatString, args);
+            Error(string.Format(formatString, args));
         }
 
         public void Fatal(string message)

@@ -14,12 +14,12 @@ namespace AuthorizationCenter.Define
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <typeparam name="TEle"></typeparam>
+        /// <typeparam name="E"></typeparam>
         /// <param name="data">数据来源</param>
         /// <param name="pageIndex">分页索引，从0开始</param>
         /// <param name="pageSize">每页数量{0,}</param>
         /// <returns></returns>
-        public static IQueryable<TEle> Page<TEle>(IQueryable<TEle> data, int pageIndex, int pageSize)
+        public static IQueryable<E> Page<E>(IQueryable<E> data, int pageIndex, int pageSize)
         {
             // 总数
             int count = data.Count();

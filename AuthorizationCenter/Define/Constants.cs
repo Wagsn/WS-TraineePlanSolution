@@ -79,6 +79,8 @@ namespace AuthorizationCenter.Define
 
         #endregion
 
+        #region << 变量名 -用于ViewData >>
+
         /// <summary>
         /// SignUser
         /// </summary>
@@ -108,6 +110,8 @@ namespace AuthorizationCenter.Define
         /// </summary>
         public const string USERROLES = "UserRoles";
 
+        #endregion
+
         #region << 文件路径 >>
 
         /// <summary>
@@ -119,6 +123,40 @@ namespace AuthorizationCenter.Define
         /// 文档文件夹
         /// </summary>
         public const string DOCDIR = "./doc/";
+
+        #endregion
+
+        #region << 权限项名称 >>
+
+        /// <summary>
+        /// 用户管理 -用户增删查改
+        /// </summary>
+        public const string USER_MANAGE = "USER_MANAGE";
+
+        /// <summary>
+        /// 组织管理 -组织的增删查改
+        /// </summary>
+        public const string ORG_MANAGE = "ORG_MANAGE";
+
+        /// <summary>
+        /// 角色管理 -角色项的增删查改
+        /// </summary>
+        public const string ROLE_MANAGE = "ROLE_MANAGE";
+
+        /// <summary>
+        /// 权限管理 -权限项写死了的，这里指的是数据库
+        /// </summary>
+        public const string PER_MANAGE = "PER_MANAGE";
+
+        /// <summary>
+        /// 角色绑定 -用户角色关联的增删查改
+        /// </summary>
+        public const string ROLE_BIND_MANAGE = "ROLE_BIND_MANAGE";
+
+        /// <summary>
+        /// 授权管理 -角色组织权限关联的增删查改
+        /// </summary>
+        public const string AUTH_MANAGE = "AUTH_MANAGE";
 
         #endregion
     }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System;
 
 namespace AuthorizationCenter.Filters
 {
@@ -33,6 +34,21 @@ namespace AuthorizationCenter.Filters
         ///// 组织管理
         ///// </summary>
         //public IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
+
+        /// <summary>
+        /// 权限
+        /// </summary>
+        public string Permission { get; set; }
+
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="permission"></param>
+        public CheckPermission (string permission = null)
+        {
+            Permission = permission;
+            Console.WriteLine(permission);
+        }
 
         /// <summary>
         /// 异步过滤

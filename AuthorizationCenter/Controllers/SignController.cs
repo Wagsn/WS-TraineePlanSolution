@@ -30,7 +30,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 日志器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger("SignController");
+        public ILogger Logger = LoggerManager.GetLogger(nameof(SignController));
 
         /// <summary>
         /// 用户管理
@@ -82,7 +82,7 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
-                Logger.Error("用户创建失败" + e);
+                Logger.Error("用户创建失败：\r\n" + e);
             }
 
             return RedirectToRoute(new { controller = "UserBaseJsons", action = "Index" });

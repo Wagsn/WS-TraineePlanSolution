@@ -11,6 +11,9 @@ using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Managers;
 using AuthorizationCenter.Define;
 using Microsoft.AspNetCore.Http;
+using AuthorizationCenter.Filters;
+using AuthorizationCenter.Dto.Responses;
+using WS.Log;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -23,7 +26,12 @@ namespace AuthorizationCenter.Controllers
         /// 管理
         /// </summary>
         public IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
-        
+
+        /// <summary>
+        /// 日志记录器
+        /// </summary>
+        public ILogger Logger = LoggerManager.GetLogger(nameof(OrganizationController));
+
         /// <summary>
         /// 组织管理
         /// </summary>
@@ -34,24 +42,56 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 列表
+        /// 列表 -MVC
         /// </summary>
         /// <returns></returns>
         // GET: Organization
         public async Task<IActionResult> Index()
         {
-            // TODO 筛选出登陆用户可见的组织 -根据用户找到角色 -根据角色找到组织 -根据父组织找到所有子组织
-            var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
+            try
+            {
+                // TODO 筛选出登陆用户可见的组织 -根据用户找到角色 -根据角色找到组织 -根据父组织找到所有子组织
+                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
 
-            Console.WriteLine(JsonUtil.ToJson(orgnazitions));
+                Console.WriteLine(JsonUtil.ToJson(orgnazitions));
 
-            ViewData["list"] = WS.Text.JsonUtil.ToJson(orgnazitions);
-            
-            return View(orgnazitions);
+                ViewData["list"] = JsonUtil.ToJson(orgnazitions);
+
+                return View(orgnazitions);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 组织列表获取失败：\r\n" + e);
+                return View();
+            }
         }
 
         /// <summary>
-        /// 详情
+        /// 列表 -API -只能看到自己所在的组织（查找方式，通过角色->三者关联->组织）
+        /// </summary>
+        /// <returns></returns>
+        public async Task<PageResponesBody<OrganizationJson>> List()
+        {
+            try
+            {
+                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
+
+                Console.WriteLine(JsonUtil.ToJson(orgnazitions));
+
+                return new PageResponesBody<OrganizationJson>
+                {
+                    Data = orgnazitions
+                };
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 组织列表获取失败：\r\n" + e);
+                return new PageResponesBody<OrganizationJson>().ServerError(e);
+            }
+        }
+
+        /// <summary>
+        /// 详情 -MVC
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -63,28 +103,43 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
 
-            var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
-            if (organization == null)
-            {
-                return NotFound();
-            }
+            try{
+                var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
+                if (organization == null)
+                {
+                    return NotFound();
+                }
 
-            return View(organization);
+                return View(organization);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Details)}] 组织详情查看失败" + e);
+                return View(nameof(Index));
+            }
         }
 
         /// <summary>
-        /// 创建
+        /// 创建 -MVC -组织列表（用来选择父组织）
         /// </summary>
         /// <returns></returns>
         // GET: Organization/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["OrgId"] = new SelectList(OrganizationManager.Find(), nameof(Organization.Id), nameof(Organization.Name), await OrganizationManager.Find().FirstOrDefaultAsync());
+            try
+            {
+                var organizations = await OrganizationManager.Find().ToListAsync();
+                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Create)}] 组织列表查询失败：\r\n" + e);
+            }
             return View();
         }
 
         /// <summary>
-        /// 创建
+        /// 创建 -MVC
         /// </summary>
         /// <param name="organization"></param>
         /// <returns></returns>
@@ -105,7 +160,7 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 编辑
+        /// 编辑 -MVC
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -126,7 +181,7 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 编辑
+        /// 编辑 -MVC
         /// </summary>
         /// <param name="id"></param>
         /// <param name="organization"></param>
@@ -151,7 +206,7 @@ namespace AuthorizationCenter.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await OrganizationManager.Exist(org => org.Id ==id))
+                    if (!await OrganizationManager.Exist(org => org.Id == id))
                     {
                         return NotFound();
                     }
@@ -166,11 +221,12 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 删除
+        /// 删除 -MVC
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: Organization/Delete/5
+        [TypeFilter(typeof(CheckPermission))]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -188,7 +244,40 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 删除确认
+        /// 通过ID删除 -API
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        //[HttpDelete]
+        [TypeFilter(typeof(CheckPermission), Arguments = new object[]{Constants.ORG_MANAGE})]
+        public async Task<ResponseBody<OrganizationJson>> DeleteById (string id)
+        {
+            if(id == null)
+            {
+                return ResponseBody.NotFound<OrganizationJson>("通过ID找不到组织");
+            }
+
+            try
+            {
+                var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
+                return ResponseBody.WrapData(organization);
+                //if (organization == null)
+                //{
+                //    return ResponseBody.NotFound<OrganizationJson>("通过ID找不到组织");
+                //}
+                //return new ResponseBody<OrganizationJson>
+                //{
+                //    Data = organization
+                //};
+            }
+            catch (Exception e)
+            {
+                return ResponseBody.ServerError<OrganizationJson>(e);
+            }
+        }
+
+        /// <summary>
+        /// 删除确认 -MVC
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

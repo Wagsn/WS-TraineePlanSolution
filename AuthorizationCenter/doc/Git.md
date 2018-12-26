@@ -92,6 +92,15 @@ git init
 git status
 ```
 
+## 标签
+
+每次发版后，需要在master分支上打上版本标签，方便以后获取固定版本代码，之前都没打，后面吧0.5 0.6也补上。
+添加本地标签： git tag -a v0.7 -m 'v0.7版本'
+提交标签到远端：git push origin --tags
+
+补充0.5. 0.6找到 当前最后一次提交的 commit id
+git tag -a v0.5 [commit id] -m 'v0.5'
+
 ## 问题及解决方案
 
 ### 凭据问题

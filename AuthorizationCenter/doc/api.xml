@@ -119,6 +119,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.DeleteById(System.String)">
+            <summary>
+            通过ID删除 -API
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.DeleteConfirmed(System.String)">
             <summary>
             删除确认
@@ -708,6 +715,36 @@
             文档文件夹
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Define.Constants.USER_MANAGE">
+            <summary>
+            用户管理 -用户增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ORG_MANAGE">
+            <summary>
+            组织管理 -组织的增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_MANAGE">
+            <summary>
+            角色管理 -角色项的增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.PER_MANAGE">
+            <summary>
+            权限管理 -权限项写死了的，这里指的是数据库
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_BIND_MANAGE">
+            <summary>
+            角色绑定 -用户角色关联的增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.AUTH_MANAGE">
+            <summary>
+            授权管理 -角色组织权限关联的增删查改
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Define.Functions">
             <summary>
             公共函数集
@@ -717,7 +754,7 @@
             <summary>
             分页查询
             </summary>
-            <typeparam name="TEle"></typeparam>
+            <typeparam name="E"></typeparam>
             <param name="data">数据来源</param>
             <param name="pageIndex">分页索引，从0开始</param>
             <param name="pageSize">每页数量{0,}</param>
@@ -858,6 +895,93 @@
         <member name="P:AuthorizationCenter.Dto.Requests.UserBaseRequest.User">
             <summary>
             用户基础信息
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Responses.ResponseBody">
+            <summary>
+            携带消息的响应体
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.ResponseBody.Code">
+            <summary>
+            状态码
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.ResponseBody.Message">
+            <summary>
+            消息
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.#ctor">
+            <summary>
+            构造器
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.WrapData``1(``0)">
+            <summary>
+            填装数据
+            </summary>
+            <typeparam name="D"></typeparam>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.NotFound(System.String)">
+            <summary>
+            找不到资源
+            </summary>
+            <param name="msg">错误提示信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.NotFound``1(System.Object)">
+            <summary>
+            找不到资源
+            </summary>
+            <param name="msg">错误提示信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.ServerError``1(System.Object)">
+            <summary>
+            服务器错误
+            </summary>
+            <typeparam name="D"></typeparam>
+            <param name="msg"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Responses.ResponseBody`1">
+            <summary>
+            携带数据的响应体
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.ResponseBody`1.Data">
+            <summary>
+            携带的数据
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Dto.Responses.PageResponesBody`1">
+            <summary>
+            携带列表数据的响应体
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.PageResponesBody`1.PageIndex">
+            <summary>
+            分页索引，当前页码，从0开始
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.PageResponesBody`1.PageSize">
+            <summary>
+            每页记录数量
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.PageResponesBody`1.PageCount">
+            <summary>
+            页数
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Responses.PageResponesBody`1.TotalCount">
+            <summary>
+            记录总数
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Entitys.ApplicationDbContext">
@@ -1176,6 +1300,17 @@
             <summary>
             权限检查过滤器（异步权限检查）
             </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Filters.CheckPermission.Permission">
+            <summary>
+            权限
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Filters.CheckPermission.#ctor(System.String)">
+            <summary>
+            构造器
+            </summary>
+            <param name="permission"></param>
         </member>
         <member name="M:AuthorizationCenter.Filters.CheckPermission.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
             <summary>
