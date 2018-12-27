@@ -111,31 +111,30 @@
                 },
                 edit: {
                     enable: true
+                },
+                callback: {
+                    beforeEditName: function (treeId, treeNode) {
+                        console.log("treeId: " + treeId);
+                        console.log("orgid: " + treeNode.id);
+                        return true;
+                    },
+                    beforeRename: function (treeId, treeNode, newName) {
+                        console.log("treeId: " + treeId);
+                        console.log("orgid: " + treeNode.id);
+                        //$.ajax({
+                        //    sync: true,
+                        //    url: 
+                        //});
+                        
+                        return true;
+                    }
                 }
             };
             data = JSON.parse(`@Html.Raw(WS.Text.JsonUtil.ToJson(Model))`);
             console.log(data);
             $.fn.zTree.init($(treeId), setting, data);
         }
-        var setting = {
-            view: {
-                addHoverDom: addHoverDom,
-                removeHoverDom: removeHoverDom,
-                selectedMulti: false
-            },
-            // 点击分支时动态刷新数据??
-            check: {
-                enable: true
-            },
-            data: {
-                simpleData: {
-                    enable: true
-                }
-            },
-            edit: {
-                enable: true
-            }
-        };
+        
         $(document).ready(function () {
             createTree("#treeDemo");
         });
@@ -145,12 +144,11 @@
             var sObj = $("#" + treeNode.tId + "_span");
             if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
             var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
-                + "' title='add node' onfocus='this.blur();'></span>";
+                + "'data-id='" + treeNode.id+"' title='add node' onfocus='this.blur();'></span>";
             sObj.after(addStr);
             var btn = $("#addBtn_" + treeNode.tId);
             if (btn) btn.bind("click", function () {
-                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-                zTree.addNodes(treeNode, { id: (100 + newCount), pId: treeNode.id, name: "new node" + (newCount++) });
+                location.href = "/Organization/Create/" + treeNode.id;
                 return false;
             });
         };

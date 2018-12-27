@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Core.Dto;
+using WS.Log;
 
 namespace AuthorizationCenter.Managers
 {
@@ -27,6 +28,11 @@ namespace AuthorizationCenter.Managers
         /// 类型映射
         /// </summary>
         public IMapper Mapper { get; set; }
+
+        /// <summary>
+        /// 日志记录器
+        /// </summary>
+        public ILogger Logger = LoggerManager.GetLogger(nameof(UserManager));
 
         /// <summary>
         /// 构造器
@@ -60,6 +66,28 @@ namespace AuthorizationCenter.Managers
             catch (Exception e)
             {
                 response.Wrap(ResponseDefine.BadRequset, e.Message);  // 给前端返回简称 Store层中打印全部错误消息日志
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public async Task<UserBaseJson> Create(UserBaseJson json)
+        {
+            var ub = Mapper.Map<User>(json);
+            ub.Id = Guid.NewGuid().ToString();
+            // 存储
+            try
+            {
+                var dbub = await Store.Create(ub);
+                return Mapper.Map<UserBaseJson>(dbub);
+            }
+            catch (Exception e)
+            {
+
                 throw e;
             }
         }

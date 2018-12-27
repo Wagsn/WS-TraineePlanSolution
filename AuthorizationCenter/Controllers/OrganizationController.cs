@@ -96,6 +96,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: Organization/Details/5
+        [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -124,10 +125,12 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Organization/Create
-        public async Task<IActionResult> Create()
+        [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
+        public async Task<IActionResult> Create(string orgid = null)
         {
             try
             {
+                //if()
                 var organizations = await OrganizationManager.Find().ToListAsync();
                 ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name));
             }

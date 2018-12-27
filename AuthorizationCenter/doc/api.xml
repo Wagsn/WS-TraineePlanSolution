@@ -65,6 +65,11 @@
             管理
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Controllers.OrganizationController.Logger">
+            <summary>
+            日志记录器
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.#ctor(AuthorizationCenter.Managers.IOrganizationManager{AuthorizationCenter.Dto.Jsons.OrganizationJson})">
             <summary>
             组织管理
@@ -73,40 +78,46 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index">
             <summary>
-            列表
+            列表 -MVC
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.List">
+            <summary>
+            列表 -API -只能看到自己所在的组织（查找方式，通过角色->三者关联->组织）
             </summary>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Details(System.String)">
             <summary>
-            详情
+            详情 -MVC
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Create">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Create(System.String)">
             <summary>
-            创建
+            创建 -MVC -组织列表（用来选择父组织）
             </summary>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Create(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            创建
+            创建 -MVC
             </summary>
             <param name="organization"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Edit(System.String)">
             <summary>
-            编辑
+            编辑 -MVC
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Edit(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            编辑
+            编辑 -MVC
             </summary>
             <param name="id"></param>
             <param name="organization"></param>
@@ -114,7 +125,7 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.Delete(System.String)">
             <summary>
-            删除
+            删除 -MVC
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -128,7 +139,7 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.OrganizationController.DeleteConfirmed(System.String)">
             <summary>
-            删除确认
+            删除确认 -MVC
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -947,6 +958,12 @@
             <param name="msg"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody.ServerError(System.Object)">
+            <summary>
+            包装
+            </summary>
+            <param name="msg"></param>
+        </member>
         <member name="T:AuthorizationCenter.Dto.Responses.ResponseBody`1">
             <summary>
             携带数据的响应体
@@ -957,6 +974,12 @@
             <summary>
             携带的数据
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.ResponseBody`1.ServerError(System.Object)">
+            <summary>
+            包装
+            </summary>
+            <param name="msg"></param>
         </member>
         <member name="T:AuthorizationCenter.Dto.Responses.PageResponesBody`1">
             <summary>
@@ -983,6 +1006,12 @@
             <summary>
             记录总数
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Dto.Responses.PageResponesBody`1.ServerError(System.Object)">
+            <summary>
+            包装
+            </summary>
+            <param name="msg"></param>
         </member>
         <member name="T:AuthorizationCenter.Entitys.ApplicationDbContext">
             <summary>
@@ -1581,6 +1610,13 @@
             <param name="request">请求</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Create(`0)">
+            <summary>
+            创建
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.Update(`0)">
             <summary>
             更新
@@ -1970,6 +2006,11 @@
             类型映射
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Managers.UserManager.Logger">
+            <summary>
+            日志记录器
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserBaseStore,AutoMapper.IMapper)">
             <summary>
             构造器
@@ -1983,6 +2024,13 @@
             </summary>
             <param name="response"></param>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.Create(AuthorizationCenter.Dto.Jsons.UserBaseJson)">
+            <summary>
+            创建
+            </summary>
+            <param name="json"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.Delete(WS.Core.Dto.ResponseMessage{AuthorizationCenter.Dto.Jsons.UserBaseJson},AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserBaseJson})">

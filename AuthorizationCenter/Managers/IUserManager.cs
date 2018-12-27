@@ -68,6 +68,13 @@ namespace AuthorizationCenter.Managers
         Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         /// <summary>
+        /// 创建
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        Task<TJson> Create(TJson json);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="json"></param>

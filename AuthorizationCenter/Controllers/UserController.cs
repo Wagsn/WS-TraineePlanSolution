@@ -167,21 +167,17 @@ namespace AuthorizationCenter.Controllers
                 }
 
                 // 处理业务
-                ResponseMessage<UserBaseJson> response = new ResponseMessage<UserBaseJson>();
                 try
                 {
-                    await UserManager.Create(response, new ModelRequest<UserBaseJson>
-                    {
-                        Data = userBaseJson,
-                        User = SignUser
-                    });
-                    if (response.Code == ResponseDefine.SuccessCode)
+                    // return UserManager.Create(this, userBaseJson); // (Controller, Request)=>IActionResult;
+                    var user =await UserManager.Create(userBaseJson);
+                    if (user != null)
                     {
                         return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        ModelState.AddModelError("All", response.Message);
+                        ModelState.AddModelError("All", "新增失败");
                         return View(userBaseJson);
                     }
                 }
