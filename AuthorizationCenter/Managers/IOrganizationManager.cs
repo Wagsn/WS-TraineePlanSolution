@@ -30,6 +30,13 @@ namespace AuthorizationCenter.Managers
         IQueryable<TJson> FindById(string id);
 
         /// <summary>
+        /// 通过组织ID查询所有子节点，返回组织树
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Organization FindChildrenById(string id);
+
+        /// <summary>
         /// 查询通过用户ID -先找角色-再找组织
         /// </summary>
         /// <param name="id"></param>

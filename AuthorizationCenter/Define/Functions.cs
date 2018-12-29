@@ -32,5 +32,15 @@ namespace AuthorizationCenter.Define
             // 获取数据
             return data.Skip(pIndex * pSize).Take(pSize);
         }
+
+        /// <summary>
+        /// 加密
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static string Encrypt(string src)
+        {
+            return null;
+        }
     }
 }

@@ -92,6 +92,7 @@
          * 创建一棵树
          * @@param treeId HtmlDoc ID
          */
+
         function createTree(treeId) {
             var setting = { //设置
                 check: {
@@ -113,19 +114,28 @@
                     enable: true
                 },
                 callback: {
+                    // 点击编辑按钮
                     beforeEditName: function (treeId, treeNode) {
-                        console.log("treeId: " + treeId);
-                        console.log("orgid: " + treeNode.id);
-                        return true;
+                        console.log({
+                            event: "beforeEditName",
+                            treeId,
+                            orgid: treeNode.id
+                        });
+                        // 跳转到编辑按钮
+                        location.href = "/Organization/Edit/" + treeNode.id;
+                        return false;
                     },
+                    // 修改节点的名称
                     beforeRename: function (treeId, treeNode, newName) {
-                        console.log("treeId: " + treeId);
-                        console.log("orgid: " + treeNode.id);
-                        //$.ajax({
-                        //    sync: true,
-                        //    url: 
-                        //});
-                        
+                        // log.environment = "Development"
+                        // log({event: "beforeRename", treeId, orgid: treeNode.id, newName});
+                        console.log({
+                            event: "beforeRename",
+                            treeId,
+                            orgid: treeNode.id,  // the id is source data from server
+                            newName
+                        });
+                        // 向服务器请求修改名称-还是点击编辑按钮直接跳转到编辑界面
                         return true;
                     }
                 }
@@ -138,8 +148,7 @@
         $(document).ready(function () {
             createTree("#treeDemo");
         });
-
-        var newCount = 1;
+        
         function addHoverDom(treeId, treeNode) {
             var sObj = $("#" + treeNode.tId + "_span");
             if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;

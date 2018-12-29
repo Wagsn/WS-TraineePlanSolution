@@ -103,8 +103,23 @@ namespace AuthorizationCenter.Managers
         public IQueryable<OrganizationJson> FindById(string id)
         {
             return Store.Find(org => org.Id == id)
-                .Include(org => org.Parent)
+                .Include(org => org.Children)
                 .Select(org => Mapper.Map<OrganizationJson>(org));
+        }
+
+        /// <summary>
+        /// 递归查询所有节点，构成一棵树返回
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Organization FindChildrenById(string id)
+        {
+            var org = Store.Find(o => o.Id == id).Include(o => o.Children).SingleOrDefault();
+            for (int i = 0; i < org.Children.Count; i++)
+            {
+                org.Children[i] = FindChildrenById(org.Children[i].Id);
+            }
+            return org;
         }
 
         /// <summary>

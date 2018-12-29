@@ -771,6 +771,13 @@
             <param name="pageSize">每页数量{0,}</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Define.Functions.Encrypt(System.String)">
+            <summary>
+            加密
+            </summary>
+            <param name="src"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.OrganizationJson">
             <summary>
             组织Dto -ViewModel
@@ -1399,6 +1406,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindChildrenById(System.String)">
+            <summary>
+            通过组织ID查询所有子节点，返回组织树
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindByUserId(System.String)">
             <summary>
             查询通过用户ID -先找角色-再找组织
@@ -1799,6 +1813,13 @@
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindById(System.String)">
             <summary>
             查询通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindChildrenById(System.String)">
+            <summary>
+            递归查询所有节点，构成一棵树返回
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -2315,6 +2336,13 @@
             组织存储
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenById(System.String)">
+            <summary>
+            通过组织ID找到所有子组织（包括间接子组织children.children）
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IPermissionStore">
             <summary>
             权限存储
@@ -2476,6 +2504,28 @@
             查询通过ID
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildrenById(System.String)">
+            <summary>
+            通过组织ID找到所有子组织（包括间接子组织children.children）
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.RecursionOrganizations(AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            递归查询
+            </summary>
+            <param name="organization"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.RecursionOrganizations(System.Collections.Generic.List{AuthorizationCenter.Entitys.Organization},AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            递归查询
+            </summary>
+            <param name="result"></param>
+            <param name="organization"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindByName(System.String)">

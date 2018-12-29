@@ -176,6 +176,8 @@ namespace AuthorizationCenter.Controllers
             }
 
             var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
+            Console.WriteLine("========================\r\n"+JsonUtil.ToJson(OrganizationManager.FindChildrenById(id)));
+
             if (organization == null)
             {
                 return NotFound();
