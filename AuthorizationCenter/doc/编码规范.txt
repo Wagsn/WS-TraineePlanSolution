@@ -1,0 +1,14 @@
+﻿# 编码规范
+
+## 数据持久化相关
+
+// 新增
+Crate
+// 修改
+Update
+// 查询
+Find =Select
+// 删除
+Delete =Remove
+// 保存
+Save = Create|Update

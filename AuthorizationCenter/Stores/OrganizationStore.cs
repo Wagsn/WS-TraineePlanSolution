@@ -1,5 +1,6 @@
 ﻿
 using AuthorizationCenter.Entitys;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,11 +66,11 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 递归查询
+        /// 递归查询子组织
         /// </summary>
         /// <param name="organization"></param>
         /// <returns></returns>
-        public List<Organization> RecursionOrganizations(Organization organization)
+        public List<Organization> RecursionChildren(Organization organization)
         {
             List<Organization> result = new List<Organization>();
             // 根据 orgid查询其所有直接子组织
@@ -77,26 +78,9 @@ namespace AuthorizationCenter.Stores
             // 遍历其直接子组织
             foreach(var org in orgs)
             {
-                result.AddRange(RecursionOrganizations(org));
+                result.AddRange(RecursionChildren(org));
             }
             return result;
-        }
-
-        /// <summary>
-        /// 递归查询
-        /// </summary>
-        /// <param name="result"></param>
-        /// <param name="organization"></param>
-        /// <returns></returns>
-        public void RecursionOrganizations(List<Organization> result, Organization organization)
-        {
-            // 根据 orgid查询其所有直接子组织
-            var orgs = Find(o => organization.Id == o.ParentId).ToList();
-            // 遍历其直接子组织
-            foreach (var org in orgs)
-            {
-                result.AddRange(RecursionOrganizations(org));
-            }
         }
 
         /// <summary>
@@ -107,6 +91,24 @@ namespace AuthorizationCenter.Stores
         public IQueryable<Organization> FindByName(string name)
         {
             return Find(org => org.Id == name);
+        }
+
+        /// <summary>
+        /// 查询所有父组织
+        /// </summary>
+        /// <param name="id">组织ID</param>
+        /// <returns></returns>
+        public async Task<List<Organization>> FindParentById(string id)
+        {
+            List<Organization> result = new List<Organization>();
+            var org = Context.Set<Organization>().Where(o => o.Id == id).Single();
+            while (org.ParentId != null)
+            {
+                var temp = await Context.Set<Organization>().Where(o => o.Id == org.ParentId).SingleOrDefaultAsync();
+                result.Add(temp);
+                org = temp;
+            }
+            return result;
         }
     }
 }
