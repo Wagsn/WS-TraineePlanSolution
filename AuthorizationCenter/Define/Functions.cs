@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Define
 {
     /// <summary>
-    /// 公共函数集
+    /// 公共函数集 扩展函数
     /// </summary>
     public static class Functions
     {
@@ -19,7 +19,7 @@ namespace AuthorizationCenter.Define
         /// <param name="pageIndex">分页索引，从0开始</param>
         /// <param name="pageSize">每页数量{0,}</param>
         /// <returns></returns>
-        public static IQueryable<E> Page<E>(IQueryable<E> data, int pageIndex, int pageSize)
+        public static IQueryable<E> Page<E>(this IQueryable<E> data, int pageIndex, int pageSize)
         {
             // 总数
             int count = data.Count();
@@ -41,6 +41,26 @@ namespace AuthorizationCenter.Define
         public static string Encrypt(string src)
         {
             return null;
+        }
+
+        // 
+        /// <summary>
+        /// 输入集合是当前集合的子集
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="theCollection"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        public static bool ContainsAll<T>(this List<T> theCollection, IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+            {
+                if (!theCollection.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

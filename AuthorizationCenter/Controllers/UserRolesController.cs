@@ -26,7 +26,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserJson> UserManager { get; set; }
 
         /// <summary>
         /// 角色管理
@@ -40,7 +40,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="userRoleManager"></param>
         /// <param name="userManager"></param>
         /// <param name="roleManager"></param>
-        public UserRolesController(ApplicationDbContext context, IUserRoleManager userRoleManager, IUserManager<UserBaseJson> userManager, IRoleManager<RoleJson> roleManager)
+        public UserRolesController(ApplicationDbContext context, IUserRoleManager userRoleManager, IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager)
         {
             _context = context;
             UserRoleManager = userRoleManager;

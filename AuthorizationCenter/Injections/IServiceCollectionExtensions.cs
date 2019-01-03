@@ -40,16 +40,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IRoleStore, RoleStore>();
             services.AddScoped<IPermissionStore, PermissionStore>();
             services.AddScoped<IOrganizationStore, OrganizationStore>();
+            services.AddScoped<IRoleOrgPerStore, RoleOrgPerStore>();
 
             #endregion
 
             #region << Manager >>
 
-            services.AddScoped<IUserManager<UserBaseJson>, UserManager>();
+            services.AddScoped<IUserManager<UserJson>, UserManager>();
             services.AddScoped<IRoleManager<RoleJson>, RoleManger>();
             services.AddScoped<IUserRoleManager, UserRoleManager>();
             services.AddScoped<IPermissionManager<PermissionJson>, PermissionManager>();
             services.AddScoped<IOrganizationManager<OrganizationJson>, OrganizationManager>();
+            services.AddScoped<IRoleOrgPerManager<RoleOrgPerJson>, RoleOrgPerManager>();
 
             #endregion
 

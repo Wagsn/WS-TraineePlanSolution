@@ -36,7 +36,7 @@ namespace AuthorizationCenter.Controllers
         /// 设置
         /// </summary>
         /// <param name="user"></param>
-        public void Set(UserBaseJson user)
+        public void Set(UserJson user)
         {
             Id = user.Id;
             SignName = user.SignName;

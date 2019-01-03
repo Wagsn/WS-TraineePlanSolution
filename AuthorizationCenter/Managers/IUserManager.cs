@@ -16,7 +16,7 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 用户管理
     /// </summary>
-    public interface IUserManager<TJson> where TJson: UserBaseJson
+    public interface IUserManager<TJson> where TJson: UserJson
     {
         ///// <summary>
         ///// 查询 或运算 满足条件的都查询（null忽略）

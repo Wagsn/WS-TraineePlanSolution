@@ -14,6 +14,6 @@ namespace AuthorizationCenter.Dto.Requests
         /// <summary>
         /// 用户基础信息
         /// </summary>
-        public UserBaseJson User { get; set; }
+        public UserJson User { get; set; }
     }
 }

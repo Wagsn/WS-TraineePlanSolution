@@ -13,11 +13,11 @@ namespace AuthorizationCenter.Stores
     {
 
         /// <summary>
-        /// 通过组织ID找到所有子组织（包括间接子组织children.children）
+        /// 通过组织ID找到所有子组织（包括间接子组织，但是不包括自身）
         /// </summary>
         /// <param name="id">组织ID</param>
         /// <returns></returns>
-        IQueryable<Organization> FindChildrenById(string id);
+        Task<List<Organization>> FindChildrenById(string id);
 
         /// <summary>
         /// 查询所有父组织

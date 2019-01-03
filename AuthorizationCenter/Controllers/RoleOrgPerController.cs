@@ -9,15 +9,27 @@ using AuthorizationCenter.Entitys;
 
 namespace AuthorizationCenter.Controllers
 {
+    /// <summary>
+    /// 角色组织权限控制器
+    /// 授权控制器
+    /// </summary>
     public class RoleOrgPerController : Controller
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// 构造器
+        /// </summary>
+        /// <param name="context"></param>
         public RoleOrgPerController(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// 跳转到列表
+        /// </summary>
+        /// <returns></returns>
         // GET: RoleOrgPer
         public async Task<IActionResult> Index()
         {
@@ -25,6 +37,11 @@ namespace AuthorizationCenter.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        /// <summary>
+        /// [MVC] 跳转到详情界面
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: RoleOrgPer/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -46,6 +63,10 @@ namespace AuthorizationCenter.Controllers
             return View(roleOrgPer);
         }
 
+        /// <summary>
+        /// [MVC] 跳转到新增界面
+        /// </summary>
+        /// <returns></returns>
         // GET: RoleOrgPer/Create
         public IActionResult Create()
         {
@@ -56,6 +77,11 @@ namespace AuthorizationCenter.Controllers
             return View();
         }
 
+        /// <summary>
+        /// [MVC] 新增
+        /// </summary>
+        /// <param name="roleOrgPer"></param>
+        /// <returns></returns>
         // POST: RoleOrgPer/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -75,6 +101,11 @@ namespace AuthorizationCenter.Controllers
             return View(roleOrgPer);
         }
 
+        /// <summary>
+        /// [MVC] 跳转到编辑界面
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: RoleOrgPer/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -94,6 +125,12 @@ namespace AuthorizationCenter.Controllers
             return View(roleOrgPer);
         }
 
+        /// <summary>
+        /// [MVC] 编辑角色组织权限关联
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="roleOrgPer"></param>
+        /// <returns></returns>
         // POST: RoleOrgPer/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -132,6 +169,11 @@ namespace AuthorizationCenter.Controllers
             return View(roleOrgPer);
         }
 
+        /// <summary>
+        /// [MVC] 删除 角色组织权限关联
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: RoleOrgPer/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -153,6 +195,11 @@ namespace AuthorizationCenter.Controllers
             return View(roleOrgPer);
         }
 
+        /// <summary>
+        /// [MVC] 添加 角色组织权限关联
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // POST: RoleOrgPer/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

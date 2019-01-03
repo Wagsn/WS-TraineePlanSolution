@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +72,7 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 是否有权限
+        /// 是否有权限 用户在某个组织下是否具有某项权限
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">操作组织ID-前端传入、表示数据范围</param>
@@ -85,55 +86,19 @@ namespace AuthorizationCenter.Managers
                                 where ur.UserId == userId
                                 select ur.RoleId).Contains(rop.RoleId) && rop.PerId == perId
                          select rop.Id).ToListAsync();
-            // 3. 找到操作组织ID的所有父组织
-            var parents = (await OrganizationStore.FindParentById(orgId)).Select(org => org.Id);
-            // 4. 判断这些父组织是否在查询出来的组织ID集合中存在??
-            foreach (var id in parents)
-            {
-                if (orgIds.Contains(id))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        /// <summary>
-        /// 是否有权限
-        /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <param name="orgIds2">操作组织集合-前端传入、表示数据范围</param>
-        /// <param name="perId">权限ID</param>
-        /// <returns></returns>
-        public async Task<bool> HasPermission(string userId, List<string> orgIds2, string perId)
-        {
-            // 2. 通过角色ID集合和权限ID查询组织ID集合
-            var orgIds = await (from rop in RoleOrgPerStore.Context.Set<RoleOrgPer>()
-                                where (from ur in UserRoleStore.Context.Set<UserRole>()  // 1. 通过用户ID查询角色ID集合
-                                       where ur.UserId == userId
-                                       select ur.RoleId).Contains(rop.RoleId) && rop.PerId == perId
-                                select rop.Id).ToListAsync();
-            // 3. 找到所有有权限的组织ID集合
+            // 3. 找到权限组织的所有子组织
             var perOrgIds = new List<string>();
-            // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
-            //if(perOrgIds.ContainsAll())
-            if (orgIds2.Count <= 0)
+            foreach (var id in orgIds)
             {
-                return false;
+                // 递归
+                perOrgIds.AddRange((await OrganizationStore.FindChildrenById(id)).Select(org => org.Id));
             }
-            foreach(var id in orgIds2)
-            {
-                if (!perOrgIds.Contains(id))
-                {
-                    return false;
-                }
-            }
-            return true;
+            perOrgIds.AddRange(orgIds);
+            // 4. 判断传入的组织ID在这些权限组织ID集合中
+            return perOrgIds.Contains(orgId);
+            #region << 3.4.步骤的历史 >>
             //// 3. 找到操作组织ID的所有父组织
-            //List<string> parents = new List<string>();
-            //foreach(var id in orgIds2)
-            //{
-            //    parents.AddRange((await OrganizationStore.FindParentById(id)).Select(org => org.Id));
-            //}
+            //var parents = (await OrganizationStore.FindParentById(orgId)).Select(org => org.Id);
             //// 4. 判断这些父组织是否在查询出来的组织ID集合中存在??
             //foreach (var id in parents)
             //{
@@ -143,8 +108,43 @@ namespace AuthorizationCenter.Managers
             //    }
             //}
             //return false;
-            //throw new NotImplementedException();
+            #endregion
         }
 
+        /// <summary>
+        /// 是否有权限 用户是否在这些组织具有某项权限
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgIds">操作组织集合-前端传入、表示数据范围</param>
+        /// <param name="perId">权限ID</param>
+        /// <returns></returns>
+        public async Task<bool> HasPermission(string userId, List<string> orgIds, string perId)
+        {
+            // 0.参数检查
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+            if (orgIds == null)
+            {
+                throw new ArgumentNullException(nameof(orgIds));
+            }
+            // 2. 通过角色ID集合和权限ID查询组织ID集合
+            var rootOrgIds = await (from rop in RoleOrgPerStore.Context.Set<RoleOrgPer>()
+                                    where (from ur in UserRoleStore.Context.Set<UserRole>()  // 1. 通过用户ID查询角色ID集合
+                                           where ur.UserId == userId
+                                           select ur.RoleId).Contains(rop.RoleId) && rop.PerId == perId
+                                    select rop.Id).ToListAsync();
+            // 3. 通过找到的组织ID集合递归查询所有子组织ID集合构成权限组织ID集合
+            var perOrgIds = new List<string>();
+            foreach(var orgId in rootOrgIds)
+            {
+                // 递归
+                perOrgIds.AddRange((await OrganizationStore.FindChildrenById(orgId)).Select(org => org.Id));
+            }
+            perOrgIds.AddRange(rootOrgIds);
+            // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
+            return perOrgIds.ContainsAll(orgIds);
+        }
     }
 }

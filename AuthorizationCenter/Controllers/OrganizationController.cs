@@ -302,7 +302,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 登陆用户
         /// </summary>
-        private UserBaseJson SignUser
+        private UserJson SignUser
         {
             get
             {
@@ -310,7 +310,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     return null;
                 }
-                return new UserBaseJson
+                return new UserJson
                 {
                     Id = HttpContext.Session.GetString(Constants.USERID),
                     SignName = HttpContext.Session.GetString(Constants.SIGNNAME),

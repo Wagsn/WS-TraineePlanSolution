@@ -28,7 +28,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserJson> UserManager { get; set; }
 
         /// <summary>
         /// 角色管理
@@ -57,7 +57,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="roleManager"></param>
         /// <param name="userRoleManager"></param>
         /// <param name="mapper"></param>
-        public UserController(IUserManager<UserBaseJson> userManager, IRoleManager<RoleJson> roleManager, IUserRoleManager userRoleManager, IMapper mapper)
+        public UserController(IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IUserRoleManager userRoleManager, IMapper mapper)
         {
             UserManager = userManager;
             RoleManager = roleManager;
@@ -76,7 +76,7 @@ namespace AuthorizationCenter.Controllers
             ViewData[Constants.SIGNUSER] = SignUser;
 
             // 分页查询用户列表
-            return View(await Functions.Page(UserManager.Find(), pageIndex, pageSize).ToListAsync());
+            return View(await UserManager.Find().Page(pageIndex, pageSize).ToListAsync());
         }
 
         /// <summary>
@@ -94,11 +94,11 @@ namespace AuthorizationCenter.Controllers
                 return NotFound();
             }
             // 请求响应构造
-            ResponseMessage<UserBaseJson> response = new ResponseMessage<UserBaseJson>();
-            ModelRequest<UserBaseJson> request = new ModelRequest<UserBaseJson>
+            ResponseMessage<UserJson> response = new ResponseMessage<UserJson>();
+            ModelRequest<UserJson> request = new ModelRequest<UserJson>
             {
                 User = SignUser,
-                Data = new UserBaseJson { Id = id }
+                Data = new UserJson { Id = id }
             };
             // 业务处理
             try
@@ -146,7 +146,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SignName,PassWord")] UserBaseJson userBaseJson)
+        public async Task<IActionResult> Create([Bind("Id,SignName,PassWord")] UserJson userBaseJson)
         {
             if (ModelState.IsValid)
             {
@@ -210,7 +210,7 @@ namespace AuthorizationCenter.Controllers
                 Logger.Trace($"[{nameof(Edit)}]进入编辑界面-用户不存在({id})");
                 return NotFound();
             }
-            return View(Mapper.Map<UserBaseJson>(userBase));
+            return View(Mapper.Map<UserJson>(userBase));
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,SignName,PassWord")] UserBaseJson userBaseJson)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,SignName,PassWord")] UserJson userBaseJson)
         {
             Logger.Trace($"[{nameof(Edit)}] 编辑用户({id}) Request: \r\n"+JsonUtil.ToJson(userBaseJson));
             if (id != userBaseJson.Id)
@@ -240,7 +240,6 @@ namespace AuthorizationCenter.Controllers
                 }
                 catch (Exception e)
                 {
-#warning 存在异常风险 --先不管了
                     if (! await UserManager.ExistById(userBaseJson.Id))
                     {
                         return NotFound();
@@ -319,7 +318,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 登陆用户
         /// </summary>
-        private UserBaseJson SignUser
+        private UserJson SignUser
         {
             get
             {
@@ -327,7 +326,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     return null;
                 }
-                return new UserBaseJson
+                return new UserJson
                 {
                     Id = HttpContext.Session.GetString(Constants.USERID),
                     SignName = HttpContext.Session.GetString(Constants.SIGNNAME),

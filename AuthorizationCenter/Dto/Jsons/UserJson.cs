@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Dto.Jsons
 {
     /// <summary>
-    /// 用户基础信息 -- UserBase
+    /// 用户信息
     /// </summary>
-    public class UserBaseJson
+    public class UserJson
     {
         /// <summary>
         /// 用户ID

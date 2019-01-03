@@ -1,14 +1,14 @@
-﻿@model IEnumerable<UserBaseJson>
+﻿@model IEnumerable<UserJson>
 @* 分页查询 *@
 @{
     ViewData["Title"] = "Index";
-    Console.WriteLine("Sign Name: "+ ((UserBaseJson)ViewData["SignUser"]).SignName??"");
+    Console.WriteLine("Sign Name: "+ ((UserJson)ViewData["SignUser"]).SignName??"");
 }
 
 <h2>用户管理</h2>
 
 <p>
-    当前用户登陆用户为【<span id="sign-name">@(((UserBaseJson)ViewData["SignUser"]).SignName ??"游客")</span>】
+    当前用户登陆用户为【<span id="sign-name">@(((UserJson)ViewData["SignUser"]).SignName ??"游客")</span>】
 </p>
 
 <p>

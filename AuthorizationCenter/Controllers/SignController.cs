@@ -35,7 +35,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<UserBaseJson> UserManager { get; set; }
+        public IUserManager<UserJson> UserManager { get; set; }
 
         /// <summary>
         /// Session
@@ -46,7 +46,7 @@ namespace AuthorizationCenter.Controllers
         /// 构造器
         /// </summary>
         /// <param name="userManager"></param>
-        public SignController(IUserManager<UserBaseJson> userManager)
+        public SignController(IUserManager<UserJson> userManager)
         {
             UserManager = userManager;
         }
@@ -68,10 +68,10 @@ namespace AuthorizationCenter.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [Filters.NoSign]
-        public async Task<IActionResult> SignUp([FromForm]ModelRequest<UserBaseJson> request)
+        public async Task<IActionResult> SignUp([FromForm]ModelRequest<UserJson> request)
         {
             // 响应体构建
-            ResponseMessage<UserBaseJson> response = new ResponseMessage<UserBaseJson>();
+            ResponseMessage<UserJson> response = new ResponseMessage<UserJson>();
 
             Console.WriteLine(JsonUtil.ToJson(request));
 
@@ -137,7 +137,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 登陆用户信息
         /// </summary>
-        private UserBaseJson SignUser
+        private UserJson SignUser
         {
             get
             {
@@ -147,7 +147,7 @@ namespace AuthorizationCenter.Controllers
                     return null;
                 }
                 // 返回登陆信息
-                return new UserBaseJson
+                return new UserJson
                 {
                     Id= Session.GetString(Constants.USERID),
                     SignName = Session.GetString(Constants.SIGNNAME),
@@ -179,7 +179,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [Filters.NoSign]
-        public IActionResult SignOut(ModelRequest<UserBaseJson> request)
+        public IActionResult SignOut(ModelRequest<UserJson> request)
         {
             SignUser = null;
             return View(nameof(Index));

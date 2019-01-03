@@ -29,7 +29,6 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 用户
         /// </summary>
-        [ForeignKey("UserId")]
         public User User { get; set; }
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 组织
         /// </summary>
-        [ForeignKey("OrgId")]
         public Organization Org { get; set; }
 
         /// <summary>

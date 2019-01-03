@@ -19,8 +19,8 @@ namespace AuthorizationCenter.Injections
         /// </summary>
         public MappingProfile()
         {
-            CreateMap<User, UserBaseJson>();
-            CreateMap<UserBaseJson, User>();
+            CreateMap<User, UserJson>();
+            CreateMap<UserJson, User>();
 
             CreateMap<Organization, OrganizationJson>(); //.ForMember(o => o.Parent, m => m.Ignore());
             CreateMap<OrganizationJson, Organization>(); //.ForMember(o => o.Parent, m => m.Ignore());

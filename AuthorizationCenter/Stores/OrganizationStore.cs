@@ -51,34 +51,35 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<Organization> FindById(string id)
         {
-            return Find(org => org.Id == id);
+            return Find(org => org.Id == id).Include(org => org.Children);
         }
 
         /// <summary>
-        /// 通过组织ID找到所有子组织（包括间接子组织children.children）
+        /// 通过组织ID找到所有子组织（包括间接子组织）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<Organization> FindChildrenById(string id)
+        public Task<List<Organization>> FindChildrenById(string id)
         {
-            
-            return null;
+            return RecursionChildren(id);
         }
 
         /// <summary>
-        /// 递归查询子组织
+        /// 递归查询子组织集合
         /// </summary>
-        /// <param name="organization"></param>
+        /// <param name="orgId"></param>
         /// <returns></returns>
-        public List<Organization> RecursionChildren(Organization organization)
+        public async Task<List<Organization>> RecursionChildren(string orgId)
         {
             List<Organization> result = new List<Organization>();
             // 根据 orgid查询其所有直接子组织
-            var orgs = Find(o => organization.Id == o.ParentId).ToList();
+            var orgs = await Find(o => orgId == o.ParentId).ToListAsync();
+            // 将直接子组织加入结果集
+            result.AddRange(orgs);
             // 遍历其直接子组织
             foreach(var org in orgs)
             {
-                result.AddRange(RecursionChildren(org));
+                result.AddRange(await RecursionChildren(org.Id));
             }
             return result;
         }
