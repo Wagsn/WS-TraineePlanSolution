@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AuthorizationCenter.Entitys;
+using AuthorizationCenter.Managers;
+using AuthorizationCenter.Dto.Jsons;
+using Microsoft.AspNetCore.Http;
+using AuthorizationCenter.Define;
+using WS.Log;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -16,6 +21,16 @@ namespace AuthorizationCenter.Controllers
     public class RoleOrgPerController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        /// <summary>
+        /// 角色组织权限关联
+        /// </summary>
+        public IRoleOrgPerManager<RoleOrgPerJson> RoleOrgPerManager { get; set; }
+
+        /// <summary>
+        /// 日志器
+        /// </summary>
+        public ILogger Logger = LoggerManager.GetLogger(nameof(RoleOrgPerController));
 
         /// <summary>
         /// 构造器
@@ -138,13 +153,25 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,RoleId,OrgId,PerId")] RoleOrgPer roleOrgPer)
         {
+            // 0. 参数检查
             if (id != roleOrgPer.Id)
             {
                 return NotFound();
             }
+            
+            
 
             if (ModelState.IsValid)
             {
+                // 1. 权限验证 具有授权权限
+
+                //if (await RoleOrgPerManager.HasPermission(SignUser.Id, "", "Authorization"))
+                //{
+                //    ModelState.AddModelError("All", "没有权限");
+                //    Logger.Warn($"[{nameof(Edit)}] 没有权限 进行角色权限编辑");
+                //    return View("Edit", id);
+                //}
+
                 try
                 {
                     _context.Update(roleOrgPer);
@@ -214,6 +241,45 @@ namespace AuthorizationCenter.Controllers
         private bool RoleOrgPerExists(string id)
         {
             return _context.RoleOrgPers.Any(e => e.Id == id);
+        }
+
+        /// <summary>
+        /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// 登陆用户
+        /// </summary>
+        private UserJson SignUser
+        {
+            get
+            {
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                return new UserJson
+                {
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                if (value == null)
+                {
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
+                }
+                else
+                {
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
+                }
+            }
         }
     }
 }

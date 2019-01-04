@@ -11,7 +11,7 @@ namespace AuthorizationCenter.Managers
     public interface IRoleOrgPerManager<TJson>
     {
         /// <summary>
-        /// 某用户是否具有某权限
+        /// 某用户在某组织下是否具有某项权限
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">组织ID</param>

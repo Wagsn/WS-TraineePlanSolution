@@ -32,7 +32,7 @@ namespace AuthorizationCenter.Controllers
         [Filters.NoSign]
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "授权中心";
 
             return View();
         }
@@ -44,7 +44,7 @@ namespace AuthorizationCenter.Controllers
         [Filters.NoSign]
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "联系我们";
 
             return View();
         }

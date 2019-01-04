@@ -29,7 +29,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 用户数据集
         /// </summary>
-        public DbSet<User> UserBases { get; set; }
+        public DbSet<User> Users { get; set; }
 
         /// <summary>
         /// 角色数据集

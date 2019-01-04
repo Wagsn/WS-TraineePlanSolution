@@ -51,9 +51,9 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // TODO 筛选出登陆用户可见的组织 -根据用户找到角色 -根据角色找到组织 -根据父组织找到所有子组织
-                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
+                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id);
 
-                Console.WriteLine(JsonUtil.ToJson(orgnazitions));
+                Logger.Trace($"[{nameof(Index)}] 响应数据：\r\n{JsonUtil.ToJson(orgnazitions)}");
 
                 ViewData["list"] = JsonUtil.ToJson(orgnazitions);
 
@@ -74,13 +74,13 @@ namespace AuthorizationCenter.Controllers
         {
             try
             {
-                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id).ToListAsync();
+                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id);
 
                 Console.WriteLine(JsonUtil.ToJson(orgnazitions));
 
                 return new PageResponesBody<OrganizationJson>
                 {
-                    Data = orgnazitions
+                    Data = orgnazitions.ToList()
                 };
             }
             catch (Exception e)
@@ -126,13 +126,17 @@ namespace AuthorizationCenter.Controllers
         /// <returns></returns>
         // GET: Organization/Create
         [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
-        public async Task<IActionResult> Create(string orgid = null)
+        public async Task<IActionResult> Create(string id)
         {
+            Logger.Trace($"[{nameof(Create)}] 请求参数: id: " +id);
             try
             {
-                //if()
                 var organizations = await OrganizationManager.Find().ToListAsync();
-                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name));
+                if (id != null)
+                {
+                    organizations =organizations.Where(org => org.Id == id).ToList();
+                }
+                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name), id);
             }
             catch (Exception e)
             {
@@ -146,20 +150,22 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="organization"></param>
         /// <returns></returns>
-        // POST: Organization/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ParentId,Name,Description")] OrganizationJson organization)
         {
-            if (ModelState.IsValid)
+            Logger.Trace($"[{nameof(Create)}] 新增：请求参数：\r\n" + JsonUtil.ToJson(organization));
+            try
             {
                 // 检查是否存在循环（允许有向无环图的产生，而不仅仅是树形结构）
                 await OrganizationManager.Create(organization);
-                return RedirectToAction(nameof(Index));
             }
-            return View(organization);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Create)}] 服务器发生错误：\r\n" + e);
+            }
+            
+            return RedirectToAction(nameof(Index));
         }
 
         /// <summary>
@@ -174,14 +180,22 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-
-            var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
-            Console.WriteLine("========================\r\n"+JsonUtil.ToJson(OrganizationManager.FindChildrenById(id)));
+            Logger.Trace($"[{nameof(Edit)}] 请求参数: id: " + id);
+            OrganizationJson organization = null;
+            try
+            {
+                organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(Edit)}] 服务器错误：\r\n" + e);
+            }
 
             if (organization == null)
             {
                 return NotFound();
             }
+            Logger.Trace($"[{nameof(Edit)}] 响应体：\r\n" + JsonUtil.ToJson(organization));
             return View(organization);
         }
 

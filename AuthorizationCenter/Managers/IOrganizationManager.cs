@@ -3,6 +3,7 @@ using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,14 +35,14 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Organization FindChildrenById(string id);
+        Organization FindTreeById(string id);
 
         /// <summary>
         /// 查询通过用户ID -先找角色-再找组织
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        IQueryable<TJson> FindByUserId(string id);
+        Task<IEnumerable<TJson>> FindByUserId(string id);
 
         /// <summary>
         /// 创建

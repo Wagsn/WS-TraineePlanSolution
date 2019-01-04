@@ -11,6 +11,11 @@ namespace AuthorizationCenter.Managers
     /// </summary>
     public interface ITodoItemManager
     {
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <param name="todos"></param>
+        /// <returns></returns>
         Task<IQueryable<TodoItem>> Create(IQueryable<TodoItem> todos);
     }
 }

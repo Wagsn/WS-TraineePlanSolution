@@ -18,7 +18,6 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         [Key]
         [StringLength(36, MinimumLength =36)]
-        [RegularExpression(Constants.GUID_REG, ErrorMessage =Constants.GUID_ERR)]
         public string Id { get; set; }
 
         /// <summary>
@@ -35,8 +34,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 权限名称
         /// </summary>
-        [StringLength(15, MinimumLength =2)]
-        [RegularExpression(Constants.VISIBLE_REG, ErrorMessage =Constants.VISIBLE_ERR)]
+        [StringLength(63, MinimumLength =2)]
         public string Name { get; set; }
 
         /// <summary>

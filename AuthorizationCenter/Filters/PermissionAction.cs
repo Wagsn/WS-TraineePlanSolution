@@ -51,11 +51,11 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="permission"></param>
+        /// <param name="permission">权限</param>
         public CheckPermission (string permission = null)
         {
             Permission = permission;
-            Console.WriteLine("权限"+permission);
+            Console.WriteLine($"[{nameof(CheckPermission)}] 权限："+permission);
         }
 
         /// <summary>
@@ -66,28 +66,28 @@ namespace AuthorizationCenter.Filters
         /// <returns></returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            // 1. 检查用户是否登陆
-            UserJson user = GetSignUser(context.HttpContext);
-            if (user == null)
-            {
-                context.Result = new ContentResult()
-                {
-                    Content = "当前用户无效",
-                    StatusCode = 403,
-                };
-                return;
-            }
+            //// 1. 检查用户是否登陆
+            //UserJson user = GetSignUser(context.HttpContext);
+            //if (user == null)
+            //{
+            //    context.Result = new ContentResult()
+            //    {
+            //        Content = "当前用户无效",
+            //        StatusCode = 403,
+            //    };
+            //    return;
+            //}
 
-            // 2. 检查权限 如何获取操作组织ID -公司项目通过User查询到OrgId，但是对于多组织体系怎么处理(在方法中手动调用?）
-            if(!await RoleOrgPerManager.HasPermission(user.Id, "orgId", Permission))
-            {
-                context.Result = new ContentResult()
-                {
-                    Content = "权限不足",
-                    StatusCode = 403,
-                };
-                return;
-            }
+            //// 2. 检查权限 如何获取操作组织ID -公司项目通过User查询到OrgId，但是对于多组织体系怎么处理(在方法中手动调用?）
+            //if(!await RoleOrgPerManager.HasPermission(user.Id, "orgId", Permission))
+            //{
+            //    context.Result = new ContentResult()
+            //    {
+            //        Content = "权限不足",
+            //        StatusCode = 403,
+            //    };
+            //    return;
+            //}
             await next();
         }
 

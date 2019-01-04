@@ -129,6 +129,11 @@ namespace AuthorizationCenter.Define
         #region << 权限项名称 >>
 
         /// <summary>
+        /// 根权限 -系统所有操作所有
+        /// </summary>
+        public const string ROOT = "ROOT";
+
+        /// <summary>
         /// 用户管理 -用户增删查改
         /// </summary>
         public const string USER_MANAGE = "USER_MANAGE";

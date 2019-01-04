@@ -9,6 +9,12 @@
             用于检查服务连通性
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Controllers.CheckController.Get">
+            <summary>
+            检查
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Controllers.CheckController.Check">
             <summary>
             检查
@@ -231,6 +237,16 @@
             授权控制器
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Controllers.RoleOrgPerController.RoleOrgPerManager">
+            <summary>
+            角色组织权限关联
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Controllers.RoleOrgPerController.Logger">
+            <summary>
+            日志器
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Controllers.RoleOrgPerController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
             <summary>
             构造器
@@ -291,6 +307,15 @@
             </summary>
             <param name="id"></param>
             <returns></returns>
+        </member>
+        <member name="P:AuthorizationCenter.Controllers.RoleOrgPerController.SignUser">
+            <summary>
+            获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+            </summary>
+            <returns></returns>
+            <summary>
+            登陆用户
+            </summary>
         </member>
         <member name="T:AuthorizationCenter.Controllers.RolesController">
             <summary>
@@ -674,12 +699,12 @@
         </member>
         <member name="T:AuthorizationCenter.DbIntializer">
             <summary>
-            
+            数据库初始化器
             </summary>
         </member>
         <member name="M:AuthorizationCenter.DbIntializer.Initialize(AuthorizationCenter.Entitys.ApplicationDbContext)">
             <summary>
-            
+            数据库初始化
             </summary>
             <param name="context"></param>
         </member>
@@ -791,6 +816,11 @@
         <member name="F:AuthorizationCenter.Define.Constants.DOCDIR">
             <summary>
             文档文件夹
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROOT">
+            <summary>
+            根权限 -系统所有操作所有
             </summary>
         </member>
         <member name="F:AuthorizationCenter.Define.Constants.USER_MANAGE">
@@ -979,9 +1009,34 @@
             权限
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Dto.Jsons.SignUserInfo">
+            <summary>
+            登陆用户信息
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.SignUserInfo.UserId">
+            <summary>
+            用户ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.SignUserInfo.SignName">
+            <summary>
+            用户名
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.SignUserInfo.OrgId">
+            <summary>
+            组织ID -用户登陆到哪个组织的
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.SignUserInfo.RoleId">
+            <summary>
+            角色ID -用户以什么角色登陆的
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.UserJson">
             <summary>
-            用户基础信息 -- UserBase
+            用户信息
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.UserJson.Id">
@@ -1152,7 +1207,7 @@
             </summary>
             <param name="options"></param>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.UserBases">
+        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.Users">
             <summary>
             用户数据集
             </summary>
@@ -1472,7 +1527,7 @@
             <summary>
             构造器
             </summary>
-            <param name="permission"></param>
+            <param name="permission">权限</param>
         </member>
         <member name="M:AuthorizationCenter.Filters.CheckPermission.OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext,Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate)">
             <summary>
@@ -1541,7 +1596,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindChildrenById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindTreeById(System.String)">
             <summary>
             通过组织ID查询所有子节点，返回组织树
             </summary>
@@ -1726,7 +1781,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager`1.HasPermission(System.String,System.String,System.String)">
             <summary>
-            某用户是否具有某权限
+            某用户在某组织下是否具有某项权限
             </summary>
             <param name="userId">用户ID</param>
             <param name="orgId">组织ID</param>
@@ -1765,6 +1820,13 @@
             <summary>
             待办项管理接口
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.ITodoItemManager.Create(System.Linq.IQueryable{AuthorizationCenter.Entitys.TodoItem})">
+            <summary>
+            批量添加
+            </summary>
+            <param name="todos"></param>
+            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.IUserManager`1">
             <summary>
@@ -1953,6 +2015,11 @@
             类型映射
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Managers.OrganizationManager.Logger">
+            <summary>
+            日志器
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.#ctor(AuthorizationCenter.Stores.IOrganizationStore,AutoMapper.IMapper)">
             <summary>
             构造器
@@ -1994,16 +2061,23 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindChildrenById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindTreeById(System.String)">
             <summary>
             递归查询所有节点，构成一棵树返回
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.TreeToList(AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            将组织树扩展成组织列表
+            </summary>
+            <param name="organization">组织树节点</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindByUserId(System.String)">
             <summary>
-            查询通过用户ID -先找角色-再找组织
+            查询通过用户ID -先找角色-再找组织-再找子组织
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -2239,7 +2313,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermission(System.String,System.String,System.String)">
             <summary>
-            是否有权限
+            是否有权限 用户在某个组织下是否具有某项权限
             </summary>
             <param name="userId">用户ID</param>
             <param name="orgId">操作组织ID-前端传入、表示数据范围</param>
