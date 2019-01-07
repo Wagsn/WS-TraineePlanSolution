@@ -78,17 +78,6 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 更新 更新用户
-        /// </summary>
-        /// <param name="entity">实体</param>
-        /// <param name="map">条件表达式</param>
-        /// <returns></returns>
-        public async Task<TProperty> Update<TProperty>(TEntity entity, Func<TEntity, TProperty> map)
-        {
-            return map(await Update(entity));
-        }
-
-        /// <summary>
         /// 更新实体 -条件表达式 -动作表达式 -返回处理后的集合
         /// </summary>
         /// <param name="predicate">条件表达式</param>
@@ -214,34 +203,6 @@ namespace AuthorizationCenter.Stores
                 throw e;
             }
             return result;
-        }
-
-        /// <summary>
-        /// 新建
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        public async Task<TProperty> Create<TProperty>(TEntity entity, Func<TEntity, TProperty> map)
-        {
-            if (Context.Set<TEntity>().Contains(entity))
-            {
-                throw new Exception("实体已经存在不可以重复添加");
-            }
-            var result = Context.Add(entity).Entity;
-
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Logger.Error($"[{nameof(Create)}] 新建实体失败：\r\n" + e);
-                throw e;
-            }
-            return map(result);
-
         }
     }
 }

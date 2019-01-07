@@ -39,34 +39,18 @@ namespace AuthorizationCenter.Stores
         IQueryable<TEntity> Find<TProperty>(Func<TEntity, TProperty> predicate);
 
         /// <summary>
-        /// 新建 创建用户
+        /// 新建 创建实体
         /// </summary>
         /// <param name="entity">实体</param>
         /// <returns></returns>
         Task<TEntity> Create(TEntity entity);
 
         /// <summary>
-        /// 新建 创建用户
-        /// </summary>
-        /// <param name="entity">实体</param>
-        /// <param name="map">映射表达式</param>
-        /// <returns></returns>
-        Task<TProperty> Create<TProperty>(TEntity entity, Func<TEntity, TProperty> map);
-
-        /// <summary>
-        /// 更新 更新用户
+        /// 更新 更新实体
         /// </summary>
         /// <param name="entity">实体</param>
         /// <returns></returns>
         Task<TEntity> Update(TEntity entity);
-
-        /// <summary>
-        /// 更新 更新用户
-        /// </summary>
-        /// <param name="entity">实体</param>
-        /// <param name="map">条件表达式</param>
-        /// <returns></returns>
-        Task<TProperty> Update<TProperty>(TEntity entity, Func<TEntity, TProperty> map);
 
         /// <summary>
         /// 更新实体 -条件表达式 -动作表达式 -返回处理后的集合

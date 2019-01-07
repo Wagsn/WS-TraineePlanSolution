@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
+using WS.Log;
 
 namespace AuthorizationCenter.Filters
 {
@@ -13,6 +14,11 @@ namespace AuthorizationCenter.Filters
     /// </summary>
     public class SignFilter : ActionFilterAttribute
     {
+        /// <summary>
+        /// 日志器
+        /// </summary>
+        public ILogger Logger = LoggerManager.GetLogger(nameof(SignFilter));
+
         /// <summary>
         /// 当动作执行中 
         /// </summary>
@@ -37,8 +43,7 @@ namespace AuthorizationCenter.Filters
             // 检查登陆信息
             if (userid == null && signname == null)
             {
-                Console.WriteLine("用户未登陆");
-                // 用户未登陆
+                Logger.Trace($"[{nameof(OnActionExecuting)}] 用户未登陆");
                 context.Result = new RedirectResult("/Sign/Index");
             }
             base.OnActionExecuting(context);

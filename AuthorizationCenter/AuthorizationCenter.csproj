@@ -16,12 +16,12 @@
     </Content>
     <None Include=".\cfg\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <!--<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>-->
+    </None>
+    <None Include=".\wwwroot\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="cfg\config.json" />
   </ItemGroup>
 
   <ItemGroup>

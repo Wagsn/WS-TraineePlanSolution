@@ -94,6 +94,10 @@ namespace AuthorizationCenter
             {
                 app.UseDeveloperExceptionPage();
             }
+            //else
+            //{
+            //    app.UseExceptionHandler("/Shared/Error");
+            //}
 
             
             // 启用Swagger中间件以生成Swagger作为JSON数据（必须在app.UseMvc();之前）

@@ -327,6 +327,11 @@
             角色管理
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Controllers.RolesController.Logger">
+            <summary>
+            日志器
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Controllers.RolesController.#ctor(AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson})">
             <summary>
             构造器
@@ -356,7 +361,7 @@
             <summary>
             新增
             </summary>
-            <param name="reqbody"></param>
+            <param name="userJson"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.RolesController.Edit(System.String)">
@@ -571,7 +576,7 @@
             <summary>
             MVC 创建 -在数据库中添加数据
             </summary>
-            <param name="userBaseJson">被创建用户</param>
+            <param name="userJson">被创建用户</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserController.Edit(System.String)">
@@ -586,7 +591,7 @@
             MVC 编辑 -修改数据库记录
             </summary>
             <param name="id">用户ID</param>
-            <param name="userBaseJson">用户</param>
+            <param name="user">用户</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserController.Delete(System.String,System.String)">
@@ -609,9 +614,6 @@
             获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
             </summary>
             <returns></returns>
-            <summary>
-            登陆用户
-            </summary>
         </member>
         <member name="T:AuthorizationCenter.Controllers.UserRolesController">
             <summary>
@@ -700,6 +702,11 @@
         <member name="T:AuthorizationCenter.DbIntializer">
             <summary>
             数据库初始化器
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.DbIntializer.Logger">
+            <summary>
+            日志器
             </summary>
         </member>
         <member name="M:AuthorizationCenter.DbIntializer.Initialize(AuthorizationCenter.Entitys.ApplicationDbContext)">
@@ -1222,6 +1229,11 @@
             用户角色
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.UserOrgs">
+            <summary>
+            用户角色
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.Permissions">
             <summary>
             权限数据集
@@ -1235,6 +1247,11 @@
         <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.RoleOrgPers">
             <summary>
             角色组织权限
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.RoleOrgs">
+            <summary>
+            角色组织
             </summary>
         </member>
         <member name="M:AuthorizationCenter.Entitys.ApplicationDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
@@ -1331,6 +1348,36 @@
         <member name="P:AuthorizationCenter.Entitys.Role.UserRoles">
             <summary>
             用户角色
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Entitys.RoleOrg">
+            <summary>
+            角色组织关联
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrg.Id">
+            <summary>
+            主键
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrg.RoleId">
+            <summary>
+            角色ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrg.Role">
+            <summary>
+            角色
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrg.OrgId">
+            <summary>
+            组织ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.RoleOrg.Org">
+            <summary>
+            组织
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Entitys.RoleOrgPer">
@@ -1468,11 +1515,6 @@
             组织
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Entitys.UserOrg.Type">
-            <summary>
-            关系类型 -所有、从属、管理、访客 
-            </summary>
-        </member>
         <member name="T:AuthorizationCenter.Entitys.UserRole">
             <summary>
             用户与角色关联
@@ -1549,6 +1591,11 @@
         <member name="T:AuthorizationCenter.Filters.SignFilter">
             <summary>
             登陆过滤器
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Filters.SignFilter.Logger">
+            <summary>
+            日志器
             </summary>
         </member>
         <member name="M:AuthorizationCenter.Filters.SignFilter.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
@@ -1696,6 +1743,14 @@
             创建
             </summary>
             <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleManager`1.CreateByOrgUserId(`0,System.String)">
+            <summary>
+            新增通过用户ID
+            </summary>
+            <param name="json">新增角色</param>
+            <param name="userId">用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.IRoleManager`1.Update(`0)">
@@ -2167,12 +2222,17 @@
             用户角色关联存储
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Managers.RoleManger.RoleOrgStore">
+            <summary>
+            角色组织关联存储
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Managers.RoleManger.Mapper">
             <summary>
             类型映射
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.RoleManger.#ctor(AuthorizationCenter.Stores.IRoleStore,AutoMapper.IMapper,AuthorizationCenter.Stores.IUserRoleStore)">
+        <member name="M:AuthorizationCenter.Managers.RoleManger.#ctor(AuthorizationCenter.Stores.IRoleStore,AutoMapper.IMapper,AuthorizationCenter.Stores.IUserRoleStore,AuthorizationCenter.Stores.IRoleOrgStore)">
             <summary>
             构造器
             </summary>
@@ -2185,6 +2245,15 @@
             创建
             </summary>
             <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleManger.CreateByOrgUserId(AuthorizationCenter.Dto.Jsons.RoleJson,System.String)">
+            <summary>
+            新增角色 -通过组织用户ID（UID->OID->RID）
+            将角色添加到用户所在组织上
+            </summary>
+            <param name="json">新增角色</param>
+            <param name="userId">用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.Delete(AuthorizationCenter.Dto.Jsons.RoleJson)">
@@ -2349,7 +2418,7 @@
             日志记录器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserBaseStore,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserStore,AutoMapper.IMapper)">
             <summary>
             构造器
             </summary>
@@ -2677,6 +2746,11 @@
             角色组织权限关联存储接口
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Stores.IRoleOrgStore">
+            <summary>
+            角色组织存储 -组织用户的关系
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IRoleStore">
             <summary>
             角色存储
@@ -2686,7 +2760,14 @@
             <summary>
             通过用户ID查询角色
             </summary>
-            <param name="userId"></param>
+            <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore.FindByOrgId(System.String)">
+            <summary>
+            查询通过组织ID
+            </summary>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.IStore`1">
@@ -2723,32 +2804,16 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.IStore`1.Create(`0)">
             <summary>
-            新建 创建用户
+            新建 创建实体
             </summary>
             <param name="entity">实体</param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.IStore`1.Create``1(`0,System.Func{`0,``0})">
-            <summary>
-            新建 创建用户
-            </summary>
-            <param name="entity">实体</param>
-            <param name="map">映射表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.IStore`1.Update(`0)">
             <summary>
-            更新 更新用户
+            更新 更新实体
             </summary>
             <param name="entity">实体</param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.IStore`1.Update``1(`0,System.Func{`0,``0})">
-            <summary>
-            更新 更新用户
-            </summary>
-            <param name="entity">实体</param>
-            <param name="map">条件表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.IStore`1.Update(System.Func{`0,System.Boolean},System.Action{`0})">
@@ -2793,14 +2858,19 @@
             待办项存储
             </summary>
         </member>
-        <member name="T:AuthorizationCenter.Stores.IUserBaseStore">
+        <member name="T:AuthorizationCenter.Stores.IUserOrgStore">
             <summary>
-            用户存储
+            用户组织关联存储
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Stores.IUserRoleStore">
             <summary>
             用户角色存储
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.IUserStore">
+            <summary>
+            用户存储
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Stores.OrganizationStore">
@@ -2907,6 +2977,17 @@
             角色组织权限关联存储实现
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Stores.RoleOrgStore">
+            <summary>
+            角色组织存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            构造器
+            </summary>
+            <param name="context"></param>
+        </member>
         <member name="T:AuthorizationCenter.Stores.RoleStore">
             <summary>
             角色存储
@@ -2953,6 +3034,13 @@
             <param name="userId"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.RoleStore.FindByOrgId(System.String)">
+            <summary>
+            查询通过组织ID
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.StoreBase`1">
             <summary>
             存储抽象类 
@@ -2987,14 +3075,6 @@
             更新实体 -异步
             </summary>
             <param name="entity">实体</param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Update``1(`0,System.Func{`0,``0})">
-            <summary>
-            更新 更新用户
-            </summary>
-            <param name="entity">实体</param>
-            <param name="map">条件表达式</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.StoreBase`1.Update(System.Func{`0,System.Boolean},System.Action{`0})">
@@ -3058,15 +3138,6 @@
             <param name="entity">实体</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.StoreBase`1.Create``1(`0,System.Func{`0,``0})">
-            <summary>
-            新建
-            </summary>
-            <typeparam name="TProperty"></typeparam>
-            <param name="entity"></param>
-            <param name="map"></param>
-            <returns></returns>
-        </member>
         <member name="T:AuthorizationCenter.Stores.TodoItemStore">
             <summary>
             待办项存储
@@ -3100,45 +3171,6 @@
             <param name="name"></param>
             <returns></returns>
         </member>
-        <member name="T:AuthorizationCenter.Stores.UserBaseStore">
-            <summary>
-            用户核心表存储实现
-            </summary>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
-            <summary>
-            构造器
-            </summary>
-            <param name="dbContext"></param>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindById(System.String)">
-            <summary>
-            查询 通过ID
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.FindByName(System.String)">
-            <summary>
-            查询 -通过名称
-            </summary>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.DeleteById(System.String)">
-            <summary>
-            删除 -通过用户ID
-            </summary>
-            <param name="id">用户ID</param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Stores.UserBaseStore.DeleteByName(System.String)">
-            <summary>
-            删除 -通过用户名
-            </summary>
-            <param name="name">用户名</param>
-            <returns></returns>
-        </member>
         <member name="T:AuthorizationCenter.Stores.UserRoleStore">
             <summary>
             用户角色存储
@@ -3149,6 +3181,45 @@
             构造器
             </summary>
             <param name="context"></param>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.UserStore">
+            <summary>
+            用户核心表存储实现
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            构造器
+            </summary>
+            <param name="dbContext"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.FindById(System.String)">
+            <summary>
+            查询 通过ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.FindByName(System.String)">
+            <summary>
+            查询 -通过名称
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteById(System.String)">
+            <summary>
+            删除 -通过用户ID
+            </summary>
+            <param name="id">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByName(System.String)">
+            <summary>
+            删除 -通过用户名
+            </summary>
+            <param name="name">用户名</param>
+            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.ViewModels.ErrorViewModel">
             <summary>

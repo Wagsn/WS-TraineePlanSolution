@@ -48,6 +48,14 @@ namespace AuthorizationCenter.Managers
         Task<TJson> Create(TJson json);
 
         /// <summary>
+        /// 新增通过用户ID
+        /// </summary>
+        /// <param name="json">新增角色</param>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        Task CreateByOrgUserId(TJson json, string userId);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="json"></param>
@@ -87,7 +95,14 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        IQueryable<TJson> FindByUserId(string id);
+        Task<IEnumerable<RoleJson>> FindByUserId(string id);
+
+        /// <summary>
+        /// 查询通过用户ID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<RoleJson>> FindByOrgUserId(string userId);
 
         /// <summary>
         /// 通过Name查询 -异步查询 -只取第一个 -没有返回空

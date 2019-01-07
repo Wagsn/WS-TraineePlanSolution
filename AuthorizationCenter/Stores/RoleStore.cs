@@ -74,6 +74,33 @@ namespace AuthorizationCenter.Stores
                           where ur.UserId == userId
                           select ur.RoleId).Contains(r.Id)
                    select r;
+
+
+            //var query = from r in Find()
+            //            where (from ur in UserRoleStore.Find()
+            //                   where ur.UserId == id
+            //                   select ur.RoleId).Contains(r.Id)
+            //            select Mapper.Map<RoleJson>(r);
+            //return query;
+
+            // 这里是两条语句，分别SQL之后再在程序中执行关联
+            //return UserRoleStore.Find(it => it.UserId == id).Join(Store.Context.Roles, a => a.RoleId, b => b.Id, (a, b) => b).Select(r => Mapper.Map<RoleJson>(r));
+            ;
+            //var roleids = UserRoleStore.Context.UserRoles.Where(ur => ur.UserId == id).Select(ur => ur.RoleId);
+            //return Store.Find(r => roleids.Contains(r.Id)).Select(r => Mapper.Map<RoleJson>(r));
+        }
+        /// <summary>
+        /// 查询通过组织ID
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public IEnumerable<Role> FindByOrgId(string orgId)
+        {
+            return from r in Context.Roles
+                   where (from ro in Context.RoleOrgs
+                          where ro.OrgId == orgId
+                          select ro.RoleId).Contains(r.Id)
+                   select r;
         }
     }
 }

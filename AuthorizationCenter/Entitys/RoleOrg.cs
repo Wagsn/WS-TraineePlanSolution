@@ -2,19 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 用户组织关联表
+    /// 角色组织关联
     /// </summary>
-    public class UserOrg
+    public class RoleOrg
     {
         /// <summary>
-        /// 关联ID
+        /// 主键
         /// </summary>
         [Key]
         [StringLength(36, MinimumLength = 36)]
@@ -22,14 +21,14 @@ namespace AuthorizationCenter.Entitys
         public string Id { get; set; }
 
         /// <summary>
-        /// 用户ID
+        /// 角色ID
         /// </summary>
-        public string UserId { get; set; }
+        public string RoleId { get; set; }
 
         /// <summary>
-        /// 用户
+        /// 角色
         /// </summary>
-        public User User { get; set; }
+        public Role Role { get; set; }
 
         /// <summary>
         /// 组织ID
@@ -40,11 +39,5 @@ namespace AuthorizationCenter.Entitys
         /// 组织
         /// </summary>
         public Organization Org { get; set; }
-
-        ///// <summary>
-        ///// 关系类型 -所有、从属、管理、访客
-        ///// </summary>
-        //[StringLength(31, MinimumLength =3, ErrorMessage ="类型格式错误，长度在3-15之间")]
-        //public string Type { get; set; }
     }
 }

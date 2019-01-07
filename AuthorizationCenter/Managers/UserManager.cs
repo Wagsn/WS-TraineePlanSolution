@@ -22,7 +22,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 用户存储
         /// </summary>
-        public IUserBaseStore Store { get; set; }
+        public IUserStore Store { get; set; }
 
         /// <summary>
         /// 类型映射
@@ -39,7 +39,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="store"></param>
         /// <param name="mapper"></param>
-        public UserManager(IUserBaseStore store, IMapper mapper)
+        public UserManager(IUserStore store, IMapper mapper)
         {
             Store = store;
             Mapper = mapper;
@@ -179,9 +179,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        public  Task<UserJson> Update(UserJson json)
+        public async Task<UserJson> Update(UserJson json)
         {
-            return Store.Update(Mapper.Map<User>(json), ub => Mapper.Map<UserJson>(ub));
+            return Mapper.Map<UserJson>(await Store.Update(Mapper.Map<User>(json)));
         }
 
         /// <summary>

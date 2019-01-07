@@ -4,32 +4,8 @@
     ViewData["Title"] = "Details";
     // 伪造数据, 仅显示看看效果
     //var roles = new List<RoleJson>(); // ViewBag.Roles;
-    var roles = (List<RoleJson>)ViewBag.Roles;
-    //for (int i=0; i<10; i++)
-    //{
-    //    roles.Add(new RoleJson
-    //    {
-    //        Id = i.ToString(),
-    //        Name = i.ToString(),
-    //        Decription = i.ToString()
-    //    });
-    //}
-    //var urs = new List<UserRole>();
-    //for (int i = 0; i < 10; i++)
-    //{
-    //    urs.Add(new UserRole
-    //    {
-    //        Role = new Role
-    //        {
-    //            Id = i.ToString(),
-    //            Name = i.ToString(),
-    //            Decription = i.ToString()
-    //        }
-    //    });
-    //}
-
-    var userRoles = (List<UserRole>)ViewBag.UserRoles;
-
+    var roles = ViewBag.Roles as IEnumerable<RoleJson>;
+    var userRoles = ViewBag.UserRoles as IEnumerable<UserRole>;
 }
 
 <h2>Details</h2>

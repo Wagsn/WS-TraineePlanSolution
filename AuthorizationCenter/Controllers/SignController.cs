@@ -85,7 +85,7 @@ namespace AuthorizationCenter.Controllers
                 Logger.Error("用户创建失败：\r\n" + e);
             }
 
-            return RedirectToRoute(new { controller = "UserBaseJsons", action = "Index" });
+            return RedirectToRoute(new { controller = nameof(UserController), action = nameof(UserController.Index) });
         }
 
         /// <summary>
@@ -98,16 +98,14 @@ namespace AuthorizationCenter.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn([Required]SignInViewModel request, string returnUrl = null)
         {
-            //var username = Request.Form["SignName"].FirstOrDefault() ?? "username";
-            //var password = Request.Form["PassWord"].FirstOrDefault() ?? "password";
-            Console.WriteLine("request: "+JsonUtil.ToJson(request));
-            Console.WriteLine("returnUrl: " + returnUrl);
+            Logger.Trace("returnUrl: " + returnUrl+ "\r\nrequest: " +JsonUtil.ToJson(request));
 
             ViewData["returnUrl"] = returnUrl;
 
             // 参数检查
             if (string.IsNullOrWhiteSpace(request.SignName) || string.IsNullOrWhiteSpace(request.PassWord))
             {
+                Logger.Trace($"[{nameof(SignIn)}] 用户名或密码不能为空");
                 ModelState.AddModelError("All", "用户名或密码不能为空");
                 return View(request);
             }
@@ -135,40 +133,40 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 登陆用户信息
+        /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// 登陆用户
         /// </summary>
         private UserJson SignUser
         {
             get
             {
-                // 判断是否存在登陆信息
-                if (Session.GetString(Constants.USERID) == null)
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
                 {
                     return null;
                 }
-                // 返回登陆信息
                 return new UserJson
                 {
-                    Id= Session.GetString(Constants.USERID),
-                    SignName = Session.GetString(Constants.SIGNNAME),
-                    PassWord = Session.GetString(Constants.PASSWORD)
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
                 };
             }
             set
             {
-                // 清除登陆信息
                 if (value == null)
                 {
-                    Session.Remove(Constants.USERID);
-                    Session.Remove(Constants.SIGNNAME);
-                    Session.Remove(Constants.PASSWORD);
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
                 }
-                // 添加登陆信息
                 else
                 {
-                    Session.SetString(Constants.USERID, value.Id);
-                    Session.SetString(Constants.SIGNNAME, value.SignName);
-                    Session.SetString(Constants.PASSWORD, value.PassWord);
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
                 }
             }
         }

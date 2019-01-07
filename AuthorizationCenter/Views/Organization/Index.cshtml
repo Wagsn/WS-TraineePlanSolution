@@ -137,6 +137,11 @@
                         });
                         // 向服务器请求修改名称-还是点击编辑按钮直接跳转到编辑界面
                         return true;
+                    },
+                    // 移除节点
+                    beforeRemove: function (treeDocId, treeNode) {
+                        location.href = "/Organization/Delete/" + treeNode.id;
+                        return false;
                     }
                 }
             };

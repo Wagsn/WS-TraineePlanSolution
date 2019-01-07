@@ -112,7 +112,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     // 查询成功
                     // 再查询用户绑定的角色列表
-                    ViewData[Constants.ROLES] = await RoleManager.FindByUserId(id).ToListAsync();
+                    ViewData[Constants.ROLES] = await RoleManager.FindByUserId(id);
                     ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
                     return View(user);
                 }
@@ -139,55 +139,51 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// MVC 创建 -在数据库中添加数据
         /// </summary>
-        /// <param name="userBaseJson">被创建用户</param>
+        /// <param name="userJson">被创建用户</param>
         /// <returns></returns>
         // POST: UserBaseJsons/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SignName,PassWord")] UserJson userBaseJson)
+        public async Task<IActionResult> Create([Bind("Id,SignName,PassWord")] UserJson userJson)
         {
-            if (ModelState.IsValid)
-            {
-                Logger.Trace($"[{nameof(Create)}]User Create Request: "+JsonUtil.ToJson(userBaseJson));
-                // 检查参数
-                if (string.IsNullOrWhiteSpace(userBaseJson.SignName)|| string.IsNullOrWhiteSpace(userBaseJson.PassWord))
-                {
-                    ModelState.AddModelError("All", "用户名或密码不能为空");
-                    return View();
-                }
-                // 检查权限 - CheckPermissionFilter
-                
-                // 检查有效 被创建用户是否存在
-                if (await UserManager.ExistByName(userBaseJson.SignName))
-                {
-                    ModelState.AddModelError("All", "创建的用户已经存在");
-                    return View();
-                }
 
-                // 处理业务
-                try
+            Logger.Trace($"[{nameof(Create)}]User Create Request: " + JsonUtil.ToJson(userJson));
+            // 0. 检查参数
+            if (string.IsNullOrWhiteSpace(userJson.SignName) || string.IsNullOrWhiteSpace(userJson.PassWord))
+            {
+                ModelState.AddModelError("All", "用户名或密码不能为空");
+                return View();
+            }
+            // 1. 检查权限 - CheckPermissionFilter
+
+            // 2. 检查有效 被创建用户是否存在
+            if (await UserManager.ExistByName(userJson.SignName))
+            {
+                ModelState.AddModelError("All", "创建的用户已经存在");
+                return View();
+            }
+            // 3. 处理业务
+            try
+            {
+                // return UserManager.Create(this, userBaseJson); // (Controller, Request)=>IActionResult;
+                var user = await UserManager.Create(userJson);
+                if (user != null)
                 {
-                    // return UserManager.Create(this, userBaseJson); // (Controller, Request)=>IActionResult;
-                    var user =await UserManager.Create(userBaseJson);
-                    if (user != null)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("All", "新增失败");
-                        return View(userBaseJson);
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
-                catch(Exception e)
+                else
                 {
-                    ModelState.AddModelError("All", e.Message);
-                    return View(userBaseJson);
+                    ModelState.AddModelError("All", "新增失败");
+                    return View(userJson);
                 }
             }
-            return View(userBaseJson);
+            catch (Exception e)
+            {
+                ModelState.AddModelError("All", e.Message);
+                return View(userJson);
+            }
         }
 
         /// <summary>
@@ -217,47 +213,44 @@ namespace AuthorizationCenter.Controllers
         /// MVC 编辑 -修改数据库记录
         /// </summary>
         /// <param name="id">用户ID</param>
-        /// <param name="userBaseJson">用户</param>
+        /// <param name="user">用户</param>
         /// <returns></returns>
         // POST: UserBaseJsons/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,SignName,PassWord")] UserJson userBaseJson)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,SignName,PassWord")] UserJson user)
         {
-            Logger.Trace($"[{nameof(Edit)}] 编辑用户({id}) Request: \r\n"+JsonUtil.ToJson(userBaseJson));
-            if (id != userBaseJson.Id)
+            Logger.Trace($"[{nameof(Edit)}] 编辑用户({id}) Request: \r\n"+JsonUtil.ToJson(user));
+            // 0. 参数检查
+            if (id != user.Id)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            // 1. 权限检查 -编辑用户组织在登陆用户的用户管理权限所在组织之下
+            // HasPermissionForUserId(signUserId, perId, userId);  // 判断登陆用户对某用户（可以查询到组织）具有某项权限
+            
+            try
             {
-                try
-                {
-                    await UserManager.Update(userBaseJson);
-                }
-                catch (Exception e)
-                {
-                    if (! await UserManager.ExistById(userBaseJson.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
-                    }
-                    ModelState.AddModelError("All", "用户信息更新失败");
-                    // 业务处理失败 -返回编辑界面
-                    return View(userBaseJson);
-                }
+                // 2. 业务处理
+                await UserManager.Update(user);
                 // 编辑成功 -跳转到用户列表
                 return RedirectToAction(nameof(Index));
             }
-            ModelState.AddModelError("All", "模型验证失败");
-            // 模型验证失败 -返回编辑界面
-            return View(userBaseJson);
+            catch (Exception e)
+            {
+                if (!await UserManager.ExistById(user.Id))
+                {
+                    Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
+                    return NotFound();
+                }
+                else
+                {
+                    Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
+                }
+                ModelState.AddModelError("All", "用户信息更新失败");
+                // 业务处理失败 -返回编辑界面
+                return View(user);
+            }
         }
 
         /// <summary>
@@ -315,9 +308,6 @@ namespace AuthorizationCenter.Controllers
         /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
         /// </summary>
         /// <returns></returns>
-        /// <summary>
-        /// 登陆用户
-        /// </summary>
         private UserJson SignUser
         {
             get

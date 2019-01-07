@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Managers;
 using AuthorizationCenter.Dto.Jsons;
+using WS.Log;
+using WS.Text;
+using Microsoft.AspNetCore.Http;
+using AuthorizationCenter.Define;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -23,6 +25,11 @@ namespace AuthorizationCenter.Controllers
         public IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
+        /// 日志器
+        /// </summary>
+        public readonly ILogger Logger = LoggerManager.GetLogger(nameof(RolesController));
+
+        /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="roleManager"></param>
@@ -31,8 +38,6 @@ namespace AuthorizationCenter.Controllers
             RoleManager = roleManager;
         }
 
-
-
         /// <summary>
         /// 角色列表
         /// </summary>
@@ -40,6 +45,8 @@ namespace AuthorizationCenter.Controllers
         // GET: Roles
         public async Task<IActionResult> Index()
         {
+            // 通过登陆的用户查询组织，通过组织查询角色 => 通过用户查询角色
+            RoleManager.FindByOrgUserId(SignUser.Id);  // List<RoleJson>
             return View(await RoleManager.Find().ToListAsync());
         }
 
@@ -77,21 +84,25 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="reqbody"></param>
+        /// <param name="userJson"></param>
         /// <returns></returns>
         // POST: Roles/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Decription")] RoleJson reqbody)
+        public async Task<IActionResult> Create([Bind("Id,Name,Decription")] RoleJson userJson)
         {
-            if (ModelState.IsValid)
+            Logger.Trace($"[{nameof(Create)}] Request: \r\n{JsonUtil.ToJson(userJson)}");
+            try
             {
-                await RoleManager.Create(reqbody);
+                // 创建角色 -与组织关联
+                await RoleManager.Create(userJson);
                 return RedirectToAction(nameof(Index));
             }
-            return View(reqbody);
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(Create)}] 错误："+e);
+                return View(userJson);
+            }
         }
 
         /// <summary>
@@ -189,6 +200,45 @@ namespace AuthorizationCenter.Controllers
         {
             await RoleManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// 登陆用户信息
+        /// </summary>
+        private UserJson SignUser
+        {
+            get
+            {
+                // 判断是否存在登陆信息
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                // 返回登陆信息
+                return new UserJson
+                {
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                // 清除登陆信息
+                if (value == null)
+                {
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
+                }
+                // 添加登陆信息
+                else
+                {
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
+                }
+            }
         }
     }
 }

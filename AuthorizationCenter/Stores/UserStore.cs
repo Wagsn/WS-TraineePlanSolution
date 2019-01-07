@@ -14,13 +14,13 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 用户核心表存储实现
     /// </summary>
-    public class UserBaseStore : StoreBase<User>, IUserBaseStore
+    public class UserStore : StoreBase<User>, IUserStore
     {
         /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="dbContext"></param>
-        public UserBaseStore([Required]ApplicationDbContext dbContext)
+        public UserStore([Required]ApplicationDbContext dbContext)
         {
             Logger = LoggerManager.GetLogger(GetType().Name);
             Context = dbContext;

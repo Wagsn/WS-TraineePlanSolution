@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region << Store >>
 
-            services.AddScoped<IUserBaseStore, UserBaseStore>();
+            services.AddScoped<IUserStore, UserStore>();
             services.AddScoped<IUserRoleStore, UserRoleStore>();
             services.AddScoped<IRoleStore, RoleStore>();
             services.AddScoped<IPermissionStore, PermissionStore>();

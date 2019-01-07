@@ -42,6 +42,11 @@ namespace AuthorizationCenter.Entitys
         public DbSet<UserRole> UserRoles { get; set; }
 
         /// <summary>
+        /// 用户角色
+        /// </summary>
+        public DbSet<UserOrg> UserOrgs{ get; set; }
+
+        /// <summary>
         /// 权限数据集
         /// </summary>
         public DbSet<Permission> Permissions { get; set; }
@@ -55,6 +60,11 @@ namespace AuthorizationCenter.Entitys
         /// 角色组织权限
         /// </summary>
         public DbSet<RoleOrgPer> RoleOrgPers { get; set; }
+
+        /// <summary>
+        /// 角色组织
+        /// </summary>
+        public DbSet<RoleOrg> RoleOrgs { get; set; }
 
         #endregion
 
@@ -70,41 +80,53 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<User>(b =>
             {
-                b.ToTable("ws_userbase");
+                b.ToTable("user");
                 b.HasIndex(p => p.SignName).IsUnique();
             });
 
             builder.Entity<Role>(b =>
             {
-                b.ToTable("ws_role");  //.HasIndex(i=>i.Name).IsUnique();
+                b.ToTable("role");  //.HasIndex(i=>i.Name).IsUnique();
                 b.Property(p => p.Name);
                 //b.Property(p => new { p.Name, p.Id });
             });
 
             builder.Entity<UserRole>(b =>
             {
-                b.ToTable("ws_userrole"); // .HasKey(prop => new { prop.RoleId, prop.UserId });
+                b.ToTable("user_role"); // .HasKey(prop => new { prop.RoleId, prop.UserId });
                 // 多对多关联
                 b.HasOne(e => e.User).WithMany(u => u.UserRoles);
                 b.HasOne(e => e.Role).WithMany(r => r.UserRoles);
             });
-            
+
+            builder.Entity<UserOrg>(b =>
+            {
+                b.ToTable("user_org");
+            });
+
             builder.Entity<Permission>(b =>
             {
-                b.ToTable("ws_permission");
+                b.ToTable("permission");
             });
 
             builder.Entity<Organization>(b =>
             {
-                b.ToTable("ws_organization");
+                b.ToTable("organization");
                 b.HasOne(e => e.Parent).WithMany(org => org.Children);
             });
 
             builder.Entity<RoleOrgPer>(b =>
             {
-                b.ToTable("ws_role_org_per");
+                b.ToTable("role_org_per");
                 //b.Property(p => p.Id).ValueGeneratedOnAddOrUpdate();
             });
+
+            builder.Entity<RoleOrg>(b =>
+            {
+                b.ToTable("role_org");
+            });
+
+
 
             #endregion
         }
