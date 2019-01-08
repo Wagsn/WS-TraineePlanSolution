@@ -137,7 +137,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="organization">组织树节点</param>
         /// <returns></returns>
-        public List<Organization> TreeToList(Organization organization)
+        public static List<Organization> TreeToList(Organization organization)
         {
             List<Organization> result = new List<Organization>
             {

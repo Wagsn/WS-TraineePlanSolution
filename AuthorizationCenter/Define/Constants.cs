@@ -156,7 +156,7 @@ namespace AuthorizationCenter.Define
         /// <summary>
         /// 角色绑定 -用户角色关联的增删查改
         /// </summary>
-        public const string ROLE_BIND_MANAGE = "ROLE_BIND_MANAGE";
+        public const string USERROLE_MANAGE = "USERROLE_MANAGE";
 
         /// <summary>
         /// 授权管理 -角色组织权限关联的增删查改

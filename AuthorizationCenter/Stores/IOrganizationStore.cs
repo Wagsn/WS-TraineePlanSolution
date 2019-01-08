@@ -25,5 +25,12 @@ namespace AuthorizationCenter.Stores
         /// <param name="id">组织ID</param>
         /// <returns></returns>
         Task<List<Organization>> FindParentById(string id);
+
+        /// <summary>
+        /// 递归查询所有节点，构成一棵树返回
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Organization FindTreeById(string id);
     }
 }

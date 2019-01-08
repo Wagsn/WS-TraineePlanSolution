@@ -65,6 +65,27 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// 递归查询所有节点，构成一棵树返回
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public Organization FindTreeById(string orgId)
+        {
+            var org = (from o in Find()
+                        where o.Id == orgId
+                        select o).Include(o => o.Children).SingleOrDefault();
+            if(org == null)
+            {
+                return null;
+            }
+            for (int i = 0; i < org.Children.Count; i++)
+            {
+                org.Children[i] = FindTreeById(org.Children[i].Id);
+            }
+            return org;
+        }
+
+        /// <summary>
         /// 递归查询子组织集合
         /// </summary>
         /// <param name="orgId"></param>

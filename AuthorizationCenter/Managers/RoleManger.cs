@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using AutoMapper;
@@ -22,6 +23,16 @@ namespace AuthorizationCenter.Managers
         IRoleStore Store { get; set; }
 
         /// <summary>
+        /// 权限存储
+        /// </summary>
+        IPermissionStore PermissionStore { get; set; }
+
+        /// <summary>
+        /// 组织存储
+        /// </summary>
+        IOrganizationStore OrganizationStore { get; set; }
+
+        /// <summary>
         /// 用户角色关联存储
         /// </summary>
         IUserRoleStore UserRoleStore { get; set; }
@@ -37,6 +48,11 @@ namespace AuthorizationCenter.Managers
         IRoleOrgStore RoleOrgStore { get; set; }
 
         /// <summary>
+        /// 角色组织权限存储
+        /// </summary>
+        IRoleOrgPerStore RoleOrgPerStore { get; set; }
+
+        /// <summary>
         /// 类型映射
         /// </summary>
         IMapper Mapper { get; set; }
@@ -46,21 +62,18 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         readonly ILogger Logger = LoggerManager.GetLogger(nameof(RoleManger));
 
-        /// <summary>
-        /// 构造器
-        /// </summary>
-        /// <param name="store"></param>
-        /// <param name="mapper"></param>
-        /// <param name="userRoleStore"></param>
-        /// <param name="roleOrgStore"></param>
-        public RoleManger(IRoleStore store, IMapper mapper, IUserRoleStore userRoleStore, IRoleOrgStore roleOrgStore)
+        public RoleManger(IRoleStore store, IPermissionStore permissionStore, IOrganizationStore organizationStore, IUserRoleStore userRoleStore, IUserOrgStore userOrgStore, IRoleOrgStore roleOrgStore, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store;
-            Mapper = mapper;
-            UserRoleStore = userRoleStore;
-            RoleOrgStore = roleOrgStore;
+            Store = store ?? throw new ArgumentNullException(nameof(store));
+            PermissionStore = permissionStore ?? throw new ArgumentNullException(nameof(permissionStore));
+            OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
+            UserRoleStore = userRoleStore ?? throw new ArgumentNullException(nameof(userRoleStore));
+            UserOrgStore = userOrgStore ?? throw new ArgumentNullException(nameof(userOrgStore));
+            RoleOrgStore = roleOrgStore ?? throw new ArgumentNullException(nameof(roleOrgStore));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-        
+
         /// <summary>
         /// 创建
         /// </summary>
@@ -93,19 +106,19 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 新增角色 -通过组织用户ID（UID->OID->RID）
+        /// 新增角色 -通过组织用户ID（UID-[UO]->OID|RID-->RO）
         /// 将角色添加到用户所在组织上
         /// </summary>
         /// <param name="json">新增角色</param>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public async Task CreateByOrgUserId(RoleJson json, string userId)
+        public async Task CreateForOrgByUserId(RoleJson json, string userId)
         {
             // 1. 创建角色
             string roleId = Guid.NewGuid().ToString();
             json.Id = roleId;
             await Store.Create(Mapper.Map<Role>(json));
-            // 2. 通过用户ID查询组织ID
+            // 2. 通过用户ID查询组织ID -用户不能有多个组织
             var orgId = (from uo in Store.Context.UserOrgs
                         where uo.UserId == userId
                         select uo.OrgId).Single();
@@ -190,7 +203,8 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 查询通过用户ID
+        /// 通过用户ID查询绑定的角色
+        /// (UID-[UR]->RID)
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -200,36 +214,31 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 查询通过用户ID(UID->OID->RID)
-        /// 查询用户ID所在组织的所有角色（包含子组织）
+        /// 查询用户ID所在组织的所有角色（包含子组织的角色）
+        /// (((UID-[UR]->RID)|PID)-[ROP]->OID-[RO]->RID)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public async Task<IEnumerable<RoleJson>> FindByOrgUserId(string userId)
+        public async Task<IEnumerable<RoleJson>> FindRoleOfOrgByUserId(string userId)
         {
-            //// 1. 查询组织
-            //var orgId = (await UserOrgStore.Find(uo => uo.UserId = userId).SingleAsync()).OrgId;
-
-            //// 2. 查询角色
-            //var roleIds = await RoleOrgStore.Find(ro => ro.OrgId == orgId).Select(ro => ro.RoleId).ToListAsync();
-            //var roles = await Store.Find(role => roleIds.Contains(role.Id)).Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();
-
-            // 判断角色查询权限 -找出可以查询的组织森林（角色组织权限），查询其所有角色
-
             // 1. 查询用户具有角色查询权限的组织森林，并扩展成组织列表
+            // 1.1 查询用户权限的组织森林根组织ID 
+            var rootOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ROLE_MANAGE)).Select(org => org.Id);
+            // 1.2 扩展成组织列表
+            var orgList = new List<Organization>();
+            foreach (var orgId in rootOrgIds)
+            {
+                orgList.AddRange(OrganizationManager.TreeToList(OrganizationStore.FindTreeById(orgId)));
+            }
+            var orgIds = orgList.Select(org => org.Id).ToList();
             // 2. 查询这些所有组织所包含的角色
-
-            var roles = await (from role in Store.Context.Roles
-                         where (from ro in Store.Context.RoleOrgs
-                                where (from uo in Store.Context.UserOrgs
-                                       where uo.UserId == userId
-                                       select uo.OrgId).Contains(ro.OrgId)  // 1. 查询组织
-                                select ro.RoleId).Contains(role.Id)  
-                         select role).Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();  // 2. 查询角色
+            var roles = await (from role in Store.Find()
+                               where (from ro in RoleOrgStore.Find()
+                                      where orgIds.Contains(ro.OrgId)
+                                      select ro.RoleId).Contains(role.Id)
+                               select role).Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();
             return roles;
         }
-
-        //public Task<IEnumerable<RoleJson>> Fin
 
         /// <summary>
         /// 查询

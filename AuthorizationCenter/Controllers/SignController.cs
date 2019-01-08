@@ -82,10 +82,10 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
-                Logger.Error("用户创建失败：\r\n" + e);
+                Logger.Error($"[{nameof(SignUp)}] 用户创建失败：\r\n{e.ToString()}");
             }
-
-            return RedirectToRoute(new { controller = nameof(UserController), action = nameof(UserController.Index) });
+            return RedirectToAction(nameof(UserController.Index), nameof(UserController));
+            //return RedirectToRoute(new { controller = nameof(UserController), action = nameof(UserController.Index) });
         }
 
         /// <summary>

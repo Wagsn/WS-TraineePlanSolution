@@ -22,12 +22,12 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 角色管理
         /// </summary>
-        public IRoleManager<RoleJson> RoleManager { get; set; }
+        IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
         /// 日志器
         /// </summary>
-        public readonly ILogger Logger = LoggerManager.GetLogger(nameof(RolesController));
+        readonly ILogger Logger = LoggerManager.GetLogger(nameof(RolesController));
 
         /// <summary>
         /// 构造器
@@ -39,153 +39,217 @@ namespace AuthorizationCenter.Controllers
         }
 
         /// <summary>
-        /// 角色列表
+        /// [MVC] 角色管理-角色列表
+        /// 管理属于自己组织的角色（包含子组织的角色）
+        /// TODO：管理自己有权限管理角色的组织的角色
         /// </summary>
         /// <returns></returns>
-        // GET: Roles
         public async Task<IActionResult> Index()
         {
-            // 通过登陆的用户查询组织，通过组织查询角色 => 通过用户查询角色
-            RoleManager.FindByOrgUserId(SignUser.Id);  // List<RoleJson>
-            return View(await RoleManager.Find().ToListAsync());
+            // 1. 权限检查
+            // 2. 业务处理
+            try
+            {
+                Logger.Trace($"[{nameof(Index)}] 角色管理主页");
+                // 通过登陆的用户查询组织，通过组织查询角色
+                var roles = await RoleManager.FindRoleOfOrgByUserId(SignUser.Id);
+                Logger.Trace($"[{nameof(Index)}] 响应数据: \r\n{JsonUtil.ToJson(roles)}");
+                return View(roles);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return RedirectToAction(nameof(UserController.Index), nameof(UserController));
+            }
         }
 
         /// <summary>
-        /// 详情
+        /// [MVC] 角色管理-角色详情界面
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">角色ID，对应前端route</param>
         /// <returns></returns>
         // GET: Roles/Details/5
         public async Task<IActionResult> Details(string id)
         {
+            Logger.Trace($"[{nameof(Details)}] 请求参数: 角色({id})");
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
+            // 1. 权限检查
 
-            var rolejson = await RoleManager.FindById(id);
-            if (rolejson == null)
+            // 2. 业务处理
+            try
             {
-                return NotFound();
+                var role = await RoleManager.FindById(id);
+                Logger.Trace($"[{nameof(Details)}] 响应数据:\r\n{JsonUtil.ToJson(role)}");
+                if (role == null)
+                {
+                    return NotFound();
+                }
+                return View(role);
             }
-            return View(rolejson);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return View(nameof(Index));
+            }
         }
 
         /// <summary>
-        /// 新增
+        /// [MVC] 角色管理-新增角色界面
         /// </summary>
         /// <returns></returns>
         // GET: Roles/Create
         public IActionResult Create()
         {
+            // 1. 权限检查
             return View();
         }
 
         /// <summary>
-        /// 新增
+        /// [MVC] 角色管理-新增角色
+        /// 将角色添加到登陆用户的组织上
+        /// TODO：将角色添加到有权限添加的组织
         /// </summary>
-        /// <param name="userJson"></param>
+        /// <param name="role">用户</param>
         /// <returns></returns>
         // POST: Roles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Decription")] RoleJson userJson)
+        public async Task<IActionResult> Create([Bind("Id,Name,Decription")] RoleJson role)
         {
-            Logger.Trace($"[{nameof(Create)}] Request: \r\n{JsonUtil.ToJson(userJson)}");
+            Logger.Trace($"[{nameof(Create)}] 请求参数; \r\n{JsonUtil.ToJson(role)}");
+            // 0. 参数检查
+            if (role == null)
+            {
+                return View(nameof(Create));
+            }
+            // 1. 权限检查
+            // 2. 业务处理
             try
             {
                 // 创建角色 -与组织关联
-                await RoleManager.Create(userJson);
+                // TODO: 新增一个接口：在指定组织下创建角色（RoleManager.CreateByOrgIdUserId(role, orgId, SignUser.Id)）
+                await RoleManager.CreateForOrgByUserId(role, SignUser.Id);
                 return RedirectToAction(nameof(Index));
             }
             catch(Exception e)
             {
-                Logger.Error($"[{nameof(Create)}] 错误："+e);
-                return View(userJson);
+                Logger.Error($"[{nameof(Create)}] 服务器错误: \r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return View(role);
             }
         }
 
         /// <summary>
-        /// 编辑
+        /// [MVC] 角色管理-角色编辑界面
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">角色ID</param>
         /// <returns></returns>
         // GET: Roles/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
+            Logger.Trace($"[{nameof(Edit)}] 请求参数; 角色({id})");
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
-
-            var rolejson = await RoleManager.FindById(id);
-            if (rolejson == null)
+            // 1. 权限检查 ROLE_UPDATE?EDIT_VIEW
+            // 2. 业务处理
+            try
             {
-                return NotFound();
+                var role = await RoleManager.FindById(id);
+                Logger.Trace($"[{nameof(Details)}] 响应数据:\r\n{JsonUtil.ToJson(role)}");
+                if (role == null)
+                {
+                    return NotFound();
+                }
+                return View(role);
             }
-            return View(rolejson);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return View(nameof(Index));
+            }
         }
 
         /// <summary>
-        /// 编辑
+        /// [MVC] 角色管理-角色编辑
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="reqbody"></param>
+        /// <param name="id">角色ID</param>
+        /// <param name="role">角色</param>
         /// <returns></returns>
         // POST: Roles/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Decription")] RoleJson reqbody)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Decription")] RoleJson role)
         {
-            if (id != reqbody.Id)
+            Logger.Trace($"[{nameof(Create)}] 请求参数; 角色({id}) \r\n{JsonUtil.ToJson(role)}");
+            // 0. 参数检查
+            if (id != role.Id)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            // 1. 权限检查 ROLE_UPDATE?EDIT
+            // 2. 业务处理
+            try
             {
-                try
-                {
-                    await RoleManager.Update(reqbody);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if(!await RoleManager.ExistById(reqbody.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await RoleManager.Update(role);
             }
-            return View(reqbody);
+            catch (Exception e)
+            {
+                if (!await RoleManager.ExistById(role.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
+                    ModelState.AddModelError("All", e.Message);
+                    return View(nameof(Edit), id);  // 测试一下
+                }
+            }
+            return View(role);
         }
 
         /// <summary>
-        /// 删除
+        /// [MVC] 角色管理-角色删除界面
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: Roles/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
+            Logger.Trace($"[{nameof(Edit)}] 请求参数; 角色({id})");
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
-
-            var rolejson = await RoleManager.FindById(id);
-            if (rolejson == null)
+            // 1. 权限检查 ROOT_ROLE_DELETE_VIEW
+            // 2. 业务处理
+            try
             {
-                return NotFound();
+                var role = await RoleManager.FindById(id);
+                Logger.Trace($"[{nameof(Delete)}] 响应数据:\r\n{JsonUtil.ToJson(role)}");
+                if (role == null)
+                {
+                    return NotFound();
+                }
+                return View(role);
             }
-
-            return View(rolejson);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return View(nameof(Index));
+            }
         }
 
         /// <summary>
@@ -198,7 +262,21 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await RoleManager.DeleteById(id);
+            Logger.Trace($"[{nameof(DeleteConfirmed)}] 请求参数; 角色({id})");
+            // 0. 参数检查
+            // 1. 权限验证
+            // 2. 业务处理
+            try
+            {
+                // TODO：
+                await RoleManager.DeleteById(id);
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return View(nameof(Delete), id);
+            }
             return RedirectToAction(nameof(Index));
         }
 

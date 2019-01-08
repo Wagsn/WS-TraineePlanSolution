@@ -35,6 +35,7 @@ namespace AuthorizationCenter
 
             // 初始用户
             string rootUserId = Guid.NewGuid().ToString();
+            string xkjUserRootId = Guid.NewGuid().ToString();
             context.AddRange(new List<User>
             {
                 new User
@@ -48,18 +49,31 @@ namespace AuthorizationCenter
                     Id = Guid.NewGuid().ToString(),
                     SignName = "wangsen",
                     PassWord = "123456"
+                },
+                new User
+                {
+                    Id = xkjUserRootId,
+                    SignName = "xkjadmin",
+                    PassWord = "123456"
                 }
             });
 
             // 初始角色
-            string rootRoleId = Guid.NewGuid().ToString();
+            string roleRootId = Guid.NewGuid().ToString();
+            string xkjRoleRootId = Guid.NewGuid().ToString();
             context.AddRange(new List<Role>
             {
                 new Role
                 {
-                    Id = rootRoleId,
+                    Id = roleRootId,
                     Name = "RoleRoot",
                     Decription = "系统最高权限者"
+                },
+                new Role
+                {
+                    Id = xkjRoleRootId,
+                    Name = "XKJRoot",
+                    Decription = "新空间最高权限者"
                 },
                 new Role
                 {
@@ -94,41 +108,48 @@ namespace AuthorizationCenter
             });
 
             // 初始组织
-            string rootOrgId = Guid.NewGuid().ToString();
-            string xkjCqId = Guid.NewGuid().ToString(); 
+            string orgRootId = Guid.NewGuid().ToString();
+            string xkjOrgRootId = Guid.NewGuid().ToString(); 
             context.AddRange(new List<Organization>
             {
                 new Organization
                 {
-                    Id = rootOrgId,
+                    Id = orgRootId,
                     Name = "OrgRoot",
                     Description = "根组织",
                     ParentId = null
                 },
                 new Organization
                 {
-                    Id = xkjCqId,
-                    ParentId = rootOrgId,
+                    Id = Guid.NewGuid().ToString(),
+                    ParentId =orgRootId,
+                    Name = "新耀行",
+                    Description = "房产中介"
+                },
+                new Organization
+                {
+                    Id = xkjOrgRootId,
+                    ParentId = orgRootId,
                     Name = "新空间（重庆）科技有限公司",
                     Description = "致力于商业地产服务"
                 },
                 new Organization
                 {
                     Id = Guid.NewGuid().ToString(),
-                    ParentId = xkjCqId,
+                    ParentId = xkjOrgRootId,
                     Name = "新空间昆明分公司",
                     Description = "新空间昆明分公司"
                 }
             });
 
             // 初始权限
-            string rootPerId = Guid.NewGuid().ToString();
+            string perRootId = Guid.NewGuid().ToString();
             string userManageId = Guid.NewGuid().ToString();
             context.AddRange(new List<Permission>
             {
                 new Permission
                 {
-                    Id = rootPerId,
+                    Id = perRootId,
                     Name = Constants.ROOT,
                     Description = "最高权限",
                     ParentId = null
@@ -138,7 +159,7 @@ namespace AuthorizationCenter
                     Id = userManageId,
                     Name = Constants.USER_MANAGE,
                     Description = "用户管理",
-                    ParentId = rootPerId
+                    ParentId = perRootId
                 },
                 new Permission
                 {
@@ -180,37 +201,53 @@ namespace AuthorizationCenter
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ROLE_MANAGE,
                     Description = "角色管理",
-                    ParentId = rootPerId
+                    ParentId = perRootId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = Constants.ROLE_BIND_MANAGE,
+                    Name = Constants.USERROLE_MANAGE,
                     Description = "角色绑定",
-                    ParentId = rootPerId
+                    ParentId = perRootId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ORG_MANAGE,
                     Description = "组织管理",
-                    ParentId = rootPerId
+                    ParentId = perRootId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.AUTH_MANAGE,
                     Description = "授权管理",
-                    ParentId = rootPerId
+                    ParentId = perRootId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "PER_QUERY",
+                    Description = "权限查询",
+                    ParentId = perRootId
                 }
             });
 
             // 角色绑定
-            context.Add(new UserRole
+            context.AddRange(new List<UserRole>
             {
-                Id = Guid.NewGuid().ToString(),
-                RoleId = rootRoleId,
-                UserId = rootUserId
+                new UserRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    RoleId = roleRootId,
+                    UserId = rootUserId
+                },
+                new UserRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    RoleId = xkjRoleRootId,
+                    UserId = xkjUserRootId
+                }
             });
 
             // 用户组织 一对一关系（暂时）
@@ -220,7 +257,13 @@ namespace AuthorizationCenter
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = rootUserId,
-                    OrgId = rootOrgId
+                    OrgId = orgRootId
+                },
+                new UserOrg
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = xkjUserRootId,
+                    OrgId = xkjOrgRootId
                 }
             });
 
@@ -230,17 +273,32 @@ namespace AuthorizationCenter
                 new RoleOrg
                 {
                     Id = Guid.NewGuid().ToString(),
-                    RoleId = rootRoleId,
-                    OrgId = rootOrgId
+                    RoleId = roleRootId,
+                    OrgId = orgRootId
+                },
+                new RoleOrg
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    RoleId = xkjRoleRootId,
+                    OrgId = xkjOrgRootId
                 }
             });
 
             // 权限授予
-            context.Add(new RoleOrgPer
+            context.AddRange(new List<RoleOrgPer>
             {
-                RoleId = rootRoleId,
-                OrgId = rootOrgId,
-                PerId = rootPerId
+                new RoleOrgPer
+                {
+                    RoleId = roleRootId, // 角色
+                    OrgId = orgRootId,  // 数据范围
+                    PerId = perRootId  // 权限范围
+                },
+                new RoleOrgPer
+                {
+                    RoleId = xkjRoleRootId,
+                    OrgId = xkjOrgRootId,
+                    PerId = perRootId
+                }
             });
 
             #endregion

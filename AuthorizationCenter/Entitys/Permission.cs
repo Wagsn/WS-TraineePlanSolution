@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 权限模型
+    /// 权限实体
     /// </summary>
     public class Permission
     {
@@ -28,7 +28,6 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 父权限
         /// </summary>
-        [ForeignKey("ParentId")]
         public Permission Parent { get; set; }
 
         /// <summary>
@@ -42,5 +41,10 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         [MaxLength(255)]
         public string Description { get; set; }
+
+        /// <summary>
+        /// 子权限
+        /// </summary>
+        public List<Permission> Children { get; set; }
     }
 }

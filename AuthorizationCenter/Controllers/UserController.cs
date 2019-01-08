@@ -74,6 +74,11 @@ namespace AuthorizationCenter.Controllers
         public async Task<IActionResult> Index(int pageIndex =0, int pageSize =10)
         {
             ViewData[Constants.SIGNUSER] = SignUser;
+            // 0. 参数检查
+
+            // 1. 权限检查
+
+            // 2. 业务处理
 
             // 分页查询用户列表
             return View(await UserManager.Find().Page(pageIndex, pageSize).ToListAsync());

@@ -41,6 +41,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IPermissionStore, PermissionStore>();
             services.AddScoped<IOrganizationStore, OrganizationStore>();
             services.AddScoped<IRoleOrgPerStore, RoleOrgPerStore>();
+            services.AddScoped<IUserOrgStore, UserOrgStore>();
+            services.AddScoped<IRoleOrgStore, RoleOrgStore>();
 
             #endregion
 
