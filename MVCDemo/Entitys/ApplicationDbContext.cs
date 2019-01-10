@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MVCDemo.Entitys;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MVCDemo.Entitys
 {
@@ -11,25 +6,28 @@ namespace MVCDemo.Entitys
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
+        ///// <summary>
+        ///// 待办项
+        ///// </summary>
+        //public DbSet<TodoItem> TodoItems { get; set; }
+
         /// <summary>
-        /// 待办项
+        /// 学生
         /// </summary>
-        public DbSet<TodoItem> TodoItems { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<TodoItem>(b =>
-                {
-                    b.ToTable("ws_todo_todoitem");
-                    //b.Property(p => p._IsDeleted);
-                });
+            //modelBuilder.Entity<TodoItem>(b =>
+            //{
+            //    b.ToTable("ws_todo_todoitem");
+            //});
+            modelBuilder.Entity<Student>(b =>
+            {
+                b.ToTable("student");
+            });
         }
-
-
-
-
-
     }
 }

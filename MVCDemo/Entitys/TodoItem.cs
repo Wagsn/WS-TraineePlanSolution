@@ -12,6 +12,11 @@ namespace MVCDemo.Entitys
     public class TodoItem 
     {
         /// <summary>
+        /// 构造器
+        /// </summary>
+        public TodoItem() { }
+
+        /// <summary>
         /// 待办ID
         /// </summary>
         [Key]
