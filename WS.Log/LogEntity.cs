@@ -6,32 +6,34 @@ using System.Threading.Tasks;
 namespace WS.Log
 {
     /// <summary>
-    /// 一条日志的实体，将会输出到日志文件中，不直接输出到
-    /// LogName
-    /// LogTime
-    /// Message
-    /// LogLevel
+    /// 一条日志的实体，将会输出到日志文件中
+    /// [2018-11-22 17:31.421428+8:00] [Trace] [LoggerName] Message
     /// </summary>
     public class LogEntity
     {
-        /// <summary>
-        /// 构造器 
-        /// [2018-11-22 17:31.421428+8:00] [Trace] [LoggerName] Message
-        /// </summary>
-        public LogEntity() { }
+        ///// <summary>
+        ///// 输出路径（"./log/sign/error/2019-01-10.log"）（URI）
+        ///// </summary>
+        //public string OutPath { get; set; }
+
 
         /// <summary>
-        /// 哪个日志器，LoggerManager.GetLogger(string LoggerName)
+        /// 日志项
+        /// </summary>
+        public string LogItem { get; set; }
+
+        /// <summary>
+        /// 日志器名
         /// </summary>
         public string LoggerName { get; set; }
 
         /// <summary>
-        /// 日志打印的时间
+        /// 日志时间
         /// </summary>
         public DateTime LogTime { get; set; }
 
         /// <summary>
-        /// 日志正文
+        /// 日志信息
         /// </summary>
         public string Message { get; set; }
 

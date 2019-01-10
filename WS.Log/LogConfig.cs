@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,19 +19,20 @@ namespace WS.Log
         public bool IsLog { get; set; }
 
         /// <summary>
-        /// 日志输出路径
+        /// 日志文件输出路径模板（"./log/${LoggerName}/${Date}.log"）
+        /// ("./log/${LoggerName}/${LogLevel}/${Date}.log")
         /// </summary>
-        public string LogOut { get; set; }
+        public string LogOutTemplate { get; set; }
 
         /// <summary>
-        /// 错误日志输出路径
+        /// 错误日志文件输出路径模板（"./log/${LoggerName}/error/${Date}.log"）
         /// </summary>
-        public string ErrorOut { get; set; }
+        public string ErrOutTemplate { get; set; }
 
         /// <summary>
-        /// 致命错误输出路径
+        /// 致命错误输出路径（"./log/${LoggerName}/fatal/${Date}.log"）
         /// </summary>
-        public string FatalOut { get; set; }
+        public string FatalOutTemplate { get; set; }
 
         /// <summary>
         /// 时间格式
@@ -97,5 +99,58 @@ namespace WS.Log
         /// 档案文件是否压缩
         /// </summary>
         public bool? ZipArchiveFile { get; set; }
+    }
+    /// <summary>
+    /// 单独一个日志器的配置
+    /// </summary>
+    public class LoggerConfig2
+    { 
+
+        /// <summary>
+        /// 错误日志文件输出路径模板（"./log/${LoggerName}/${Date}.log"）
+        /// </summary>
+        public string LogOutTemplate { get; set; }
+
+        /// <summary>
+        /// 错误日志文件输出路径模板（"./log/${LoggerName}/error/${Date}.log"）
+        /// </summary>
+        public string ErrOutTemplate { get; set; }
+
+        /// <summary>
+        /// 日志文件名模板（"${Year} ${Month} ${Day}.log"）
+        /// 暂时支持标签（LoggerName：TodoContriller，Date：yyy-MM-dd）
+        /// </summary>
+        public string FileNameTemplate { get; set; }
+
+        /// <summary>
+        /// 日志项模板
+        /// "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}" -> "[2018-11-18 17:15.452154+8:00] [Trace] [TodoController] Message"
+        /// </summary>
+        public string LogItemTemplate { get; set; }
+
+        /// <summary>
+        /// 日期格式（yyyy-MM-dd）
+        /// </summary>
+        public string DateFormat { get; set; }
+
+        /// <summary>
+        /// 时间格式（09:53:12.154451+8:00）
+        /// </summary>
+        public string TimeFormat { get; set; }
+
+        /// <summary>
+        /// 映射，键值对
+        /// 占位符与实际值的映射（LoggerName：TodoContriller）
+        /// 不在JSON中映射
+        /// TODO：LoggerName可能只需要赋值一次，但是DateTime是每次打印都在刷新的，将object改造成委托，采用动态计算机制 KVs[key](entity):string
+        /// </summary>
+        [JsonIgnore]
+        public Dictionary<string, object> Map = new Dictionary<string, object>();
+
+        /// <summary>
+        /// 通过LogEntity动态计算LogItem
+        /// </summary>
+        [JsonIgnore]
+        public Dictionary<string, Func<object, string>> DynanicMap { get; set; }
     }
 }

@@ -76,8 +76,8 @@ namespace WS.Log
         {
             return new DefaultLogger(new LoggerConfig
             {
-                LogOutFormat = "./log" ,
-                FileNameFormat = "${Date}",
+                LogOutTemplate = "./log" ,
+                FileNameTemplate = "${Date}",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
                 DateFormat = "yyyy-MM-dd",
                 DynanicMap = new Dictionary<string, Func<object, string>>
@@ -127,12 +127,12 @@ namespace WS.Log
             // { name: "price", value: new Money(15.6, unit:"dollar"), type: Money, format: "udddd.ff"} => "$0015.60"
             return new DefaultLogger(new LoggerConfig
             {
-                LogOutFormat = "./log/"+loggerName,
-                LogName = loggerName,
-                FileNameFormat = "${Date}.log",
+                LogOutTemplate = "./log/"+loggerName,
+                LoggerName = loggerName,
+                FileNameTemplate = "${Date}.log",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
                 DateFormat = "yyyy-MM-dd",
-                ItemFormat = "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}",
+                LogItemTemplate = "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}",
                 DynanicMap = new Dictionary<string, Func<object, string>>
                 {
                     ["Date"] = delegate (object entity)
@@ -177,12 +177,12 @@ namespace WS.Log
         {
             return new DefaultLogger(new LoggerConfig
             {
-                LogOutFormat = "./log/${LoggerName}/${Date}.log",
-                LogName = nameof(CategoryName),
-                FileNameFormat = "${Date}.log",
+                LogOutTemplate = "./log/${LoggerName}/${Date}.log",
+                LoggerName = nameof(CategoryName),
+                FileNameTemplate = "${Date}.log",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
                 DateFormat = "yyyy-MM-dd",
-                ItemFormat = "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}",
+                LogItemTemplate = "[${DateTime}] [${LogLevel}] [${LoggerName}] ${Message}",
                 DynanicMap = new Dictionary<string, Func<object, string>>
                 {
                     ["Date"] = delegate (object entity)
@@ -191,13 +191,13 @@ namespace WS.Log
                     },
                     ["DateTime"] = delegate (object entity)
                     {
-                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd yyyy-MM-dd");
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd HH:mm:ss");
                     },
                     ["LoggerName"] = delegate (object entity)
                     {
                         return (entity as LogEntity)?.LoggerName;
                     },
-                    ["LoggerLevel"] = delegate (object entity)
+                    ["LogLevel"] = delegate (object entity)
                     {
                         return (entity as LogEntity).LogLevel.ToString();
                     },
@@ -208,11 +208,15 @@ namespace WS.Log
                     ["ErrOut"] = delegate (object entity)
                     {
                         // return EL.Parse((entity as LogEntity)?.ErrOut, )
-                        return EL.Parse("./log/${LoggerName}/error/${Date}.log", new Dictionary<string, object> { ["Date"]= (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd"), ["LoggerName"] = (entity as LogEntity)?.LoggerName});
+                        return EL.Parse("./log/${LoggerName}/error/${Date}.log", new Dictionary<string, object> { ["Date"] = (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd"), ["LoggerName"] = (entity as LogEntity)?.LoggerName });
                     },
                     ["LogOut"] = delegate (object entity)
                     {
-                        return "./log/" + (entity as LogEntity)?.LoggerName + "/" + (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd") + ".log";
+                        return EL.Parse("./log/${LoggerName}/${Date}.log", new Dictionary<string, object> { ["Date"] = (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd"), ["LoggerName"] = (entity as LogEntity)?.LoggerName });
+                    },
+                    ["LogItem"] = delegate (object entity)
+                    {
+                        return EL.Parse("[${DateTime}] [${LogLevel}] [${LoggerName}] ${Message}", new { DateTime = (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd HH:mm:ss"), (entity as LogEntity)?.LogLevel, (entity as LogEntity)?.LoggerName, (entity as LogEntity)?.Message});
                     }
                 }
             });
@@ -237,12 +241,12 @@ namespace WS.Log
         {
             return new DefaultLogger(new LoggerConfig
             {
-                LogOutFormat = config.LogOutFormat,
-                LogName = nameof(CategoryName),
-                FileNameFormat = config.FileNameFormat,
+                LogOutTemplate = config.LogOutTemplate,
+                LoggerName = nameof(CategoryName),
+                FileNameTemplate = config.FileNameTemplate,
                 TimeFormat = config.TimeFormat,
                 DateFormat = config.DateFormat,
-                ItemFormat = config.ItemFormat,
+                LogItemTemplate = config.LogItemTemplate,
                 DynanicMap = config.DynanicMap
             });
         }

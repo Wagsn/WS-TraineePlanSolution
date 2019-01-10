@@ -27,7 +27,7 @@ namespace WS.Log
             {
                 ["LogOut"] = delegate (object entity)
                 {
-                    return EL.Parse(config.LogOutFormat, new Dictionary<string, object> { ["Date"] = (entity as LogEntity).LogTime.ToString(Config.DateFormat) });
+                    return EL.Parse(config.LogOutTemplate, new Dictionary<string, object> { ["Date"] = (entity as LogEntity).LogTime.ToString(Config.DateFormat) });
                     //return "./log/" + entity.LoggerName + ".log";
                 }
             };
@@ -152,7 +152,7 @@ namespace WS.Log
             Log(config, new LogEntity
             {
                 LogLevel = level,
-                LoggerName = config.LogName,
+                LoggerName = config.LoggerName,
                 LogTime = DateTime.Now,
                 Message = message
             });
@@ -172,19 +172,19 @@ namespace WS.Log
             {
                 ["LogOut"] = delegate()
                 {
-                    return EL.Parse(config.LogOutFormat, new Dictionary<string, object> { ["Date"] = entity.LogTime.ToString(config.DateFormat) });
+                    return EL.Parse(config.LogOutTemplate, new Dictionary<string, object> { ["Date"] = entity.LogTime.ToString(config.DateFormat) });
                     //return "./log/" + entity.LoggerName + ".log";
                 }
             };
-            var logitem = EL.Parse(config.ItemFormat, entity, config.DynanicMap, @"\$\{", @"\}");
+            var logitem = EL.Parse(config.LogItemTemplate, entity, config.DynanicMap, @"\$\{", @"\}");
             // 文件名占位符替换
-            var filename = EL.Parse(config.FileNameFormat, entity, config.DynanicMap, @"\$\{", @"\}");
+            var filename = EL.Parse(config.FileNameTemplate, entity, config.DynanicMap, @"\$\{", @"\}");
             // 输出->控制台
             Console.WriteLine(logitem);
             //Console.WriteLine(EL.Parse(config.FileNameFormat, new { Date = entity.LogTime.ToString(config.DateFormat), entity.LoggerName }));
             //string.Format("", )
             // {name, value, type, format, convertor: (format)=>string}
-            // 输出->文件
+            // 输出->文件 TODO: 根据配置文件限制Trace等日志输出到文件
             switch (entity.LogLevel)
             {
                 case LogLevels.Error:

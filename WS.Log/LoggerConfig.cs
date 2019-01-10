@@ -1,58 +1,56 @@
 ﻿#region << 版 本 注 释 >>
 /*----------------------------------------------------------------
-* 项目名称 ：WS.Core.Log
-* 项目描述 ：
+* 项目名称 ：WS.Log
+* 项目描述 ：.NET Standard 2.0
 * 类 名 称 ：LoggerConfig
 * 类 描 述 ：
 * 所在的域 ：DESKTOP-KA4M82K
-* 命名空间 ：WS.Core.Log
+* 命名空间 ：WS.Log
 * 机器名称 ：DESKTOP-KA4M82K 
 * CLR 版本 ：4.0.30319.42000
 * 作    者 ：wagsn
-* 创建时间 ：2018/11/23 9:14:28
-* 更新时间 ：2018/11/23 9:14:28
-* 版 本 号 ：v1.0.0.0
+* 创建时间 ：2018/11/23 09:14:28
+* 更新时间 ：2018/01/10 13:15:00
+* 版 本 号 ：v1.0.0.2
 //----------------------------------------------------------------*/
 #endregion
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using WS.Text;
 
 namespace WS.Log
 {
     /// <summary>
     /// 单独一个日志器的配置
-    /// LoogerName
-    /// LoggerRoot
-    /// FileFormat
-    /// TimeFormat
     /// </summary>
     public class LoggerConfig
     {
         /// <summary>
         /// 日志器名称
         /// </summary>
-        public string LogName { get; set; }
-        
-        /// <summary>
-        /// 日志器日志文件根路径（./log/loggerName）
-        /// </summary>
-        public string LogOutFormat { get; set; }
+        public string LoggerName { get; set; }
 
         /// <summary>
-        /// 日志文件名模板
-        /// 暂时支持标签（LoggerName：TodoContriller、DateTime：yyy-MM-dd）
-        /// TODO：模板化  "${LoggerName} ${Year} ${Month} ${Day}"  
-        /// 花括号里面的是日志器识别的标签，如果在标签库存在则将 ${TagName} -> TagValue 否则就将 ${TagName} 消去
+        /// 错误日志文件输出路径模板（"./log/${LoggerName}/${Date}.log"）
         /// </summary>
-        public string FileNameFormat { get; set; }
+        public string LogOutTemplate { get; set; }
+
+        /// <summary>
+        /// 错误日志文件输出路径模板（"./log/${LoggerName}/error/${Date}.log"）
+        /// </summary>
+        public string ErrOutTemplate { get; set; }
+
+        /// <summary>
+        /// 日志文件名模板（"${Year} ${Month} ${Day}.log"）
+        /// 暂时支持标签（LoggerName：TodoContriller，Date：yyy-MM-dd）
+        /// </summary>
+        public string FileNameTemplate { get; set; }
 
         /// <summary>
         /// 日志项模板
         /// "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}" -> "[2018-11-18 17:15.452154+8:00] [Trace] [TodoController] Message"
         /// </summary>
-        public string ItemFormat { get; set; }
+        public string LogItemTemplate { get; set; }
 
         /// <summary>
         /// 日期格式（yyyy-MM-dd）
@@ -74,7 +72,7 @@ namespace WS.Log
         public Dictionary<string, object> Map = new Dictionary<string, object>();
 
         /// <summary>
-        /// 动态计算Value
+        /// 通过LogEntity动态计算LogItem
         /// </summary>
         [JsonIgnore]
         public Dictionary<string, Func<object, string>> DynanicMap { get; set; }
