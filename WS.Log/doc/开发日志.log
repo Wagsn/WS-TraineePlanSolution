@@ -1,5 +1,8 @@
 ﻿[2018-11-27]
 [11:00]
 [DONE] 修复了一些BUG，日志层级显示错误的情况
-[16:40]
+[16:40] 
 [DONE] 将项目从 .NET Core Library 更改为 .NET Standard Library
+[2018-01-10]
+[08:57]
+[DONE] 日志器优化

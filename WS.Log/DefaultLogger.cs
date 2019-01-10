@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WS.IO;
 using WS.Text;
 
@@ -22,7 +23,14 @@ namespace WS.Log
         public DefaultLogger(LoggerConfig config)
         {
             Config = config;
-            config.KVs.Set("LoggerName", config.LogName);
+            KeyValues = new Dictionary<string, Func<object, string>>
+            {
+                ["LogOut"] = delegate (object entity)
+                {
+                    return EL.Parse(config.LogOutFormat, new Dictionary<string, object> { ["Date"] = (entity as LogEntity).LogTime.ToString(Config.DateFormat) });
+                    //return "./log/" + entity.LoggerName + ".log";
+                }
+            };
         }
 
         public void Debug(string message)
@@ -43,6 +51,26 @@ namespace WS.Log
         public void Error(object message)
         {
             Error(message?.ToString());
+        }
+
+        /// <summary>
+        /// 错误
+        /// </summary>
+        /// <typeparam name="ActionName"></typeparam>
+        /// <param name="message"></param>
+        public void Error<ActionName>(object message)
+        {
+            Error($"[{nameof(ActionName)}] {message?.ToString()}");
+        }
+
+        /// <summary>
+        /// 错误
+        /// </summary>
+        /// <param name="tagName"></param>
+        /// <param name="message"></param>
+        public void Error(object tagName, object message)
+        {
+            Error($"[{tagName}] {message?.ToString()}");
         }
 
         public void Error(string formatString, params object[] args)
@@ -130,6 +158,8 @@ namespace WS.Log
             });
         }
 
+        public Dictionary<string, Func<object, string>> KeyValues { get; set; }
+
         /// <summary>
         /// 写日志
         /// </summary>
@@ -137,20 +167,32 @@ namespace WS.Log
         /// <param name="entity">记录实体（记录包含信息）</param>
         public static void Log(LoggerConfig config,  LogEntity entity)
         {
-            string logItem = $"[{entity.LogTime.ToString(config.DateFormat+" "+config.TimeFormat)}] [{entity.LogLevel.ToString()}] {(entity.LoggerName==null?"":"["+ entity.LoggerName + "]")} {entity.Message}";
-            Console.WriteLine(logItem);
-
-            config.KVs.Set("Date", entity.LogTime.ToString(config.DateFormat));
-
-            // 占位符替换
-            string filename = Format.ReplacePlaceholder(config.FileNameFormat, config.KVs)+".log";
-            File.WriteAllText(config.LogOut + "/" + filename, logItem+"\r\n", true);
-
+            // 日志项占位符替换
+            var ps = new Dictionary<string, Func<string>>
+            {
+                ["LogOut"] = delegate()
+                {
+                    return EL.Parse(config.LogOutFormat, new Dictionary<string, object> { ["Date"] = entity.LogTime.ToString(config.DateFormat) });
+                    //return "./log/" + entity.LoggerName + ".log";
+                }
+            };
+            var logitem = EL.Parse(config.ItemFormat, entity, config.DynanicMap, @"\$\{", @"\}");
+            // 文件名占位符替换
+            var filename = EL.Parse(config.FileNameFormat, entity, config.DynanicMap, @"\$\{", @"\}");
+            // 输出->控制台
+            Console.WriteLine(logitem);
+            //Console.WriteLine(EL.Parse(config.FileNameFormat, new { Date = entity.LogTime.ToString(config.DateFormat), entity.LoggerName }));
+            //string.Format("", )
+            // {name, value, type, format, convertor: (format)=>string}
+            // 输出->文件
             switch (entity.LogLevel)
             {
                 case LogLevels.Error:
-                    // 是否错误日志输出独立，默认独立
-                    File.WriteAllText(config.LogOut + "/error/" + filename, logItem + "\r\n", true);
+                    // 是否错误日志输出独立，默认独立 ErrOut: "./log/${LoggerName}/error/${Date}.log"
+                    File.WriteAllText(config.DynanicMap["ErrOut"](entity), logitem + "\r\n", true);
+                    break;
+                default:
+                    File.WriteAllText(config.DynanicMap["LogOut"](entity), logitem + "\r\n", true);
                     break;
             }
         }

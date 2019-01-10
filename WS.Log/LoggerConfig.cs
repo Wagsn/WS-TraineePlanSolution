@@ -15,6 +15,8 @@
 //----------------------------------------------------------------*/
 #endregion
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using WS.Text;
 
 namespace WS.Log
@@ -36,7 +38,7 @@ namespace WS.Log
         /// <summary>
         /// 日志器日志文件根路径（./log/loggerName）
         /// </summary>
-        public string LogOut { get; set; }
+        public string LogOutFormat { get; set; }
 
         /// <summary>
         /// 日志文件名模板
@@ -48,7 +50,7 @@ namespace WS.Log
 
         /// <summary>
         /// 日志项模板
-        /// "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}" -> "[2018-11-18 17:15.452154+8:00] [Trace] [TodoController] logging content"
+        /// "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}" -> "[2018-11-18 17:15.452154+8:00] [Trace] [TodoController] Message"
         /// </summary>
         public string ItemFormat { get; set; }
 
@@ -63,10 +65,18 @@ namespace WS.Log
         public string TimeFormat { get; set; }
 
         /// <summary>
-        /// 键值对，占位符与实际值的映射（LoggerName：TodoContriller）
+        /// 映射，键值对
+        /// 占位符与实际值的映射（LoggerName：TodoContriller）
         /// 不在JSON中映射
+        /// TODO：LoggerName可能只需要赋值一次，但是DateTime是每次打印都在刷新的，将object改造成委托，采用动态计算机制 KVs[key](entity):string
         /// </summary>
         [JsonIgnore]
-        public SafeMap<object> KVs = new SafeMap<object>();
+        public Dictionary<string, object> Map = new Dictionary<string, object>();
+
+        /// <summary>
+        /// 动态计算Value
+        /// </summary>
+        [JsonIgnore]
+        public Dictionary<string, Func<object, string>> DynanicMap { get; set; }
     }
 }

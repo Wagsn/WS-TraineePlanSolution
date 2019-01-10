@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WS.Text;
 
 namespace WS.Log
 {
@@ -75,10 +76,41 @@ namespace WS.Log
         {
             return new DefaultLogger(new LoggerConfig
             {
-                LogOut = "./log" ,
+                LogOutFormat = "./log" ,
                 FileNameFormat = "${Date}",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
-                DateFormat = "yyyy-MM-dd"
+                DateFormat = "yyyy-MM-dd",
+                DynanicMap = new Dictionary<string, Func<object, string>>
+                {
+                    ["Date"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd");
+                    },
+                    ["DateTime"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd yyyy-MM-dd");
+                    },
+                    ["LoggerName"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LoggerName;
+                    },
+                    ["LoggerLevel"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity).LogLevel.ToString();
+                    },
+                    ["Message"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.Message;
+                    },
+                    ["ErrOut"] = delegate (object entity)
+                    {
+                        return "./log/"+(entity as LogEntity)?.LoggerName+"/error/" +(entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd")+".log";
+                    },
+                    ["LogOut"] = delegate (object entity)
+                    {
+                        return "./log/" + (entity as LogEntity)?.LoggerName + "/" + (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd") + ".log";
+                    }
+                }
             });
         }
 
@@ -89,13 +121,100 @@ namespace WS.Log
         /// <returns></returns>
         public static ILogger GetLogger(string loggerName)
         {
+            // 日志项数据 
+            // item: {name, value, type, format} 
+            // { name: "today", value: DateTime.Now, type: DateTime, format: "yyyy-MM-dd HH:mm:ss.FFFFFFK"}
+            // { name: "price", value: new Money(15.6, unit:"dollar"), type: Money, format: "udddd.ff"} => "$0015.60"
             return new DefaultLogger(new LoggerConfig
             {
-                LogOut = "./log/"+loggerName,
+                LogOutFormat = "./log/"+loggerName,
                 LogName = loggerName,
-                FileNameFormat = "${Date}",
+                FileNameFormat = "${Date}.log",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
-                DateFormat = "yyyy-MM-dd"
+                DateFormat = "yyyy-MM-dd",
+                ItemFormat = "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}",
+                DynanicMap = new Dictionary<string, Func<object, string>>
+                {
+                    ["Date"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd");
+                    },
+                    ["DateTime"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd yyyy-MM-dd");
+                    },
+                    ["LoggerName"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LoggerName;
+                    },
+                    ["LoggerLevel"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity).LogLevel.ToString();
+                    },
+                    ["Message"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.Message;
+                    },
+                    ["ErrOut"] = delegate (object entity)
+                    {
+                        // return EL.Parse((entity as LogEntity)?.ErrOut, )
+                        return "./log/" + (entity as LogEntity)?.LoggerName + "/error/" + (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd") + ".log";
+                    },
+                    ["LogOut"] = delegate (object entity)
+                    {
+                        return "./log/" + (entity as LogEntity)?.LoggerName + "/" + (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd") + ".log";
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// 获取日志器
+        /// </summary>
+        /// <typeparam name="CategoryName"></typeparam>
+        /// <returns></returns>
+        public static ILogger GetLogger<CategoryName>()
+        {
+            return new DefaultLogger(new LoggerConfig
+            {
+                LogOutFormat = "./log/${LoggerName}/${Date}.log",
+                LogName = nameof(CategoryName),
+                FileNameFormat = "${Date}.log",
+                TimeFormat = "HH:mm:ss.FFFFFFK",
+                DateFormat = "yyyy-MM-dd",
+                ItemFormat = "[${DateTime}] [${LoggerLevel}] [${LoggerName}] ${Message}",
+                DynanicMap = new Dictionary<string, Func<object, string>>
+                {
+                    ["Date"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd");
+                    },
+                    ["DateTime"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd yyyy-MM-dd");
+                    },
+                    ["LoggerName"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.LoggerName;
+                    },
+                    ["LoggerLevel"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity).LogLevel.ToString();
+                    },
+                    ["Message"] = delegate (object entity)
+                    {
+                        return (entity as LogEntity)?.Message;
+                    },
+                    ["ErrOut"] = delegate (object entity)
+                    {
+                        // return EL.Parse((entity as LogEntity)?.ErrOut, )
+                        return EL.Parse("./log/${LoggerName}/error/${Date}.log", new Dictionary<string, object> { ["Date"]= (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd"), ["LoggerName"] = (entity as LogEntity)?.LoggerName});
+                    },
+                    ["LogOut"] = delegate (object entity)
+                    {
+                        return "./log/" + (entity as LogEntity)?.LoggerName + "/" + (entity as LogEntity)?.LogTime.ToString("yyyy-MM-dd") + ".log";
+                    }
+                }
             });
         }
 
@@ -107,6 +226,25 @@ namespace WS.Log
         public static ILogger GetLogger(LoggerConfig config)
         {
             return new DefaultLogger(config);
+        }
+
+        /// <summary>
+        /// 通过日志器配置获取Logger
+        /// </summary>
+        /// <param name="config">日志器配置</param>
+        /// <returns></returns>
+        public static ILogger GetLogger<CategoryName>(LoggerConfig config)
+        {
+            return new DefaultLogger(new LoggerConfig
+            {
+                LogOutFormat = config.LogOutFormat,
+                LogName = nameof(CategoryName),
+                FileNameFormat = config.FileNameFormat,
+                TimeFormat = config.TimeFormat,
+                DateFormat = config.DateFormat,
+                ItemFormat = config.ItemFormat,
+                DynanicMap = config.DynanicMap
+            });
         }
 
         /// <summary>
