@@ -106,16 +106,6 @@ namespace WS.Text
         }
 
         /// <summary>
-        /// 不安全的获取
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public TValue UnSafeGet(string index)
-        {
-            return kvs[index];
-        }
-
-        /// <summary>
         /// 设置Key对应的值
         /// </summary>
         /// <param name="index"></param>

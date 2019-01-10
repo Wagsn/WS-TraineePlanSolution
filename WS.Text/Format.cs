@@ -66,13 +66,23 @@ namespace WS.Text
         /// </summary>
         public static void Test()
         {
-            SafeMap<object> map = new SafeMap<object>();
-            map["username"] = "wagsn";
-            map["password"] = "123456";
-
+            Dictionary<string, object> map = new Dictionary<string, object>
+            {
+                ["username"] = "wagsn",
+                ["password"] = "123456"
+            };
             Console.WriteLine(ReplacePlaceholder("${username}: ${password}", map));
         }
 
+        /// <summary>
+        /// 用于EL表达式正则
+        /// </summary>
+        public static string pattern = @"(\$\{)(\w*)(\})";
+        
+        /// <summary>
+        /// 用于EL表达式
+        /// </summary>
+        public static Regex elRagex = new Regex(pattern);
 
         /// <summary>
         /// 占位符替换: ${}
@@ -83,38 +93,19 @@ namespace WS.Text
         /// <returns></returns>
         public static string ReplacePlaceholder<TValue>(string template, SafeMap<TValue> pairs)
         {
-            string result = new string(template.ToCharArray());
-
-            // 需要优化为，匹配到 \$\{\S*?\} 后按照匹配到的内容作为Key在Map中寻找Value替换
-            foreach(var key in pairs.Keys)
-            {
-                Regex regex = new Regex(@"\$\{"+key+@"\}");
-                result =regex.Replace(result, pairs[key].ToString()); // 
-
-            }
-            return result;
+            return elRagex.Replace(template, new MatchEvaluator(m => pairs[m.Groups[2].ToString()]?.ToString()));
         }
 
         /// <summary>
-        /// 占位符替换: ${}.
-        /// ${TagName} 如果TagName找不到将保留${TagName}. 
-        /// "${Date} ${NotFoundTagName}" -> "2018-11-28 ${NotFoundTagName}"
-        /// Created by Wagsn on 2018/11/28 11:29.
+        /// 占位符替换: ${}
+        /// ${TagName} 如果TagName找不到将整体消去${TagName}.
+        /// "${Date} ${NotFoundTagName}end" -> "2018-11-28 end".
         /// </summary>
         /// <param name="template">模板字符串</param>
         /// <returns></returns>
-        public static string ReplacePlaceholderByIgnore<TValue>(string template, SafeMap<TValue> pairs)
+        public static string ReplacePlaceholder<TValue>(string template, Dictionary<string, TValue> pairs)
         {
-            string result = new string(template.ToCharArray());
-
-            // 需要优化为，匹配到 \$\{\S*?\} 后按照匹配到的内容作为Key在Map中寻找Value替换
-            foreach (var key in pairs.Keys)
-            {
-                Regex regex = new Regex(@"\$\{" + key + @"\}");  // 如果Key也是正则表达式
-                result = regex.Replace(result, pairs[key].ToString());
-                result = regex.Replace(result, new MatchEvaluator(m => pairs.ContainsKey(key) ? pairs.UnSafeGet(key).ToString() : m.Groups[1].Value));  // ?? 这里的m. m.Groups[1] 难道指的是一个值，而不是所有匹配项
-            }
-            return result;
+            return elRagex.Replace(template, new MatchEvaluator(m => pairs[m.Groups[2].ToString()]?.ToString()));
         }
 
         /// <summary>
