@@ -2,21 +2,16 @@
 using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Managers;
-using AuthorizationCenter.Entitys;
-using AuthorizationCenter.Stores;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Core.Dto;
 using WS.Log;
 using WS.Text;
-using System.ComponentModel.DataAnnotations;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -63,7 +58,6 @@ namespace AuthorizationCenter.Controllers
             RoleManager = roleManager;
             UserRoleManager = userRoleManager;
             Mapper = mapper;
-            Logger = LoggerManager.GetLogger<UserController>();
         }
 
         /// <summary>
@@ -73,16 +67,17 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons
         public async Task<IActionResult> Index(int pageIndex =0, int pageSize =10)
         {
+            Logger.Trace($"[{nameof(Index)}] 请求参数: pageIndex: {pageIndex}, pageSize: {pageSize}");
             ViewData[Constants.SIGNUSER] = SignUser;
-            // 0. 参数检查
-
-            // 1. 权限检查
-
-            // 2. 业务处理
             try
             {
+                // 1. 权限检查
+
+                // 2. 业务处理
+                var users = await UserManager.FindByUserId(SignUser.Id);
                 // 分页查询用户列表 
-                var data = await UserManager.Find().Page(pageIndex, pageSize).ToListAsync();
+                var data = users.AsQueryable().Page(pageIndex, pageSize).ToList();
+                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
                 return View(data);
             }
             catch(Exception e)

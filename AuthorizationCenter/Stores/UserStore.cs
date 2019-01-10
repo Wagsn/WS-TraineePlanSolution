@@ -37,6 +37,20 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// 通过组织ID查询
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public IQueryable<User> FindByOrgId(string orgId)
+        {
+            return from user in Context.Users
+                   where (from uo in Context.UserOrgs
+                          where uo.OrgId == orgId
+                          select uo.UserId).Contains(user.Id)
+                   select user;
+        }
+
+        /// <summary>
         /// 查询 -通过名称
         /// </summary>
         /// <param name="name"></param>
@@ -56,6 +70,31 @@ namespace AuthorizationCenter.Stores
             // 打印日志
             Logger.Trace($"[{nameof(DeleteById)}] 条件删除用户({id})");
             return Delete(ub => ub.Id == id);
+        }
+
+
+        /// <summary>
+        /// 删除通过用户ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId)
+        {
+            var user = Context.Users.Where(u => userId == u.Id).Single();
+            Context.Remove(user);
+            var userroles = Context.UserRoles.Where(ur => ur.UserId == userId);
+            Context.RemoveRange(userroles);
+            var userorgs = Context.UserOrgs.Where(uo => uo.UserId == userId);
+            Context.RemoveRange(userorgs);
+
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("错误: " + e);
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using AuthorizationCenter.Define;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -28,6 +29,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// <summary>
         /// 父权限
         /// </summary>
+        [JsonIgnore]
         public PermissionJson Parent { get; set; }
 
         /// <summary>

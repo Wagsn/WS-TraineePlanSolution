@@ -163,9 +163,6 @@
             获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
             </summary>
             <returns></returns>
-            <summary>
-            登陆用户
-            </summary>
         </member>
         <member name="T:AuthorizationCenter.Controllers.PermissionController">
             <summary>
@@ -2048,28 +2045,6 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.List(WS.Core.Dto.PagingResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
-            <summary>
-            批量查询
-            </summary>
-            <param name="response"></param>
-            <param name="request"></param>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Create(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
-            <summary>
-            新建
-            </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Update(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
-            <summary>
-            更新
-            </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
-            <returns></returns>
-        </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.Create(`0)">
             <summary>
             创建
@@ -2082,14 +2057,6 @@
             更新
             </summary>
             <param name="json"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.Delete(WS.Core.Dto.ResponseMessage{`0},AuthorizationCenter.Dto.Requests.ModelRequest{`0})">
-            <summary>
-            删除
-            </summary>
-            <param name="response">响应</param>
-            <param name="request">请求</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.Find">
@@ -2110,6 +2077,13 @@
             通过ID查询 -异步查询 -只取第一个 -没有返回空
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindByUserId(System.String)">
+            <summary>
+            通过用户ID查询有权查看的用户列表
+            </summary>
+            <param name="userId">用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindByName(System.String)">
@@ -2152,6 +2126,14 @@
             通过ID删除 -异步
             </summary>
             <param name="id">ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.DeleteByUserId(System.String,System.String)">
+            <summary>
+            删除通过用户ID
+            </summary>
+            <param name="userId">登陆用户ID</param>
+            <param name="id">删除用户ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.IUserRoleManager">
@@ -2258,7 +2240,7 @@
             <summary>
             删除通过ID
             </summary>
-            <param name="id"></param>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.Exist(System.Func{AuthorizationCenter.Dto.Jsons.OrganizationJson,System.Boolean})">
@@ -2617,6 +2599,11 @@
             用户存储
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Managers.UserManager.RoleOrgPerStore">
+            <summary>
+            角色组织权限存储
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Managers.UserManager.Mapper">
             <summary>
             类型映射
@@ -2627,11 +2614,12 @@
             日志记录器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserStore,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AutoMapper.IMapper)">
             <summary>
-            构造器
+            
             </summary>
             <param name="store"></param>
+            <param name="roleOrgPerStore"></param>
             <param name="mapper"></param>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.Create(WS.Core.Dto.ResponseMessage{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserJson})">
@@ -2700,6 +2688,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.FindByUserId(System.String)">
+            <summary>
+            通过用户ID查询有权查看的用户列表
+            </summary>
+            <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.FindByName(System.String)">
             <summary>
             通过Name查询 -异步
@@ -2747,6 +2742,14 @@
             通过ID删除 -异步
             </summary>
             <param name="id">ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.DeleteByUserId(System.String,System.String)">
+            <summary>
+            删除通过用户ID
+            </summary>
+            <param name="userId">登陆用户ID</param>
+            <param name="id">删除用户ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.UserRoleManager">
@@ -3103,6 +3106,20 @@
             <summary>
             用户存储
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserStore.FindByOrgId(System.String)">
+            <summary>
+            通过组织ID查询
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserStore.DeleteByUserId(System.String)">
+            <summary>
+            删除通过用户ID
+            </summary>
+            <param name="userId">用户ID</param>
+            <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.OrganizationStore">
             <summary>
@@ -3484,6 +3501,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.FindByOrgId(System.String)">
+            <summary>
+            通过组织ID查询
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.FindByName(System.String)">
             <summary>
             查询 -通过名称
@@ -3496,6 +3520,13 @@
             删除 -通过用户ID
             </summary>
             <param name="id">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String)">
+            <summary>
+            删除通过用户ID
+            </summary>
+            <param name="userId">用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByName(System.String)">

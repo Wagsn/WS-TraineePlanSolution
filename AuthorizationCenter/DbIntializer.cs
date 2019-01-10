@@ -66,7 +66,7 @@ namespace AuthorizationCenter
                 new Role
                 {
                     Id = roleRootId,
-                    Name = "RoleRoot",
+                    Name = "SysRoleRoot",
                     Decription = "系统最高权限者"
                 },
                 new Role
@@ -144,6 +144,7 @@ namespace AuthorizationCenter
 
             // 初始权限
             string perRootId = Guid.NewGuid().ToString();
+            string roleManageId = Guid.NewGuid().ToString();
             string userManageId = Guid.NewGuid().ToString();
             string userSaveId = Guid.NewGuid().ToString();
             string orgManageId = Guid.NewGuid().ToString();
@@ -208,7 +209,7 @@ namespace AuthorizationCenter
                 }, // Manage == Delete|Update|Create|Query > Delete > Save == Update|Create > Update > Create > Query
                 new Permission
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = roleManageId,
                     Name = Constants.ROLE_MANAGE,
                     Description = "角色管理",
                     ParentId = perRootId
@@ -322,7 +323,8 @@ namespace AuthorizationCenter
                 }
             });
 
-            // 权限授予
+            // 权限授予 
+            // XKJAdmin只有角色管理权限管理组织管理角色绑定授权管理以及权限项查询权限，不包含权限项增删改
             context.AddRange(new List<RoleOrgPer>
             {
                 new RoleOrgPer
@@ -335,7 +337,19 @@ namespace AuthorizationCenter
                 {
                     RoleId = xkjRoleRootId,
                     OrgId = xkjOrgRootId,
-                    PerId = perRootId
+                    PerId = userManageId
+                },
+                new RoleOrgPer
+                {
+                    RoleId = xkjRoleRootId,
+                    OrgId = xkjOrgRootId,
+                    PerId = orgManageId
+                },
+                new RoleOrgPer
+                {
+                    RoleId = xkjRoleRootId,
+                    OrgId = xkjOrgRootId,
+                    PerId = roleManageId
                 }
             });
 

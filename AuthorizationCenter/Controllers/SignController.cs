@@ -78,7 +78,8 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 用户创建
-                await UserManager.Create(response, request);
+                await UserManager.Create(request.Data);
+                //await UserManager.Create(response, request);
             }
             catch (Exception e)
             {

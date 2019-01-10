@@ -89,11 +89,16 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 删除通过ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public async Task DeleteById(string id)
+        public async Task DeleteById(string orgId)
         {
-            await Store.DeleteById(id);
+            // 1. 删除组织
+            await Store.DeleteById(orgId);
+            // 2. 删除用户组织关联
+
+            // 3. 删除角色组织关联
+            // 4. 删除角色组织权限关联
         }
 
         /// <summary>

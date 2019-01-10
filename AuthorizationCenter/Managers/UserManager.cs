@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Dto.Requests;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
@@ -25,6 +26,11 @@ namespace AuthorizationCenter.Managers
         public IUserStore Store { get; set; }
 
         /// <summary>
+        /// 角色组织权限存储
+        /// </summary>
+        public IRoleOrgPerStore RoleOrgPerStore { get; set; }
+
+        /// <summary>
         /// 类型映射
         /// </summary>
         public IMapper Mapper { get; set; }
@@ -34,16 +40,21 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger(nameof(UserManager));
 
+
         /// <summary>
-        /// 构造器
+        /// 
         /// </summary>
         /// <param name="store"></param>
+        /// <param name="roleOrgPerStore"></param>
         /// <param name="mapper"></param>
-        public UserManager(IUserStore store, IMapper mapper)
+        public UserManager(IUserStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store;
-            Mapper = mapper;
+            Store = store ?? throw new ArgumentNullException(nameof(store));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
+
 
         /// <summary>
         /// 创建
@@ -165,6 +176,24 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
+        /// 通过用户ID查询有权查看的用户列表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<UserJson>> FindByUserId(string userId)
+        {
+            // 1. 查询有权组织
+            var perOrgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY);
+            // 2. 查询用户集合
+            var result = new List<User>();
+            foreach(var org in perOrgs)
+            {
+                result.AddRange(await Store.FindByOrgId(org.Id).ToListAsync());
+            }
+            return result.Select(user => Mapper.Map<UserJson>(user));
+        }
+
+        /// <summary>
         /// 通过Name查询 -异步
         /// </summary>
         /// <param name="name"></param>
@@ -230,6 +259,17 @@ namespace AuthorizationCenter.Managers
         /// <param name="id">ID</param>
         /// <returns></returns>
         public async Task DeleteById(string id)
+        {
+            await Store.DeleteById(id);
+        }
+
+        /// <summary>
+        /// 删除通过用户ID
+        /// </summary>
+        /// <param name="userId">登陆用户ID</param>
+        /// <param name="id">删除用户ID</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, string id)
         {
             await Store.DeleteById(id);
         }

@@ -18,20 +18,6 @@ namespace AuthorizationCenter.Managers
     /// </summary>
     public interface IUserManager<TJson> where TJson: UserJson
     {
-        ///// <summary>
-        ///// 查询 或运算 满足条件的都查询（null忽略）
-        ///// </summary>
-        ///// <param name="response">响应</param>
-        ///// <param name="request">请求</param>
-        //Task GetOr([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
-
-        ///// <summary>
-        ///// 查询 与运算 全部条件满足的查询（null忽略）
-        ///// </summary>
-        ///// <param name="response">响应</param>
-        ///// <param name="request">请求</param>
-        //Task GetAnd([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
-
         /// <summary>
         /// 通过ID查询
         /// </summary>
@@ -39,33 +25,6 @@ namespace AuthorizationCenter.Managers
         /// <param name="request"></param>
         /// <returns></returns>
         Task ById([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
-
-        ///// <summary>
-        ///// 存储
-        ///// </summary>
-        //IStore Store { get; set; }
-
-        /// <summary>
-        /// 批量查询
-        /// </summary>
-        /// <param name="response"></param>
-        /// <param name="request"></param>
-        Task List([Required]PagingResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
-
-        /// <summary>
-        /// 新建
-        /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
-        Task Create([Required]ResponseMessage<TJson>  response, [Required]ModelRequest<TJson> request);
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
-        /// <returns></returns>
-        Task Update([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
 
         /// <summary>
         /// 创建
@@ -80,31 +39,6 @@ namespace AuthorizationCenter.Managers
         /// <param name="json"></param>
         /// <returns></returns>
         Task<TJson> Update(TJson json);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="response">响应</param>
-        /// <param name="request">请求</param>
-        /// <returns></returns>
-        Task Delete([Required]ResponseMessage<TJson> response, [Required]ModelRequest<TJson> request);
-
-        ///// <summary>
-        ///// 通过主键查询
-        ///// </summary>
-        ///// <param name="keys"></param>
-        ///// <returns></returns>
-        //Task FindByKeys(params string[] keys);
-
-        ///// <summary>
-        ///// 查询 -通过字段名组查询
-        ///// </summary>
-        ///// <typeparam name="TProperty"></typeparam>
-        ///// <param name="output"></param>
-        ///// <param name="lambda"></param>
-        ///// <returns></returns>
-        //Task Find<TProperty>(List<TJson> output, Expression<Func<UserBaseJson, TProperty>> lambda);
-        //Task<List<TJson>> Find<TProperty>(Expression<Func<UserBaseJson, TProperty>> lambda);
 
         /// <summary>
         /// 查询所有 用户
@@ -126,7 +60,13 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         IQueryable<TJson> FindById(string id);
 
-
+        /// <summary>
+        /// 通过用户ID查询有权查看的用户列表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<TJson>> FindByUserId(string userId);
+        
         /// <summary>
         /// 通过Name查询 -异步查询 -只取第一个 -没有返回空
         /// </summary>
@@ -168,5 +108,13 @@ namespace AuthorizationCenter.Managers
         /// <param name="id">ID</param>
         /// <returns></returns>
         Task DeleteById(string id);
+
+        /// <summary>
+        /// 删除通过用户ID
+        /// </summary>
+        /// <param name="userId">登陆用户ID</param>
+        /// <param name="id">删除用户ID</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, string id);
     }
 }
