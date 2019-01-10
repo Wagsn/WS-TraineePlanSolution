@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 权限实体
+    /// 权限实体 -ROOT>ORG_MANAGE>(ORG_SAVE>ORG_CREATE|ORG_UPDATE)|ORG_DELETE|ORG_QUERY
     /// </summary>
     public class Permission
     {

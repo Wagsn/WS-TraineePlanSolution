@@ -15,9 +15,9 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">组织ID</param>
-        /// <param name="perId">权限ID</param>
+        /// <param name="perName">权限名</param>
         /// <returns></returns>
-        Task<bool> HasPermission(string userId, string orgId, string perId);
+        Task<bool> HasPermission(string userId, string orgId, string perName);
 
         /// <summary>
         /// 查询角色的权限

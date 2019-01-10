@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace AuthorizationCenter.Entitys
 {
     /// <summary>
-    /// 组织模型
+    /// 组织模型 TODO: 将关系分离成关系表（ParentId）
     /// </summary>
     public class Organization
     {
@@ -62,5 +62,15 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         [MaxLength(255)]
         public string Description { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<Organization> Sons { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<Organization> Parents { get; set; }
     }
 }

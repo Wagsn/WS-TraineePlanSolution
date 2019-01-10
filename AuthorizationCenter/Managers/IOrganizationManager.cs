@@ -26,16 +26,24 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 查询通过ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId"></param>
         /// <returns></returns>
-        IQueryable<TJson> FindById(string id);
+        IQueryable<TJson> FindById(string orgId);
+
+        /// <summary>
+        /// 通过用户ID和组织ID查询
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<TJson>> FindByUserIdOrgId(string userId, string orgId);
 
         /// <summary>
         /// 通过组织ID查询所有子节点，返回组织树
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId"></param>
         /// <returns></returns>
-        Organization FindTreeById(string id);
+        Organization FindTreeById(string orgId);
 
         /// <summary>
         /// 查询通过用户ID -先找角色-再找组织
@@ -68,8 +76,8 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 删除通过ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId"></param>
         /// <returns></returns>
-        Task DeleteById(string id);
+        Task DeleteById(string orgId);
     }
 }

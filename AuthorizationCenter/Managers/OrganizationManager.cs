@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using AutoMapper;
@@ -18,9 +19,14 @@ namespace AuthorizationCenter.Managers
     public class OrganizationManager : IOrganizationManager<OrganizationJson>
     {
         /// <summary>
-        /// 存储
+        /// 组织存储
         /// </summary>
         public IOrganizationStore Store { get; set; }
+
+        /// <summary>
+        /// 角色组织权限存储
+        /// </summary>
+        public IRoleOrgPerStore RoleOrgPerStore { get; set; }
 
         /// <summary>
         /// 类型映射
@@ -28,21 +34,28 @@ namespace AuthorizationCenter.Managers
         public IMapper Mapper { get; set; }
 
         /// <summary>
-        /// 日志器
+        /// 日志记录器
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger(nameof(OrganizationManager));
-
+        
         /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="store"></param>
+        /// <param name="roleOrgPerStore"></param>
         /// <param name="mapper"></param>
-        public OrganizationManager(IOrganizationStore store, IMapper mapper)
+        public OrganizationManager(IOrganizationStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store;
-            Mapper = mapper;
+            Store = store ?? throw new ArgumentNullException(nameof(store));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <summary>
+        /// 手动类型映射
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns></returns>
         private OrganizationJson Map(Organization organization)
         {
             var json = new OrganizationJson
@@ -155,40 +168,32 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 查询通过用户ID -先找角色-再找组织-再找子组织
+        /// 查询通过用户ID -先找角色-再找权限组织-再找子组织
+        /// U.ID->R.ID->O.ID-O.ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public async Task<IEnumerable<OrganizationJson>> FindByUserId(string id)
+        public async Task<IEnumerable<OrganizationJson>> FindByUserId(string userId)
         {
-            // 1. 查询角色相关的组织
-            var orgs = await (from org in Store.Context.Organizations
-                              where (from rop in Store.Context.RoleOrgPers
-                                     where (from ur in Store.Context.UserRoles
-                                            where ur.UserId == id
-                                            select ur.RoleId).Contains(rop.RoleId)
-                                     select rop.OrgId).Contains(org.Id)
-                              select org).ToListAsync();
-            // 2. 递归查询所有其下的子组织
-            var orgList = new List<Organization>();
-            foreach(var org in orgs)
-            {
-                orgList.AddRange(TreeToList(FindTreeById(org.Id)));
-            }
-            orgList =orgList.Distinct().ToList();
-            orgList.ForEach(org => org.Children = null);
-            return orgList.Select(org => Mapper.Map<OrganizationJson>(org));
+            // 1. 查询用户的有权组织集合
+            var orgs = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY)).ToList();
+            orgs.ForEach(org => org.Children = null);
+            return orgs.Select(org => Mapper.Map<OrganizationJson>(org));
+        }
 
-            //return (from org in Store.Context.Organizations
-            //        where (from rop in Store.Context.RoleOrgPers
-            //               where (from ur in Store.Context.UserRoles
-            //                      where ur.UserId == id
-            //                      select ur.RoleId).Contains(rop.RoleId)
-            //               select rop.OrgId).Contains(org.Id)
-            //        select org).Select(org => Mapper.Map<OrganizationJson>(org));
-            //select org).Include(org =>org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
-
-            //return Store.Find(org => Store.Context.RoleOrgPers.Where(rop = rop))
+        /// <summary>
+        /// 通过用户ID和组织ID查询 -代码编写中
+        /// U.ID->R.ID|P.ID->O.ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId)
+        {
+            // 1. 查询有权组织集合
+            var orgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY);
+            // 2. 查询组织ID所在组织
+            return null;
         }
 
         /// <summary>

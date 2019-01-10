@@ -134,14 +134,64 @@ namespace AuthorizationCenter.Define
         public const string ROOT = "ROOT";
 
         /// <summary>
-        /// 用户管理 -用户增删查改
+        /// 用户管理 -用户增删查改 -ROOT>ORG_MANAGE>(ORG_SAVE>ORG_CREATE|ORG_UPDATE)|ORG_DELETE|ORG_QUERY
         /// </summary>
         public const string USER_MANAGE = "USER_MANAGE";
+
+        /// <summary>
+        /// 用户管理 -用户增改
+        /// </summary>
+        public const string USER_SAVE = "USER_SAVE";
+
+        /// <summary>
+        /// 用户创建
+        /// </summary>
+        public const string USER_CREATE = "USER_CREATE";
+
+        /// <summary>
+        /// 用户更新
+        /// </summary>
+        public const string USER_UPDATE = "USER_UPDATE";
+
+        /// <summary>
+        /// 用户删除
+        /// </summary>
+        public const string USER_DELETE = "USER_DELETE";
+
+        /// <summary>
+        /// 用户查询
+        /// </summary>
+        public const string USER_QUERY = "USER_QUERY";
 
         /// <summary>
         /// 组织管理 -组织的增删查改
         /// </summary>
         public const string ORG_MANAGE = "ORG_MANAGE";
+
+        /// <summary>
+        /// 组织保存 -组织增改
+        /// </summary>
+        public const string ORG_SAVE = "ORG_SAVE";
+
+        /// <summary>
+        /// 组织创建
+        /// </summary>
+        public const string ORG_CREATE = "ORG_CREATE";
+
+        /// <summary>
+        /// 组织更新
+        /// </summary>
+        public const string ORG_UPDATE = "ORG_UPDATE";
+
+        /// <summary>
+        /// 组织删除
+        /// </summary>
+        public const string ORG_DELETE = "ORG_DELETE";
+
+        /// <summary>
+        /// 组织查询 ORG_SELECT
+        /// </summary>
+        public const string ORG_QUERY = "ORG_QUERY";
 
         /// <summary>
         /// 角色管理 -角色项的增删查改
@@ -152,6 +202,11 @@ namespace AuthorizationCenter.Define
         /// 权限管理 -权限项写死了的，这里指的是数据库
         /// </summary>
         public const string PER_MANAGE = "PER_MANAGE";
+
+        /// <summary>
+        /// 权限查询
+        /// </summary>
+        public const string PER_QUERY = "PER_QUERY";
 
         /// <summary>
         /// 角色绑定 -用户角色关联的增删查改

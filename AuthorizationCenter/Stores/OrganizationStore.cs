@@ -55,13 +55,50 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 通过组织ID找到所有子组织（包括间接子组织）
+        /// 通过组织ID找到所有子组织（包含自身）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public Task<List<Organization>> FindChildrenById(string id)
+        public async Task<List<Organization>> FindChildrenById(string orgId)
         {
-            return RecursionChildren(id);
+            List<Organization> result = new List<Organization>();
+            //if(orgId == null)
+            //{
+            //    return result;
+            //}
+            var org = await Find(o => o.Id == orgId).SingleAsync();
+            result.Add(org);
+            // 根据 orgid查询其所有直接子组织
+            var orgs = await Find(o => orgId == o.ParentId).ToListAsync();
+            // 遍历其直接子组织
+            foreach (var o in orgs)
+            {
+                result.AddRange(await FindChildrenById(o.Id));
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 通过组织找到所有子组织（不包含自身）
+        /// </summary>
+        /// <param name="organization">组织</param>
+        /// <returns></returns>
+        public async Task<List<Organization>> FindChildren(Organization organization)
+        {
+            List<Organization> result = new List<Organization>();
+            //if(org == null)
+            //{
+            //    return result;
+            //}
+            // 根据 orgid查询其所有直接子组织
+            var orgs = await Find(org => organization.Id == org.ParentId).ToListAsync();
+            result.AddRange(orgs);
+            // 遍历其直接子组织
+            foreach (var org in orgs)
+            {
+                result.AddRange(await FindChildren(org));
+            }
+            return result;
         }
 
         /// <summary>

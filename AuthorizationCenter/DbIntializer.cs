@@ -145,6 +145,9 @@ namespace AuthorizationCenter
             // 初始权限
             string perRootId = Guid.NewGuid().ToString();
             string userManageId = Guid.NewGuid().ToString();
+            string userSaveId = Guid.NewGuid().ToString();
+            string orgManageId = Guid.NewGuid().ToString();
+            string orgSaveId = Guid.NewGuid().ToString();
             context.AddRange(new List<Permission>
             {
                 new Permission
@@ -163,8 +166,15 @@ namespace AuthorizationCenter
                 },
                 new Permission
                 {
+                    Id = userSaveId,
+                    Name = Constants.USER_SAVE,
+                    Description = "用户保存",
+                    ParentId = userManageId
+                },
+                new Permission
+                {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "USER_QUERY",
+                    Name = Constants.USER_QUERY,
                     Description = "用户查询",
                     ParentId = userManageId
                 },
@@ -178,21 +188,21 @@ namespace AuthorizationCenter
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "USER_UPDATE",
+                    Name = Constants.USER_UPDATE,
                     Description = "用户更新",
-                    ParentId = userManageId
+                    ParentId = userSaveId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "USER_CREATE",
+                    Name = Constants.USER_CREATE,
                     Description = "用户创建",
-                    ParentId = userManageId
+                    ParentId = userSaveId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "USER_DELETE",
+                    Name = Constants.USER_DELETE,
                     Description = "用户删除",
                     ParentId = userManageId
                 }, // Manage == Delete|Update|Create|Query > Delete > Save == Update|Create > Update > Create > Query
@@ -212,10 +222,38 @@ namespace AuthorizationCenter
                 },
                 new Permission
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = orgManageId,  // 功能模块
                     Name = Constants.ORG_MANAGE,
                     Description = "组织管理",
                     ParentId = perRootId
+                },
+                new Permission
+                {
+                    Id = orgSaveId,
+                    Name = Constants.ORG_SAVE,
+                    Description = "组织保存",
+                    ParentId = orgManageId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ORG_CREATE,
+                    Description ="组织创建",
+                    ParentId = orgSaveId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ORG_UPDATE,
+                    Description ="组织更新",
+                    ParentId = orgSaveId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ORG_QUERY,
+                    Description = "组织查询",
+                    ParentId = orgManageId
                 },
                 new Permission
                 {
@@ -227,7 +265,7 @@ namespace AuthorizationCenter
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "PER_QUERY",
+                    Name = Constants.PER_QUERY,
                     Description = "权限查询",
                     ParentId = perRootId
                 }

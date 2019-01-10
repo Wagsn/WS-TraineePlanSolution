@@ -12,11 +12,11 @@ namespace AuthorizationCenter.Stores
     public interface IRoleOrgPerStore: IStore<RoleOrgPer>
     {
         /// <summary>
-        /// 查询用户有权限的所有组织
+        /// 查询用户有权根组织ID集合
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名称</param>
         /// <returns></returns>
-        Task<List<Organization>> FindOrgByUserIdPerName(string userId, string perName);
+        Task<IEnumerable<Organization>> FindOrgByUserIdPerName(string userId, string perName);
     }
 }

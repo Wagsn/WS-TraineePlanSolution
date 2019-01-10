@@ -28,27 +28,27 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 用户管理
         /// </summary>
-        public IUserManager<UserJson> UserManager { get; set; }
+        IUserManager<UserJson> UserManager { get; set; }
 
         /// <summary>
         /// 角色管理
         /// </summary>
-        public IRoleManager<RoleJson> RoleManager { get; set; }
+        IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
         /// 用户角色关联管理
         /// </summary>
-        public IUserRoleManager UserRoleManager { get; set; }
+        IUserRoleManager UserRoleManager { get; set; }
         
         /// <summary>
         /// 类型映射
         /// </summary>
-        public IMapper Mapper { get; set; }
+        IMapper Mapper { get; set; }
 
         /// <summary>
         /// 日志器
         /// </summary>
-        public ILogger Logger { get; set; }
+        readonly ILogger Logger = LoggerManager.GetLogger<UserController>();
 
         /// <summary>
         /// 构造器
@@ -63,7 +63,7 @@ namespace AuthorizationCenter.Controllers
             RoleManager = roleManager;
             UserRoleManager = userRoleManager;
             Mapper = mapper;
-            Logger = LoggerManager.GetLogger(GetType().Name);
+            Logger = LoggerManager.GetLogger<UserController>();
         }
 
         /// <summary>
@@ -79,9 +79,17 @@ namespace AuthorizationCenter.Controllers
             // 1. 权限检查
 
             // 2. 业务处理
-
-            // 分页查询用户列表
-            return View(await UserManager.Find().Page(pageIndex, pageSize).ToListAsync());
+            try
+            {
+                // 分页查询用户列表 
+                var data = await UserManager.Find().Page(pageIndex, pageSize).ToListAsync();
+                return View(data);
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
+                return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
+            }
         }
 
         /// <summary>

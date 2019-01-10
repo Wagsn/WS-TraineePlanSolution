@@ -57,6 +57,11 @@ namespace AuthorizationCenter.Entitys
         public DbSet<Organization> Organizations { get; set; }
 
         /// <summary>
+        /// 组织关系表
+        /// </summary>
+        public DbSet<OrganizationRelation> OrganizationRelations { get; set; }
+
+        /// <summary>
         /// 角色组织权限
         /// </summary>
         public DbSet<RoleOrgPer> RoleOrgPers { get; set; }
@@ -65,6 +70,11 @@ namespace AuthorizationCenter.Entitys
         /// 角色组织
         /// </summary>
         public DbSet<RoleOrg> RoleOrgs { get; set; }
+
+        /// <summary>
+        /// 待办项
+        /// </summary>
+        public DbSet<TodoItem> TodoItems { get; set; }
 
         #endregion
 
@@ -125,9 +135,6 @@ namespace AuthorizationCenter.Entitys
             {
                 b.ToTable("role_org");
             });
-
-
-
             #endregion
         }
 

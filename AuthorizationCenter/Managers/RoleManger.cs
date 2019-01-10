@@ -222,15 +222,8 @@ namespace AuthorizationCenter.Managers
         public async Task<IEnumerable<RoleJson>> FindRoleOfOrgByUserId(string userId)
         {
             // 1. 查询用户具有角色查询权限的组织森林，并扩展成组织列表
-            // 1.1 查询用户权限的组织森林根组织ID 
-            var rootOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ROLE_MANAGE)).Select(org => org.Id);
-            // 1.2 扩展成组织列表
-            var orgList = new List<Organization>();
-            foreach (var orgId in rootOrgIds)
-            {
-                orgList.AddRange(OrganizationManager.TreeToList(OrganizationStore.FindTreeById(orgId)));
-            }
-            var orgIds = orgList.Select(org => org.Id).ToList();
+            // 1.1 查询用户权限的组织ID集合
+            var orgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ROLE_MANAGE)).Select(org => org.Id).ToList();
             // 2. 查询这些所有组织所包含的角色
             var roles = await (from role in Store.Find()
                                where (from ro in RoleOrgStore.Find()

@@ -15,22 +15,29 @@ namespace AuthorizationCenter.Stores
         /// <summary>
         /// 通过组织ID找到所有子组织（包括间接子组织，但是不包括自身）
         /// </summary>
-        /// <param name="id">组织ID</param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<List<Organization>> FindChildrenById(string id);
+        Task<List<Organization>> FindChildrenById(string orgId);
+
+        /// <summary>
+        /// 通过组织找到所有子组织（不包含自身）
+        /// </summary>
+        /// <param name="organization">组织</param>
+        /// <returns></returns>
+        Task<List<Organization>> FindChildren(Organization organization);
 
         /// <summary>
         /// 查询所有父组织
         /// </summary>
-        /// <param name="id">组织ID</param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<List<Organization>> FindParentById(string id);
+        Task<List<Organization>> FindParentById(string orgId);
 
         /// <summary>
         /// 递归查询所有节点，构成一棵树返回
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId">组织</param>
         /// <returns></returns>
-        Organization FindTreeById(string id);
+        Organization FindTreeById(string orgId);
     }
 }

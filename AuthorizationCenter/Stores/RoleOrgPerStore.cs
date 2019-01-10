@@ -14,45 +14,58 @@ namespace AuthorizationCenter.Stores
     public class RoleOrgPerStore: StoreBase<RoleOrgPer>, IRoleOrgPerStore
     {
         /// <summary>
+        /// 组织存储 -NOTE：小心循环调用
+        /// </summary>
+        public IOrganizationStore OrganizationStore { get; set; }
+
+        /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public RoleOrgPerStore(ApplicationDbContext context)
+        public RoleOrgPerStore(ApplicationDbContext context, IOrganizationStore organizationStore)
         {
             Context = context;
-            Logger = LoggerManager.GetLogger(nameof(RoleOrgPerStore));
+            OrganizationStore = organizationStore;
+            Logger = LoggerManager.GetLogger<RoleOrgPerStore>();
         }
 
         /// <summary>
-        /// 查询用户拥有某项权限的所有组织
+        /// 查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
+        /// 如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
+        /// 有权组织列表获取，通过用户ID和权限名称获取组织列表(U.ID-[UR]->R.ID, P.N-[P]->P.ID-[P]->P.ID)-[ROP]->O.ID-[O]->O.ID
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名称</param>
         /// <returns></returns>
-        public async Task<List<Organization>> FindOrgByUserIdPerName(string userId, string perName)
+        public async Task<IEnumerable<Organization>> FindOrgByUserIdPerName(string userId, string perName)
         {
-            // 如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
-            // 可操作权限组织列表获取，通过用户ID和权限名称获取组织列表(U.ID-[UR]->R.ID, P.N-[P]->P.ID-[P]->P.ID)-[ROP]->O.ID-[O]->O.ID
             // 1. 查询该操作的所有权限（包含父级权限）
-            // 1.1 查询角色Id列表
-            var roleIds = from ur in Context.UserRoles
-                          where ur.UserId == userId
-                          select ur.RoleId;
-            // 1.2 通过权限名称查询权限ID列表
+            // 1.1 通过权限名称查询权限ID
             var perId = (from per in Context.Permissions
                          where per.Name == perName
                          select per.Id).Single();
-            // 1.2.2 扩展权限列表
-            var perIds = new List<string>();
-            perIds.Add(perId);
-            perIds.AddRange((await FindParentById(perId)).Select(per => per.Id));
-            // 2. 该用户包含该权限列表的任意一项（即该用户拥有该操作的权限）
+            // 1.2 查询权限ID的所有父级权限构成权限ID集合（包含自身）
+            var perIds = (await FindParentById(perId)).Select(per => per.Id);
+            // 2. 查询用户包含的角色Id列表
+            var roleIds = from ur in Context.UserRoles
+                          where ur.UserId == userId
+                          select ur.RoleId;
+            // 3. 通过权限ID集合和角色ID集合查询有权根组织ID集合
             var orgs = await (from org in Context.Organizations
                               where (from rop in Context.RoleOrgPers
-                                     where perIds.Contains(rop.PerId) && roleIds.Contains(rop.RoleId)
+                                     where perIds.Contains(rop.PerId) && roleIds.Contains(rop.RoleId) // 通过权限和角色查询组织
                                      select rop.OrgId).Contains(org.Id)
                               select org).ToListAsync();
-            return orgs;
+            // 4. 扩展成组织列表
+            var orgList = new List<Organization>();
+            orgList.AddRange(orgs);
+            foreach (var org in orgs)
+            {
+                orgList.AddRange(await OrganizationStore.FindChildren(org));
+            }
+            orgList = orgList.Distinct().ToList();
+            //orgList.ForEach(org => org.Children = null);
+            return orgList;
         }
 
         /// <summary>

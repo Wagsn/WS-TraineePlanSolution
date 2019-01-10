@@ -76,39 +76,14 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">操作组织ID-前端传入、表示数据范围</param>
-        /// <param name="perId">权限ID</param>
+        /// <param name="perName">权限ID</param>
         /// <returns></returns>
-        public async Task<bool> HasPermission(string userId, string orgId, string perId)
+        public async Task<bool> HasPermission(string userId, string orgId, string perName)
         {
-            // 2. 通过角色ID集合和权限ID查询组织ID集合
-            var orgIds = await (from rop in RoleOrgPerStore.Context.Set<RoleOrgPer>()
-                         where (from ur in UserRoleStore.Context.Set<UserRole>()  // 1. 通过用户ID查询角色ID集合
-                                where ur.UserId == userId
-                                select ur.RoleId).Contains(rop.RoleId) && rop.PerId == perId
-                         select rop.Id).ToListAsync();
-            // 3. 找到权限组织的所有子组织
-            var perOrgIds = new List<string>();
-            foreach (var id in orgIds)
-            {
-                // 递归
-                perOrgIds.AddRange((await OrganizationStore.FindChildrenById(id)).Select(org => org.Id));
-            }
-            perOrgIds.AddRange(orgIds);
+            // 1. 通过用户ID和权限名查询有权组织ID集合
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
             // 4. 判断传入的组织ID在这些权限组织ID集合中
             return perOrgIds.Contains(orgId);
-            #region << 3.4.步骤的历史 >>
-            //// 3. 找到操作组织ID的所有父组织
-            //var parents = (await OrganizationStore.FindParentById(orgId)).Select(org => org.Id);
-            //// 4. 判断这些父组织是否在查询出来的组织ID集合中存在??
-            //foreach (var id in parents)
-            //{
-            //    if (orgIds.Contains(id))
-            //    {
-            //        return true;
-            //    }
-            //}
-            //return false;
-            #endregion
         }
 
         /// <summary>
@@ -146,5 +121,8 @@ namespace AuthorizationCenter.Managers
             // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
             return perOrgIds.ContainsAll(orgIds);
         }
+
+        // 根据用户名和权限名查询权限组织
+
     }
 }
