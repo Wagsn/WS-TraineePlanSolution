@@ -55,6 +55,20 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// 查询通过用户ID在UserOrg表中
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public IQueryable<Organization> FindByUserId(string userId)
+        {
+            return from org in Context.Organizations
+                   where (from uo in Context.UserOrgs
+                          where true
+                          select uo.OrgId).Contains(org.Id)
+                   select org;
+        }
+
+        /// <summary>
         /// 通过组织ID找到所有子组织（包含自身）
         /// </summary>
         /// <param name="orgId">组织ID</param>

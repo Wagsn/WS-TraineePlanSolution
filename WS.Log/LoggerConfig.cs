@@ -31,6 +31,11 @@ namespace WS.Log
         public string LoggerName { get; set; }
 
         /// <summary>
+        /// 全称命名
+        /// </summary>
+        public string ClassFullName { get; set; }
+
+        /// <summary>
         /// 错误日志文件输出路径模板（"./log/${LoggerName}/${Date}.log"）
         /// </summary>
         public string LogOutTemplate { get; set; }

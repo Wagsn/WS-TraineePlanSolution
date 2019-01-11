@@ -31,9 +31,19 @@ namespace AuthorizationCenter.Controllers
         IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
+        /// 组织管理
+        /// </summary>
+        IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
+
+        /// <summary>
         /// 用户角色关联管理
         /// </summary>
         IUserRoleManager UserRoleManager { get; set; }
+
+        /// <summary>
+        /// 角色组织权限管理
+        /// </summary>
+        IRoleOrgPerManager RoleOrgPerManager { get; set; }
         
         /// <summary>
         /// 类型映射
@@ -51,14 +61,18 @@ namespace AuthorizationCenter.Controllers
         /// <param name="userManager"></param>
         /// <param name="roleManager"></param>
         /// <param name="userRoleManager"></param>
+        /// <param name="roleOrgPerManager"></param>
         /// <param name="mapper"></param>
-        public UserController(IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IUserRoleManager userRoleManager, IMapper mapper)
+        public UserController(IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IUserRoleManager userRoleManager, IRoleOrgPerManager roleOrgPerManager, IMapper mapper)
         {
-            UserManager = userManager;
-            RoleManager = roleManager;
-            UserRoleManager = userRoleManager;
-            Mapper = mapper;
+            UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            RoleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            UserRoleManager = userRoleManager ?? throw new ArgumentNullException(nameof(userRoleManager));
+            RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
+
 
         /// <summary>
         /// 列表 -跳转到列表界面
@@ -71,8 +85,6 @@ namespace AuthorizationCenter.Controllers
             ViewData[Constants.SIGNUSER] = SignUser;
             try
             {
-                // 1. 权限检查
-
                 // 2. 业务处理
                 var users = await UserManager.FindByUserId(SignUser.Id);
                 // 分页查询用户列表 
@@ -83,7 +95,7 @@ namespace AuthorizationCenter.Controllers
             catch(Exception e)
             {
                 Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
-                return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
         }
 
@@ -95,30 +107,30 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            Logger.Trace($"[{nameof(Details)}] 查看用户详情->用户ID: {id}");
-            // 检查参数
+            Logger.Trace($"[{nameof(Details)}] 查看用户详情 用户ID: {id}");
+            // 0. 检查参数
             if (id == null)
             {
                 return NotFound();
             }
-            // 请求响应构造
-            ResponseMessage<UserJson> response = new ResponseMessage<UserJson>();
-            ModelRequest<UserJson> request = new ModelRequest<UserJson>
-            {
-                User = SignUser,
-                Data = new UserJson { Id = id }
-            };
-            // 业务处理
             try
             {
+                // 1. 权限检查
+                if (!(await RoleOrgPerManager.HasPermissionForUser(SignUser.Id, Constants.USER_QUERY, id)))
+                {
+                    Logger.Warn($"用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.USER_QUERY})操作用户({id})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+                // 2. 业务处理
                 var user = await UserManager.FindById(id).SingleOrDefaultAsync();
+                Logger.Trace($"[{nameof(Details)}] 响应数据:\r\n{JsonUtil.ToJson(user)}");
                 if (user == null)
                 {
                     return NotFound();
                 }
                 else
                 {
-                    // 查询成功
                     // 再查询用户绑定的角色列表
                     ViewData[Constants.ROLES] = await RoleManager.FindByUserId(id);
                     ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
@@ -127,8 +139,8 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
-                Logger.Error(e);
-                return View(nameof(Index));
+                Logger.Error($"[{nameof(Details)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(Index));
             }
             
         }
@@ -154,29 +166,31 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SignName,PassWord")] UserJson userJson)
+        public async Task<IActionResult> Create(UserJson userJson)
         {
-
-            Logger.Trace($"[{nameof(Create)}]User Create Request: " + JsonUtil.ToJson(userJson));
+            Logger.Trace($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})新增用户:\r\n{JsonUtil.ToJson(userJson)}");
             // 0. 检查参数
             if (string.IsNullOrWhiteSpace(userJson.SignName) || string.IsNullOrWhiteSpace(userJson.PassWord))
             {
                 ModelState.AddModelError("All", "用户名或密码不能为空");
                 return View();
             }
-            // 1. 检查权限 - CheckPermissionFilter
-
-            // 2. 检查有效 被创建用户是否存在
-            if (await UserManager.ExistByName(userJson.SignName))
-            {
-                ModelState.AddModelError("All", "创建的用户已经存在");
-                return View();
-            }
-            // 3. 处理业务
             try
             {
-                // return UserManager.Create(this, userBaseJson); // (Controller, Request)=>IActionResult;
-                var user = await UserManager.Create(userJson);
+                // 1. 权限检查 -这里创建用户是在自己公司创建 -指定公司创建需要UserOrg表
+                if (!(await RoleOrgPerManager.HasPermissionForUser(SignUser.Id, Constants.USER_CREATE, SignUser.Id)))
+                {
+                    Logger.Warn($"用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.USER_CREATE})操作用户({SignUser.Id})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+                if (await UserManager.ExistByName(userJson.SignName))
+                {
+                    ModelState.AddModelError("All", "创建的用户已经存在");
+                    return View(userJson);
+                }
+                // 2. 处理业务
+                var user = UserManager.CreateToOrgByUserId(SignUser.Id, userJson);
                 if (user != null)
                 {
                     return RedirectToAction(nameof(Index));
@@ -189,6 +203,7 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
+                Logger.Error($"[{nameof(Details)}] 服务器错误:\r\n{e}");
                 ModelState.AddModelError("All", e.Message);
                 return View(userJson);
             }
@@ -202,19 +217,27 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            Logger.Trace($"[{nameof(Edit)}]进入编辑界面-编辑用户({id})");
+            Logger.Trace($"[{nameof(Edit)}] 请求参数: 用户ID({id})");
             if (id == null)
             {
                 return NotFound();
             }
-
-            var userBase = await UserManager.FindById(id).SingleOrDefaultAsync();
-            if (userBase == null)
+            try
             {
-                Logger.Trace($"[{nameof(Edit)}]进入编辑界面-用户不存在({id})");
-                return NotFound();
+                var user = await UserManager.FindById(id).SingleOrDefaultAsync();
+                Logger.Trace($"[{nameof(Edit)}] 响应数据:\r\n{JsonUtil.ToJson(user)}");
+                if (user == null)
+                {
+                    Logger.Trace($"[{nameof(Edit)}] 进入编辑界面-用户不存在({id})");
+                    return NotFound();
+                }
+                return View(Mapper.Map<UserJson>(user));
             }
-            return View(Mapper.Map<UserJson>(userBase));
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Edit)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         /// <summary>
@@ -236,7 +259,6 @@ namespace AuthorizationCenter.Controllers
             }
             // 1. 权限检查 -编辑用户组织在登陆用户的用户管理权限所在组织之下
             // HasPermissionForUserId(signUserId, perId, userId);  // 判断登陆用户对某用户（可以查询到组织）具有某项权限
-            
             try
             {
                 // 2. 业务处理
@@ -246,17 +268,12 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
+                Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
                 if (!await UserManager.ExistById(user.Id))
                 {
-                    Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
                     return NotFound();
                 }
-                else
-                {
-                    Logger.Error($"[{nameof(Edit)}] 用户信息更新失败: " + e);
-                }
                 ModelState.AddModelError("All", "用户信息更新失败");
-                // 业务处理失败 -返回编辑界面
                 return View(user);
             }
         }
@@ -271,25 +288,35 @@ namespace AuthorizationCenter.Controllers
         public async Task<IActionResult> Delete(string id, string errMsg = null)
         {
             Logger.Trace($"[{nameof(Delete)}] 删除用户({id})");
-            // 检查参数
+            // 0. 检查参数
             if (id == null)
             {
                 return NotFound();
             }
-            // 业务处理
-            var userJson = await UserManager.FindById(id).SingleOrDefaultAsync();
-            if (userJson == null)
+            try
             {
-                Logger.Trace($"[{nameof(Delete)}] 删除失败 用户未找到->用户ID: "+id);
-                return NotFound();
+                // 1. 业务处理
+                var userJson = await UserManager.FindById(id).SingleOrDefaultAsync();
+                Logger.Trace($"[{nameof(Delete)}] 响应数据:\r\n{JsonUtil.ToJson(userJson)}");
+                if (userJson == null)
+                {
+                    Logger.Trace($"[{nameof(Delete)}] 删除失败 用户未找到->用户ID: " + id);
+                    return NotFound();
+                }
+                return View(userJson);
             }
-            return View(userJson);
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(Delete)}] 服务器错误:\r\n{e}");
+                ModelState.AddModelError("All", e.Message);
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         /// <summary>
         /// MVC 删除确认 -从数据库删除 -跳转到列表界面 
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">用户ID</param>
         /// <returns></returns>
         // POST: UserBaseJsons/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -299,7 +326,8 @@ namespace AuthorizationCenter.Controllers
             Logger.Trace($"[{nameof(DeleteConfirmed)}] 删除确认->用户ID: " + id);
             try
             {
-                // 业务处理
+                // 1. 权限验证
+                // 2. 业务处理
                 await UserManager.DeleteById(id);
                 // 删除成功 -跳转到用户列表
                 return RedirectToAction(nameof(Index));

@@ -19,11 +19,40 @@ namespace AuthorizationCenter.Stores
         /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="dbContext"></param>
-        public UserStore([Required]ApplicationDbContext dbContext)
+        /// <param name="context"></param>
+        public UserStore([Required]ApplicationDbContext context)
         {
-            Logger = LoggerManager.GetLogger(GetType().Name);
-            Context = dbContext;
+            Logger = LoggerManager.GetLogger<UserStore>();
+            Context = context;
+        }
+
+        /// <summary>
+        /// 用户在其组织下创建用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="user">用户</param>
+        /// <returns></returns>
+        public async Task<User> CreateToOrgByUserId(string userId, User user)
+        {
+            var orgId = await (from uo in Context.UserOrgs
+                         where uo.UserId == userId
+                         select uo.OrgId).SingleAsync();
+            var dbUser =Context.Add(user).Entity;
+            Context.Add(new UserOrg
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = user.Id,
+                OrgId = orgId
+            });
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(CreateToOrgByUserId)}] 保存失败:\r\n{e}");
+            }
+            return dbUser;
         }
 
         /// <summary>

@@ -21,16 +21,16 @@ namespace AuthorizationCenter.Define
         /// <returns></returns>
         public static IQueryable<E> Page<E>(this IQueryable<E> data, int pageIndex, int pageSize)
         {
-            // 总数
-            int count = data.Count();
-            // 判断索引有效
-            int pIndex = pageIndex;
-            int pSize = pageSize > 50 ? 10 : pageSize;
-            if (pageSize <= 0) pSize = 10;
-            int pageNum = (int)Math.Ceiling((double)count / pSize);
-            pIndex = (pageIndex % pageNum + pageNum) % pageNum;
+            //// 总数
+            //int count = data.Count();
+            //// 判断索引有效
+            //int pIndex = pageIndex;
+            //int pSize = pageSize > 50 ? 10 : pageSize;
+            //if (pageSize <= 0) pSize = 10;
+            //int pageNum = (int)Math.Ceiling((double)count / pSize);
+            //pIndex = (pageIndex % pageNum + pageNum) % pageNum;
             // 获取数据
-            return data.Skip(pIndex * pSize).Take(pSize);
+            return data.Skip(pageIndex * pageSize).Take(pageSize);
         }
 
         /// <summary>
@@ -42,8 +42,7 @@ namespace AuthorizationCenter.Define
         {
             return null;
         }
-
-        // 
+        
         /// <summary>
         /// 输入集合是当前集合的子集
         /// </summary>
@@ -51,7 +50,7 @@ namespace AuthorizationCenter.Define
         /// <param name="theCollection"></param>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static bool ContainsAll<T>(this List<T> theCollection, IEnumerable<T> collection)
+        public static bool ContainsAll<T>(this IEnumerable<T> theCollection, IEnumerable<T> collection)
         {
             foreach (var item in collection)
             {

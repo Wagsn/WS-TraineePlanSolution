@@ -30,7 +30,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 角色组织权限管理
         /// </summary>
-        IRoleOrgPerManager<RoleOrgPerJson> RoleOrgPerManager { get; set; }
+        IRoleOrgPerManager RoleOrgPerManager { get; set; }
 
         /// <summary>
         /// 日志记录器
@@ -38,14 +38,16 @@ namespace AuthorizationCenter.Controllers
         readonly ILogger Logger = LoggerManager.GetLogger<OrganizationController>();
 
         /// <summary>
-        /// 组织管理
+        /// 
         /// </summary>
         /// <param name="organizationManager"></param>
-        public OrganizationController(IOrganizationManager<OrganizationJson> organizationManager)
+        /// <param name="roleOrgPerManager"></param>
+        public OrganizationController(IOrganizationManager<OrganizationJson> organizationManager, IRoleOrgPerManager roleOrgPerManager)
         {
-            OrganizationManager = organizationManager;
+            OrganizationManager = organizationManager ?? throw new ArgumentNullException(nameof(organizationManager));
+            RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
         }
-
+        
         /// <summary>
         /// [MVC] 组织管理-组织列表
         /// 只能查看ORG_QUERY的组织森林
@@ -58,9 +60,9 @@ namespace AuthorizationCenter.Controllers
             {
                 // 1. 权限验证 ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Count(O.ID)>0
                 // 2. 业务处理 -查询有权组织 森林列表
-                var orgnazitions = await OrganizationManager.FindByUserId(SignUser.Id);
+                var orgnazitions = await OrganizationManager.FindPerOrgsByUserId(SignUser.Id);
 
-                Logger.Trace($"[{nameof(Index)}] 响应数据：\r\n{JsonUtil.ToJson(orgnazitions)}");
+                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(orgnazitions)}");
 
                 ViewData["list"] = JsonUtil.ToJson(orgnazitions);
 
@@ -68,9 +70,9 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
-                ModelState.AddModelError("All", "组织列表获取失败");
-                Logger.Error($"[{nameof(Index)}] 服务器错误：\r\n" + e);
-                return View();
+                ModelState.AddModelError("All", "获取失败");
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n" + e);
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
         }
 
@@ -83,7 +85,7 @@ namespace AuthorizationCenter.Controllers
         {
             try
             {
-                var organizations = await OrganizationManager.FindByUserId(SignUser.Id);
+                var organizations = await OrganizationManager.FindPerOrgsByUserId(SignUser.Id);
 
                 Console.WriteLine(JsonUtil.ToJson(organizations));
 
@@ -119,7 +121,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_QUERY})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
                 var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
@@ -133,7 +135,7 @@ namespace AuthorizationCenter.Controllers
             catch (Exception e)
             {
                 Logger.Error($"[{nameof(Details)}] 服务器错误:\r\n{e}");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -170,7 +172,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Create)}] 服务器错误：\r\n" + e);
                 ModelState.AddModelError("All", "页面跳转失败");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -232,11 +234,10 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_UPDATE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
                 var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
-
                 if (organization == null)
                 {
                     return NotFound();
@@ -248,7 +249,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误：\r\n" + e);
                 ModelState.AddModelError("All", "编辑界面跳转失败");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -276,7 +277,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_UPDATE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
                 await OrganizationManager.Update(organization);
@@ -286,7 +287,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误:\r\n{e}");
                 ModelState.AddModelError("All", "保存失败");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -311,7 +312,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_DELETE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
                 var organization = await OrganizationManager.FindById(id).SingleOrDefaultAsync();
@@ -326,7 +327,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误:\r\n{e}");
                 ModelState.AddModelError("All", "界面跳转失败");
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -386,7 +387,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_DELETE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
                 await OrganizationManager.DeleteById(id);
@@ -396,7 +397,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误:\r\n{e}");
                 ModelState.AddModelError("All", "保存失败");
-                return View(nameof(Delete), id);
+                return RedirectToAction(nameof(Delete), id);
             }
         }
 

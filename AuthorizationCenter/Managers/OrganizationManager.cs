@@ -21,13 +21,23 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 组织存储
         /// </summary>
-        public IOrganizationStore Store { get; set; }
+        public IOrganizationStore OrganizationStore { get; set; }
+
+        /// <summary>
+        /// 用户组织存储
+        /// </summary>
+        public IUserOrgStore UserOrgStore { get; set; }
+
+        /// <summary>
+        /// 角色组织存储
+        /// </summary>
+        public IRoleOrgStore RoleOrgStore { get; set; }
 
         /// <summary>
         /// 角色组织权限存储
         /// </summary>
         public IRoleOrgPerStore RoleOrgPerStore { get; set; }
-
+        
         /// <summary>
         /// 类型映射
         /// </summary>
@@ -37,16 +47,20 @@ namespace AuthorizationCenter.Managers
         /// 日志记录器
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger(nameof(OrganizationManager));
-        
+
         /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="store"></param>
+        /// <param name="userOrgStore"></param>
+        /// <param name="roleOrgStore"></param>
         /// <param name="roleOrgPerStore"></param>
         /// <param name="mapper"></param>
-        public OrganizationManager(IOrganizationStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
+        public OrganizationManager(IOrganizationStore store, IUserOrgStore userOrgStore, IRoleOrgStore roleOrgStore, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store ?? throw new ArgumentNullException(nameof(store));
+            OrganizationStore = store ?? throw new ArgumentNullException(nameof(store));
+            UserOrgStore = userOrgStore ?? throw new ArgumentNullException(nameof(userOrgStore));
+            RoleOrgStore = roleOrgStore ?? throw new ArgumentNullException(nameof(roleOrgStore));
             RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
@@ -83,7 +97,7 @@ namespace AuthorizationCenter.Managers
         {
             var entity = Mapper.Map<Organization>(json);
             entity.Id = Guid.NewGuid().ToString();
-            await Store.Create(entity);
+            await OrganizationStore.Create(entity);
         }
 
         /// <summary>
@@ -94,11 +108,7 @@ namespace AuthorizationCenter.Managers
         public async Task DeleteById(string orgId)
         {
             // 1. 删除组织
-            await Store.DeleteById(orgId);
-            // 2. 删除用户组织关联
-
-            // 3. 删除角色组织关联
-            // 4. 删除角色组织权限关联
+            await OrganizationStore.DeleteById(orgId);
         }
 
         /// <summary>
@@ -108,7 +118,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> Exist(Func<OrganizationJson, bool> predicate)
         {
-            return Store.Exist(org => predicate(Mapper.Map<OrganizationJson>(org)));
+            return OrganizationStore.Exist(org => predicate(Mapper.Map<OrganizationJson>(org)));
         }
 
         /// <summary>
@@ -117,7 +127,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<OrganizationJson> Find()
         {
-            return Store.Find()
+            return OrganizationStore.Find()
                 .Include(org => org.Parent)
                 .Select(org => Mapper.Map<OrganizationJson>(org));
         }
@@ -129,7 +139,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<OrganizationJson> FindById(string id)
         {
-            return Store.Find(org => org.Id == id)
+            return OrganizationStore.Find(org => org.Id == id)
                 .Include(org => org.Parent)
                 .Include(org => org.Children)
                 .Select(org => Mapper.Map<OrganizationJson>(org));
@@ -142,7 +152,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Organization FindTreeById(string id)
         {
-            var org = Store.Find(o => o.Id == id).Include(o => o.Children).SingleOrDefault();
+            var org = OrganizationStore.Find(o => o.Id == id).Include(o => o.Children).SingleOrDefault();
             for (int i = 0; i < org.Children.Count; i++)
             {
                 org.Children[i] = FindTreeById(org.Children[i].Id);
@@ -178,12 +188,22 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public async Task<IEnumerable<OrganizationJson>> FindByUserId(string userId)
+        public async Task<IEnumerable<OrganizationJson>> FindPerOrgsByUserId(string userId)
         {
             // 1. 查询用户的有权组织集合
             var orgs = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY)).ToList();
             orgs.ForEach(org => org.Children = null);
             return orgs.Select(org => Mapper.Map<OrganizationJson>(org));
+        }
+
+        /// <summary>
+        /// 查询通过用户ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Organization>> FindFromUserOrgByUserId(string userId)
+        {
+            return await OrganizationStore.FindByUserId(userId).ToListAsync();
         }
 
         /// <summary>
@@ -195,6 +215,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId)
         {
+            throw new NotImplementedException("未实现");
             // 1. 查询有权组织集合
             var orgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY);
             // 2. 查询组织ID所在组织
@@ -209,7 +230,7 @@ namespace AuthorizationCenter.Managers
         public async Task Update(OrganizationJson json)
         {
             var organization = Mapper.Map<Organization>(json);
-            await Store.Update(organization);
+            await OrganizationStore.Update(organization);
         }
     }
 }

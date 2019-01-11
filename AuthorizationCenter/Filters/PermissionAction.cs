@@ -26,7 +26,7 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 角色组织权限管理
         /// </summary>
-        public IRoleOrgPerManager<RoleOrgPerJson> RoleOrgPerManager { get; set; }
+        public IRoleOrgPerManager RoleOrgPerManager { get; set; }
 
         ///// <summary>
         ///// 角色管理

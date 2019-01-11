@@ -13,30 +13,42 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 角色组织权限管理实现
     /// </summary>
-    public class RoleOrgPerManager : IRoleOrgPerManager<RoleOrgPerJson>
+    public class RoleOrgPerManager : IRoleOrgPerManager
     {
 
         /// <summary>
         /// 用户角色存储
         /// </summary>
-        protected IUserRoleStore UserRoleStore { get; set; }
+        IUserRoleStore UserRoleStore { get; set; }
 
         /// <summary>
         /// 角色组织权限关联存储
         /// </summary>
-        protected IRoleOrgPerStore RoleOrgPerStore { get; set; }
+        IRoleOrgPerStore RoleOrgPerStore { get; set; }
 
         /// <summary>
         /// 组织存储
         /// </summary>
-        protected IOrganizationStore OrganizationStore { get; set; }
+        IOrganizationStore OrganizationStore { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userRoleStore"></param>
+        /// <param name="roleOrgPerStore"></param>
+        /// <param name="organizationStore"></param>
+        public RoleOrgPerManager(IUserRoleStore userRoleStore, IRoleOrgPerStore roleOrgPerStore, IOrganizationStore organizationStore)
+        {
+            UserRoleStore = userRoleStore ?? throw new ArgumentNullException(nameof(userRoleStore));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
+        }
         /// <summary>
         /// 通过ID删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<RoleOrgPerJson> DeleteById(string id)
+        public IQueryable<RoleOrgPer> DeleteById(string id)
         {
             throw new NotImplementedException();
         }
@@ -46,7 +58,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<RoleOrgPerJson> FindById(string id)
+        public IQueryable<RoleOrgPer> FindById(string id)
         {
             throw new NotImplementedException();
         }
@@ -56,7 +68,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="roleId"></param>
         /// <returns></returns>
-        public IQueryable<RoleOrgPerJson> FindByRoleId(string roleId)
+        public IQueryable<RoleOrgPer> FindByRoleId(string roleId)
         {
             throw new NotImplementedException();
         }
@@ -66,7 +78,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IQueryable<RoleOrgPerJson> FindByUserId(string id)
+        public IQueryable<RoleOrgPer> FindByUserId(string id)
         {
             throw new NotImplementedException();
         }
@@ -82,8 +94,51 @@ namespace AuthorizationCenter.Managers
         {
             // 1. 通过用户ID和权限名查询有权组织ID集合
             var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
-            // 4. 判断传入的组织ID在这些权限组织ID集合中
+            // 2. 判断传入的组织ID在这些权限组织ID集合中
             return perOrgIds.Contains(orgId);
+        }
+
+        /// <summary>
+        /// 某用户在某组织下是否具有某项权限
+        /// </summary>
+        /// <param name="userId">登陆用户ID</param>
+        /// <param name="perName">权限名</param>
+        /// <param name="id">用户ID</param>
+        /// <returns></returns>
+        public async Task<bool> HasPermissionForUser(string userId, string perName, string id)
+        {
+            // 1. 通过用户ID和权限名查询有权组织ID集合
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
+            // 2. 查询用户所在组织ID集合
+            var orgIds = await OrganizationStore.FindByUserId(id).Select(org => org.Id).ToListAsync();
+            return perOrgIds.ContainsAll(orgIds);
+        }
+
+        /// <summary>
+        /// 某用户在其组织下是否具有某项权限
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名</param>
+        /// <returns></returns>
+        public async Task<bool> HasPermission(string userId, string perName)
+        {
+            // 1. 通过用户ID和权限名查询有权组织ID集合
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
+            // 2. 查询用户所在组织
+            var userOrgIds = await OrganizationStore.FindByUserId(userId).Select(uo => uo.Id).ToListAsync();
+            return perOrgIds.ContainsAll(userOrgIds);
+        }
+
+        /// <summary>
+        /// 查询有权组织
+        /// 根据用户名和权限名查询权限组织
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名</param>
+        /// <returns></returns>
+        public Task<IEnumerable<Organization>> FindOrgByUserIdPerName(string userId, string perName)
+        {
+            return  RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName);
         }
 
         /// <summary>
@@ -121,8 +176,5 @@ namespace AuthorizationCenter.Managers
             // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
             return perOrgIds.ContainsAll(orgIds);
         }
-
-        // 根据用户名和权限名查询权限组织
-
     }
 }

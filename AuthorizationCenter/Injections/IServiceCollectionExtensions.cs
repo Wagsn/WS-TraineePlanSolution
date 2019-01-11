@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IUserRoleManager, UserRoleManager>();
             services.AddScoped<IPermissionManager<PermissionJson>, PermissionManager>();
             services.AddScoped<IOrganizationManager<OrganizationJson>, OrganizationManager>();
-            services.AddScoped<IRoleOrgPerManager<RoleOrgPerJson>, RoleOrgPerManager>();
+            services.AddScoped<IRoleOrgPerManager, RoleOrgPerManager>();
 
             #endregion
 

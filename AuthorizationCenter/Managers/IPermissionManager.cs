@@ -31,6 +31,13 @@ namespace AuthorizationCenter.Managers
         IQueryable<TJson> FindById(string id);
 
         /// <summary>
+        /// 通过ID查询
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TJson>> FindByUserId(string userId);
+
+        /// <summary>
         /// 创建
         /// </summary>
         /// <param name="json"></param>

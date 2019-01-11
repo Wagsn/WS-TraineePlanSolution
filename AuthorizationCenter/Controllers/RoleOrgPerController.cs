@@ -25,7 +25,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 角色组织权限关联
         /// </summary>
-        public IRoleOrgPerManager<RoleOrgPerJson> RoleOrgPerManager { get; set; }
+        public IRoleOrgPerManager RoleOrgPerManager { get; set; }
 
         /// <summary>
         /// 日志器

@@ -31,6 +31,11 @@ namespace AuthorizationCenter.Managers
         public IRoleOrgPerStore RoleOrgPerStore { get; set; }
 
         /// <summary>
+        /// 组织存储
+        /// </summary>
+        public IOrganizationStore OrganizationStore { get; set; }
+
+        /// <summary>
         /// 类型映射
         /// </summary>
         public IMapper Mapper { get; set; }
@@ -40,22 +45,21 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger(nameof(UserManager));
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="store"></param>
         /// <param name="roleOrgPerStore"></param>
+        /// <param name="organizationStore"></param>
         /// <param name="mapper"></param>
-        public UserManager(IUserStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
+        public UserManager(IUserStore store, IRoleOrgPerStore roleOrgPerStore, IOrganizationStore organizationStore, IMapper mapper)
         {
             Store = store ?? throw new ArgumentNullException(nameof(store));
             RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
-
-
-
+        
         /// <summary>
         /// 创建
         /// </summary>
@@ -88,32 +92,26 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<UserJson> Create(UserJson json)
         {
-            var ub = Mapper.Map<User>(json);
-            ub.Id = Guid.NewGuid().ToString();
+            var user = Mapper.Map<User>(json);
+            user.Id = Guid.NewGuid().ToString();
             // 存储
-            try
-            {
-                var dbub = await Store.Create(ub);
-                return Mapper.Map<UserJson>(dbub);
-            }
-            catch (Exception e)
-            {
-
-                throw e;
-            }
+            var dbUser = await Store.Create(user);
+            return Mapper.Map<UserJson>(dbUser);
         }
 
         /// <summary>
-        /// 删除
+        /// 用户在自己的组织下创建用户
         /// </summary>
-        /// <param name="response"></param>
-        /// <param name="request"></param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="json">用户</param>
         /// <returns></returns>
-        public Task Delete([Required] ResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
+        public async Task<UserJson> CreateToOrgByUserId(string userId, UserJson json)
         {
-            throw new NotImplementedException();
+            var user = Mapper.Map<User>(json);
+            user.Id = Guid.NewGuid().ToString();
+            var dbUser =await Store.CreateToOrgByUserId(userId, user);
+            return Mapper.Map<UserJson>(dbUser);
         }
-
         /// <summary>
         /// 批量 查询
         /// </summary>

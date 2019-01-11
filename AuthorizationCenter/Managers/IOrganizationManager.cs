@@ -48,9 +48,16 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 查询通过用户ID -先找角色-再找组织
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        Task<IEnumerable<TJson>> FindByUserId(string id);
+        Task<IEnumerable<TJson>> FindPerOrgsByUserId(string userId);
+
+        /// <summary>
+        /// 查询通过用户ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<Organization>> FindFromUserOrgByUserId(string userId);
 
         /// <summary>
         /// 创建
@@ -71,7 +78,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        Task<bool> Exist(Func<OrganizationJson, bool> predicate);
+        Task<bool> Exist(Func<TJson, bool> predicate);
 
         /// <summary>
         /// 删除通过ID

@@ -30,6 +30,20 @@ namespace AuthorizationCenter.Dto.Responses
         }
 
         /// <summary>
+        /// 转换
+        /// </summary>
+        /// <typeparam name="D"></typeparam>
+        /// <returns></returns>
+        public ResponseBody<D> ToResponseBody<D>()
+        {
+            return new ResponseBody<D>
+            {
+                Code = Code,
+                Message = Message
+            };
+        }
+
+        /// <summary>
         /// 填装数据
         /// </summary>
         /// <typeparam name="D"></typeparam>

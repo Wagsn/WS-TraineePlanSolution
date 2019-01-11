@@ -121,7 +121,7 @@ namespace AuthorizationCenter.Controllers
                 }
                 else
                 {
-                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    return RedirectToAction(nameof(HomeController.Index), nameof(HomeController));
                 }
             }
             // 登陆失败

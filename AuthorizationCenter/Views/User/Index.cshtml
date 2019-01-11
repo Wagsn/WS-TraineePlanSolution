@@ -53,8 +53,8 @@
 </table>
 @* 分页跳转 *@
 <form asp-action="Index">
-    <input id="pageIndex" name="pageIndex" type="number" placeholder="分页索引(0-base)"/>
-    <input id="pageSize" name="pageSize" type="number" placeholder="每页尺寸"/>
+    <input id="pageIndex" name="pageIndex" type="number" min="0" value="0" placeholder="分页索引(0-base)"/>
+    <input id="pageSize" name="pageSize" type="number" min="1" value="1" placeholder="每页尺寸"/>
     <input type="submit" value="跳转"/>
     @*<input type="submit" value="下一页" />*@
 </form>

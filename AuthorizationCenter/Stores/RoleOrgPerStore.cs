@@ -63,9 +63,7 @@ namespace AuthorizationCenter.Stores
             {
                 orgList.AddRange(await OrganizationStore.FindChildren(org));
             }
-            orgList = orgList.Distinct().ToList();
-            //orgList.ForEach(org => org.Children = null);
-            return orgList;
+            return orgList.Distinct();
         }
 
         /// <summary>

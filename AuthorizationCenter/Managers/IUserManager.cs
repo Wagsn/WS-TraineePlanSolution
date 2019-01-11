@@ -34,6 +34,14 @@ namespace AuthorizationCenter.Managers
         Task<TJson> Create(TJson json);
 
         /// <summary>
+        /// 用户在自己的组织下创建用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="json">用户</param>
+        /// <returns></returns>
+        Task<TJson> CreateToOrgByUserId(string userId, TJson json);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="json"></param>

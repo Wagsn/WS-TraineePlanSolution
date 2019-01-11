@@ -39,5 +39,12 @@ namespace AuthorizationCenter.Stores
         /// <param name="orgId">组织</param>
         /// <returns></returns>
         Organization FindTreeById(string orgId);
+
+        /// <summary>
+        /// 查询通过用户ID在UserOrg表中
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        IQueryable<Organization> FindByUserId(string userId);
     }
 }

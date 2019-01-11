@@ -20,6 +20,14 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         IQueryable<User> FindByOrgId(string orgId);
 
+        /// <summary>
+        /// 用户在其组织下创建用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="user">用户</param>
+        /// <returns></returns>
+        Task<User> CreateToOrgByUserId(string userId, User user);
+
 
         /// <summary>
         /// 删除通过用户ID

@@ -178,7 +178,8 @@ namespace WS.Log
             return new DefaultLogger(new LoggerConfig
             {
                 LogOutTemplate = "./log/${LoggerName}/${Date}.log",
-                LoggerName = nameof(CategoryName),
+                ClassFullName = typeof(CategoryName).FullName,
+                LoggerName = typeof(CategoryName).Name,
                 FileNameTemplate = "${Date}.log",
                 TimeFormat = "HH:mm:ss.FFFFFFK",
                 DateFormat = "yyyy-MM-dd",
@@ -242,7 +243,8 @@ namespace WS.Log
             return new DefaultLogger(new LoggerConfig
             {
                 LogOutTemplate = config.LogOutTemplate,
-                LoggerName = nameof(CategoryName),
+                ClassFullName = typeof(CategoryName).FullName,
+                LoggerName = typeof(CategoryName).Name,
                 FileNameTemplate = config.FileNameTemplate,
                 TimeFormat = config.TimeFormat,
                 DateFormat = config.DateFormat,

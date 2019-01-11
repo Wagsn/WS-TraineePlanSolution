@@ -1,4 +1,5 @@
-﻿using AuthorizationCenter.Dto.Jsons;
+﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Stores;
 using AutoMapper;
@@ -20,21 +21,20 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         protected IPermissionStore Store { get; set; }
 
+        IRoleOrgPerStore RoleOrgPerStore { get; set; }
+
         /// <summary>
         /// 类型映射
         /// </summary>
         protected IMapper Mapper { get; set; }
 
-        /// <summary>
-        /// 构造器
-        /// </summary>
-        /// <param name="store"></param>
-        /// <param name="mapper"></param>
-        public PermissionManager(IPermissionStore store, IMapper mapper)
+        public PermissionManager(IPermissionStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store;
-            Mapper = mapper;
+            Store = store ?? throw new ArgumentNullException(nameof(store));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
 
         /// <summary>
         /// 查询所有
@@ -42,7 +42,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<PermissionJson> Find()
         {
-            return Store.Find().Select(per => Mapper.Map<PermissionJson>(per));
+            return Store.Find().Include(per => per.Parent).Include(per => per.Children).Select(per => Mapper.Map<PermissionJson>(per));
         }
 
         /// <summary>
@@ -53,6 +53,18 @@ namespace AuthorizationCenter.Managers
         public IQueryable<PermissionJson> FindById(string id)
         {
             return Find().Where(ur => ur.Id == id);
+        }
+
+        /// <summary>
+        /// 通过ID查询
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PermissionJson>> FindByUserId(string userId)
+        {
+            // 查询有权组织
+            var perOegs = RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.PER_QUERY);
+            return await Find().ToListAsync();
         }
 
         /// <summary>

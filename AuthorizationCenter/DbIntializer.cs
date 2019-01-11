@@ -149,6 +149,7 @@ namespace AuthorizationCenter
             string userSaveId = Guid.NewGuid().ToString();
             string orgManageId = Guid.NewGuid().ToString();
             string orgSaveId = Guid.NewGuid().ToString();
+            string perManageId = Guid.NewGuid().ToString();
             context.AddRange(new List<Permission>
             {
                 new Permission
@@ -268,6 +269,13 @@ namespace AuthorizationCenter
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.PER_QUERY,
                     Description = "权限查询",
+                    ParentId = perManageId
+                },
+                new Permission
+                {
+                    Id = perManageId,
+                    Name = Constants.PER_MANAGE,
+                    Description = "权限管理",
                     ParentId = perRootId
                 }
             });
