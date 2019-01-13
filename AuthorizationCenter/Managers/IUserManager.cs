@@ -39,7 +39,16 @@ namespace AuthorizationCenter.Managers
         /// <param name="userId">用户ID</param>
         /// <param name="json">用户</param>
         /// <returns></returns>
-        Task<TJson> CreateToOrgByUserId(string userId, TJson json);
+        Task<TJson> CreateForOrgByUserId(string userId, TJson json);
+
+        /// <summary>
+        /// 用户(userId)添加用户(json)到组织(orgId)下
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="json">用户</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task<TJson> CreateToOrgByUserId(string userId, TJson json, string orgId);
 
         /// <summary>
         /// 更新
@@ -118,7 +127,7 @@ namespace AuthorizationCenter.Managers
         Task DeleteById(string id);
 
         /// <summary>
-        /// 删除通过用户ID
+        /// 用户(userId)删除用户(id)
         /// </summary>
         /// <param name="userId">登陆用户ID</param>
         /// <param name="id">删除用户ID</param>

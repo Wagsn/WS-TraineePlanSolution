@@ -28,6 +28,12 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         protected IMapper Mapper { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="roleOrgPerStore"></param>
+        /// <param name="mapper"></param>
         public PermissionManager(IPermissionStore store, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
             Store = store ?? throw new ArgumentNullException(nameof(store));

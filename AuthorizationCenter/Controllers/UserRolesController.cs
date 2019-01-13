@@ -49,12 +49,14 @@ namespace AuthorizationCenter.Controllers
         }
         
         /// <summary>
-        /// 主页
+        /// [MVC] 角色绑定
         /// </summary>
         /// <returns></returns>
         // GET: UserRoles
         public async Task<IActionResult> Index()
         {
+            // 1. 权限验证
+            // 2. 业务处理
             return View(await UserRoleManager.Find().ToListAsync());
         }
 

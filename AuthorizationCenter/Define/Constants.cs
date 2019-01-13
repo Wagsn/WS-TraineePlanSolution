@@ -199,6 +199,21 @@ namespace AuthorizationCenter.Define
         public const string ROLE_MANAGE = "ROLE_MANAGE";
 
         /// <summary>
+        /// 角色添加
+        /// </summary>
+        public const string ROLE_CREATE = "ROLE_CREATE";
+
+        /// <summary>
+        /// 角色添加界面
+        /// </summary>
+        public const string ROLE_CREATE_VIEW = "ROLE_CREATE_VIEW";
+
+        /// <summary>
+        /// 角色查询
+        /// </summary>
+        public const string ROLE_QUERY = "ROLE_QUERY";
+
+        /// <summary>
         /// 权限管理 -权限项写死了的，这里指的是数据库
         /// </summary>
         public const string PER_MANAGE = "PER_MANAGE";

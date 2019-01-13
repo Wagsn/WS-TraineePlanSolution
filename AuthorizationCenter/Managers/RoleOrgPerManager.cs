@@ -90,7 +90,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="orgId">操作组织ID-前端传入、表示数据范围</param>
         /// <param name="perName">权限ID</param>
         /// <returns></returns>
-        public async Task<bool> HasPermission(string userId, string orgId, string perName)
+        public async Task<bool> HasPermission(string userId, string perName, string orgId)
         {
             // 1. 通过用户ID和权限名查询有权组织ID集合
             var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
@@ -110,12 +110,27 @@ namespace AuthorizationCenter.Managers
             // 1. 通过用户ID和权限名查询有权组织ID集合
             var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
             // 2. 查询用户所在组织ID集合
-            var orgIds = await OrganizationStore.FindByUserId(id).Select(org => org.Id).ToListAsync();
+            var orgIds = await OrganizationStore.FindByUserId(id).Select(org => org.Id).AsNoTracking().ToListAsync();
             return perOrgIds.ContainsAll(orgIds);
         }
 
         /// <summary>
-        /// 某用户在其组织下是否具有某项权限
+        /// 用户(userId)在自身的组织下是否具有权限(perName)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名</param>
+        /// <returns></returns>
+        public async Task<bool> HasPermissionInSelfOrg(string userId, string perName)
+        {
+            // 1. 通过用户ID和权限名查询有权组织ID集合
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
+            // 2. 查询用户所在组织
+            var userOrgIds = await OrganizationStore.FindByUserId(userId).Select(uo => uo.Id).ToListAsync();
+            return perOrgIds.ContainsAll(userOrgIds);
+        }
+
+        /// <summary>
+        /// 用户(userId)是否具有权限(perName)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名</param>
@@ -124,9 +139,24 @@ namespace AuthorizationCenter.Managers
         {
             // 1. 通过用户ID和权限名查询有权组织ID集合
             var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
-            // 2. 查询用户所在组织
-            var userOrgIds = await OrganizationStore.FindByUserId(userId).Select(uo => uo.Id).ToListAsync();
-            return perOrgIds.ContainsAll(userOrgIds);
+            return perOrgIds.Any();
+        }
+
+        /// <summary>
+        /// 判断用户(userId)有没权限(perName)操作资源(resourceId)
+        /// </summary>
+        /// <typeparam name="TResource">资源类型</typeparam>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名称</param>
+        /// <param name="resourceId">资源ID(主键)</param>
+        /// <returns></returns>
+        public async Task<bool> HasPermission<TResource>(string userId, string perName, string resourceId) where TResource : class
+        {
+            // 1. 通过用户ID和权限名查询有权组织ID集合
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, perName)).Select(org => org.Id);
+            // 2. 查询资源所在组织
+            var srcOrgIds = (await OrganizationStore.FindByUserIdSrcId<TResource>(userId, resourceId)).Select(uo => uo.Id).ToList();
+            return perOrgIds.ContainsAll(srcOrgIds);
         }
 
         /// <summary>

@@ -63,9 +63,42 @@ namespace AuthorizationCenter.Stores
         {
             return from org in Context.Organizations
                    where (from uo in Context.UserOrgs
-                          where true
+                          where uo.UserId == userId
                           select uo.OrgId).Contains(org.Id)
                    select org;
+        }
+
+        /// <summary>
+        /// 查询资源所在组织 -级联查询
+        /// TODO: 改成返回IQueryble
+        /// </summary>
+        /// <typeparam name="TResource">资源类型</typeparam>
+        /// <param name="userId">用户ID</param>
+        /// <param name="resourceId">资源ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Organization>> FindByUserIdSrcId<TResource>(string userId, string resourceId) where TResource: class
+        {
+            //var src= await Context.Set<TResource>().FindAsync(resourceId);
+            List<string> orgIds = new List<string>();
+            switch (typeof(TResource).Name)
+            {
+                case nameof(User):
+                    orgIds =await (from uo in Context.Set<UserOrg>()
+                                where uo.UserId == resourceId
+                                select uo.OrgId).AsNoTracking().ToListAsync();
+                    
+                    break;
+                case nameof(Role):
+                    orgIds = await (from ro in Context.Set<RoleOrg>()
+                                    where ro.RoleId == resourceId
+                                    select ro.OrgId).ToListAsync();
+                    break;
+                default:
+                    break;
+            }
+            return await (from org in Context.Set<Organization>()
+                          where orgIds.Contains(org.Id)
+                          select org).ToListAsync(); ;
         }
 
         /// <summary>
@@ -100,12 +133,12 @@ namespace AuthorizationCenter.Stores
         public async Task<List<Organization>> FindChildren(Organization organization)
         {
             List<Organization> result = new List<Organization>();
-            //if(org == null)
-            //{
-            //    return result;
-            //}
+            if (organization == null)
+            {
+                return result;
+            }
             // 根据 orgid查询其所有直接子组织
-            var orgs = await Find(org => organization.Id == org.ParentId).ToListAsync();
+            var orgs = await Find(org => organization.Id == org.ParentId).AsNoTracking().ToListAsync();
             result.AddRange(orgs);
             // 遍历其直接子组织
             foreach (var org in orgs)

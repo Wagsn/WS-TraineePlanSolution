@@ -146,5 +146,13 @@ namespace AuthorizationCenter.Managers
         /// <param name="id">ID</param>
         /// <returns></returns>
         Task DeleteById(string id);
+
+        /// <summary>
+        /// 用户(userId)删除角色(id)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="id">被删除角色ID</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, string id);
     }
 }

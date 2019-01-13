@@ -143,13 +143,24 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 条件删除
+        /// 删除角色(id)
         /// </summary>
-        /// <param name="roleId"></param>
+        /// <param name="roleId">角色ID</param>
         /// <returns></returns>
         public Task DeleteById(string roleId)
         {
             return Store.Delete(role => role.Id == roleId);
+        }
+
+        /// <summary>
+        /// 用户(userId)删除角色(id)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="id">被删除角色ID</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, string id)
+        {
+            await Store.DeleteByUserId(userId, id);
         }
 
         /// <summary>
@@ -223,13 +234,16 @@ namespace AuthorizationCenter.Managers
         {
             // 1. 查询用户具有角色查询权限的组织森林，并扩展成组织列表
             // 1.1 查询用户权限的组织ID集合
-            var orgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ROLE_MANAGE)).Select(org => org.Id).ToList();
+            var orgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ROLE_QUERY)).Select(org => org.Id).ToList();
             // 2. 查询这些所有组织所包含的角色
-            var roles = await (from role in Store.Find()
-                               where (from ro in RoleOrgStore.Find()
-                                      where orgIds.Contains(ro.OrgId)
-                                      select ro.RoleId).Contains(role.Id)
-                               select role).Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();
+            // 2.1 查询角色ID集合
+            var roleIds = await (from ro in RoleOrgStore.Find()
+                                 where orgIds.Contains(ro.OrgId)
+                                 select ro.RoleId).ToListAsync();
+            // 2.2 查询角色
+            var roles = await (from role in Store.Context.Roles
+                               where roleIds.Contains(role.Id)
+                               select role).AsNoTracking().Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();
             return roles;
         }
 

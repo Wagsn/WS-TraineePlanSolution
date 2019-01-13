@@ -91,7 +91,7 @@ namespace AuthorizationCenter.Entitys
             builder.Entity<User>(b =>
             {
                 b.ToTable("user");
-                b.HasIndex(p => p.SignName).IsUnique();
+                //b.HasIndex(p => p.SignName).IsUnique();
             });
 
             builder.Entity<Role>(b =>

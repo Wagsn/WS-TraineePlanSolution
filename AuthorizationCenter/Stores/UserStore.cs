@@ -1,13 +1,9 @@
 ﻿using AuthorizationCenter.Entitys;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using WS.Log;
-using WS.Text;
 
 namespace AuthorizationCenter.Stores
 {
@@ -16,14 +12,18 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public class UserStore : StoreBase<User>, IUserStore
     {
+
+        private readonly ITransaction _transaction;
         /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public UserStore([Required]ApplicationDbContext context)
+        /// <param name="transaction"></param>
+        public UserStore(ApplicationDbContext context, ITransaction transaction)
         {
-            Logger = LoggerManager.GetLogger<UserStore>();
             Context = context;
+            _transaction = transaction;
+            Logger = LoggerManager.GetLogger<UserStore>();
         }
 
         /// <summary>
@@ -32,27 +32,31 @@ namespace AuthorizationCenter.Stores
         /// <param name="userId">用户ID</param>
         /// <param name="user">用户</param>
         /// <returns></returns>
-        public async Task<User> CreateToOrgByUserId(string userId, User user)
+        public async Task<User> CreateForOrgByUserId(string userId, User user)
         {
-            var orgId = await (from uo in Context.UserOrgs
-                         where uo.UserId == userId
-                         select uo.OrgId).SingleAsync();
-            var dbUser =Context.Add(user).Entity;
-            Context.Add(new UserOrg
+            using (var trans = await Context.Database.BeginTransactionAsync())
             {
-                Id = Guid.NewGuid().ToString(),
-                UserId = user.Id,
-                OrgId = orgId
-            });
-            try
-            {
-                await Context.SaveChangesAsync();
+                try
+                {
+                    var orgId = await Context.UserOrgs.Where(uo => uo.UserId == userId).Select(uo => uo.OrgId).AsNoTracking().SingleAsync();
+                    Context.Add(user);
+                    Context.Add(new UserOrg
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserId = user.Id,
+                        OrgId = orgId
+                    });
+                    await Context.SaveChangesAsync();
+                    trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"事务提交失败:\r\n{e}");
+                    trans.Rollback();
+                    throw;
+                }
             }
-            catch(Exception e)
-            {
-                Logger.Error($"[{nameof(CreateToOrgByUserId)}] 保存失败:\r\n{e}");
-            }
-            return dbUser;
+            return user;
         }
 
         /// <summary>
@@ -101,29 +105,45 @@ namespace AuthorizationCenter.Stores
             return Delete(ub => ub.Id == id);
         }
 
-
         /// <summary>
         /// 删除通过用户ID
         /// </summary>
         /// <param name="userId">用户ID</param>
+        /// <param name="id">被删除用户ID</param>
         /// <returns></returns>
-        public async Task DeleteByUserId(string userId)
+        public async Task DeleteByUserId(string userId, string id)
         {
-            var user = Context.Users.Where(u => userId == u.Id).Single();
-            Context.Remove(user);
-            var userroles = Context.UserRoles.Where(ur => ur.UserId == userId);
-            Context.RemoveRange(userroles);
-            var userorgs = Context.UserOrgs.Where(uo => uo.UserId == userId);
-            Context.RemoveRange(userorgs);
+            using(var trans = await Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var userroles = from ur in Context.Set<UserRole>()
+                                    where ur.UserId == id
+                                    select ur;
+                    Context.AttachRange(userroles);
+                    Context.RemoveRange(userroles);
+                    var userorgs = from uo in Context.Set<UserOrg>()
+                                   where uo.UserId == id
+                                   select uo;
+                    Context.AttachRange(userorgs);
+                    Context.RemoveRange(userorgs);
+                    var users = from user in Context.Set<User>()
+                                where user.Id == id
+                                select user;
+                    Context.AttachRange(users);
+                    Context.RemoveRange(users);
+                    await Context.SaveChangesAsync();
+                    trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"[{nameof(DeleteByUserId)}] 删除用户失败:\r\n{e}");
+                    trans.Rollback();
+                    throw new Exception("删除用户失败", e);
+                }
+            }
+            
 
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("错误: " + e);
-            }
         }
 
         /// <summary>

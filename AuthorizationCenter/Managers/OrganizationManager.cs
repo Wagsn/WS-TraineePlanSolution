@@ -183,7 +183,7 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 查询通过用户ID -先找角色-再找权限组织-再找子组织
+        /// 查询用户(userId)具有组织查询的组织
         /// U.ID->R.ID->O.ID-O.ID
         /// </summary>
         /// <param name="userId">用户ID</param>

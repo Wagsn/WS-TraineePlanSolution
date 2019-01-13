@@ -53,7 +53,7 @@ namespace AuthorizationCenter.Managers
         Task<IEnumerable<TJson>> FindPerOrgsByUserId(string userId);
 
         /// <summary>
-        /// 查询通过用户ID
+        /// 查询用户(userId)所在组织
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>

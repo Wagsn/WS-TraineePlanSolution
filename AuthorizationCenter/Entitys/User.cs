@@ -17,7 +17,7 @@ namespace AuthorizationCenter.Entitys
         /// 用户ID
         /// </summary>
         [Key]
-        [MaxLength(36)]
+        [StringLength(36, MinimumLength = 36)]
         [RegularExpression(Constants.GUID_REG, ErrorMessage = Constants.GUID_ERR)]
         public string Id { get; set; }
 

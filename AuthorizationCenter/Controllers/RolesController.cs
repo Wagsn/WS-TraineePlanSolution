@@ -10,6 +10,7 @@ using WS.Log;
 using WS.Text;
 using Microsoft.AspNetCore.Http;
 using AuthorizationCenter.Define;
+using AuthorizationCenter.Entitys;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -25,18 +26,27 @@ namespace AuthorizationCenter.Controllers
         IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
+        /// 角色组织权限管理
+        /// </summary>
+        IRoleOrgPerManager RoleOrgPerManager { get; set; }
+
+        /// <summary>
         /// 日志器
         /// </summary>
         readonly ILogger Logger = LoggerManager.GetLogger(nameof(RolesController));
 
         /// <summary>
-        /// 构造器
+        /// 
         /// </summary>
         /// <param name="roleManager"></param>
-        public RolesController(IRoleManager<RoleJson> roleManager)
+        /// <param name="roleOrgPerManager"></param>
+        public RolesController(IRoleManager<RoleJson> roleManager, IRoleOrgPerManager roleOrgPerManager)
         {
-            RoleManager = roleManager;
+            RoleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
         }
+
+
 
         /// <summary>
         /// [MVC] 角色管理-角色列表
@@ -46,10 +56,10 @@ namespace AuthorizationCenter.Controllers
         /// <returns></returns>
         public async Task<IActionResult> Index()
         {
-            // 1. 权限检查
-            // 2. 业务处理
             try
             {
+                // 1. 权限检查
+                // 2. 业务处理
                 Logger.Trace($"[{nameof(Index)}] 角色管理主页");
                 // 通过登陆的用户查询组织，通过组织查询角色
                 var roles = await RoleManager.FindRoleOfOrgByUserId(SignUser.Id);
@@ -60,7 +70,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
                 ModelState.AddModelError("All", e.Message);
-                return RedirectToAction(nameof(UserController.Index), nameof(UserController));
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
         }
 
@@ -95,7 +105,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e.ToString()}");
                 ModelState.AddModelError("All", e.Message);
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -104,8 +114,24 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Roles/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            try
+            {
+                // 1. 权限检查
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.ROLE_CREATE_VIEW))
+                {
+                    Logger.Warn($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ROLE_CREATE_VIEW})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Create)}] 服务器错误: \r\n{e.ToString()}");
+                ModelState.AddModelError("All", e.Message);
+                return RedirectToAction(nameof(Index));
+            }
             // 1. 权限检查
             return View();
         }
@@ -120,7 +146,7 @@ namespace AuthorizationCenter.Controllers
         // POST: Roles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Decription")] RoleJson role)
+        public async Task<IActionResult> Create(/*[Bind("Id,Name,Decription")]*/ RoleJson role)
         {
             Logger.Trace($"[{nameof(Create)}] 请求参数; \r\n{JsonUtil.ToJson(role)}");
             // 0. 参数检查
@@ -128,10 +154,16 @@ namespace AuthorizationCenter.Controllers
             {
                 return View(nameof(Create));
             }
-            // 1. 权限检查
-            // 2. 业务处理
             try
             {
+                // 1. 权限检查
+                if(!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.ROLE_CREATE))
+                {
+                    Logger.Warn($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ROLE_CREATE})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return View(role);
+                }
+                // 2. 业务处理
                 // 创建角色 -与组织关联
                 // TODO: 新增一个接口：在指定组织下创建角色（RoleManager.CreateByOrgIdUserId(role, orgId, SignUser.Id)）
                 await RoleManager.CreateForOrgByUserId(role, SignUser.Id);
@@ -159,10 +191,16 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            // 1. 权限检查 ROLE_UPDATE?EDIT_VIEW
             // 2. 业务处理
             try
             {
+                // 1. 权限检查 ROOT_ROLE_SAVE_UPDATE_VIEW
+                if (!await RoleOrgPerManager.HasPermission<Role>(SignUser.Id, Constants.ROLE_MANAGE, id))
+                {
+                    Logger.Warn($"[{nameof(Edit)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ROLE_MANAGE})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
                 var role = await RoleManager.FindById(id);
                 Logger.Trace($"[{nameof(Details)}] 响应数据:\r\n{JsonUtil.ToJson(role)}");
                 if (role == null)
@@ -175,7 +213,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
                 ModelState.AddModelError("All", e.Message);
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -196,11 +234,18 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            // 1. 权限检查 ROLE_UPDATE?EDIT
-            // 2. 业务处理
             try
             {
+                // 1. 权限检查ROOT_ROLE_UPDATE (TODO: ROLE > ROLE_SAVE > ROLE_SAVE_UPDATE)
+                if (!await RoleOrgPerManager.HasPermission<Role>(SignUser.Id, Constants.ROLE_MANAGE, id))
+                {
+                    Logger.Warn($"[{nameof(Edit)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ROLE_MANAGE})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+                // 2. 业务处理
                 await RoleManager.Update(role);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
             {
@@ -232,10 +277,16 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            // 1. 权限检查 ROOT_ROLE_DELETE_VIEW
-            // 2. 业务处理
             try
             {
+                // 1. 权限检查 ROOT_ROLE_DELETE > ROOT_ROLE_DELETE_VIEW
+                if(!await RoleOrgPerManager.HasPermission<Role>(SignUser.Id, Constants.ROLE_MANAGE, id))
+                {
+                    Logger.Warn($"[{nameof(Delete)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ROLE_MANAGE})");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+                // 2. 业务处理
                 var role = await RoleManager.FindById(id);
                 Logger.Trace($"[{nameof(Delete)}] 响应数据:\r\n{JsonUtil.ToJson(role)}");
                 if (role == null)
@@ -248,7 +299,7 @@ namespace AuthorizationCenter.Controllers
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
                 ModelState.AddModelError("All", e.Message);
-                return View(nameof(Index));
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -264,12 +315,21 @@ namespace AuthorizationCenter.Controllers
         {
             Logger.Trace($"[{nameof(DeleteConfirmed)}] 请求参数; 角色({id})");
             // 0. 参数检查
-            // 1. 权限验证
-            // 2. 业务处理
+            if (id == null)
+            {
+                return NotFound();
+            }
             try
             {
-                // TODO：
-                await RoleManager.DeleteById(id);
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission<Role>(SignUser.Id, Constants.ROLE_MANAGE, id))
+                {
+                    Logger.Warn($"[{nameof(DeleteConfirmed)}] 没有权限");
+                    ModelState.AddModelError("All", "没有权限");
+                    return RedirectToAction(nameof(Index));
+                }
+                // 2. 业务处理 -级联删除
+                await RoleManager.DeleteByUserId(SignUser.Id, id);
             }
             catch(Exception e)
             {

@@ -14,6 +14,12 @@
             <div asp-validation-summary="All" class="text-danger"></div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                @* 这里写一个SelectList *@
+                <label class="control-label">Organization Name</label>
+                <select name="OrgId" class="form-control" asp-items="ViewBag.OrgId"></select>
+                @*<input asp-for="ParentId" class="form-control" />*@
+            </div>
+            <div class="form-group">
                 <label asp-for="SignName" class="control-label"></label>
                 <input asp-for="SignName" class="form-control" />
                 <span asp-validation-for="SignName" class="text-danger"></span>

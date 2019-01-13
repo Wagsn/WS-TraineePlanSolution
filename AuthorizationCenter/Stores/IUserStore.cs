@@ -26,14 +26,15 @@ namespace AuthorizationCenter.Stores
         /// <param name="userId">用户ID</param>
         /// <param name="user">用户</param>
         /// <returns></returns>
-        Task<User> CreateToOrgByUserId(string userId, User user);
+        Task<User> CreateForOrgByUserId(string userId, User user);
 
 
         /// <summary>
         /// 删除通过用户ID
         /// </summary>
         /// <param name="userId">用户ID</param>
+        /// <param name="id">被删除用户ID</param>
         /// <returns></returns>
-        Task DeleteByUserId(string userId);
+        Task DeleteByUserId(string userId, string id);
     }
 }

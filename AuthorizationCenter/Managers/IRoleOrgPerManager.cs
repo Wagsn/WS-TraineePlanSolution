@@ -18,7 +18,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="orgId">组织ID</param>
         /// <param name="perName">权限名</param>
         /// <returns></returns>
-        Task<bool> HasPermission(string userId, string orgId, string perName);
+        Task<bool> HasPermission(string userId, string perName, string orgId);
 
         /// <summary>
         /// 某用户在某组织下是否具有某项权限
@@ -30,7 +30,15 @@ namespace AuthorizationCenter.Managers
         Task<bool> HasPermissionForUser(string userId, string perName, string id);
 
         /// <summary>
-        /// 某用户在其组织下是否具有某项权限
+        /// 用户(userId)在自身的组织下是否具有权限(perName)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名</param>
+        /// <returns></returns>
+        Task<bool> HasPermissionInSelfOrg(string userId, string perName);
+
+        /// <summary>
+        /// 用户(userId)是否具有权限(perName)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名</param>
@@ -38,7 +46,18 @@ namespace AuthorizationCenter.Managers
         Task<bool> HasPermission(string userId, string perName);
 
         /// <summary>
-        /// 查询有权组织
+        /// 判断用户(userId)有没权限(perName)操作资源(resourceId)
+        /// 新增的有组织资源类型需要在<see cref="Stores.OrganizationStore.FindByUserIdSrcId{TResource}(string, string)"/>中添加获取组织方法
+        /// </summary>
+        /// <typeparam name="TResource">资源类型</typeparam>
+        /// <param name="userId">用户ID</param>
+        /// <param name="perName">权限名称</param>
+        /// <param name="resourceId">资源ID</param>
+        /// <returns></returns>
+        Task<bool> HasPermission<TResource>(string userId, string perName, string resourceId) where TResource : class;
+
+        /// <summary>
+        /// 查询用户(userId)有权限(perName)的组织
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名</param>

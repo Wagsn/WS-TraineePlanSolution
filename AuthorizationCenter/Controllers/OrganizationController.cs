@@ -18,7 +18,7 @@ using WS.Log;
 namespace AuthorizationCenter.Controllers
 {
     /// <summary>
-    /// 组织控制
+    /// 组织架构管理模块
     /// </summary>
     public class OrganizationController : Controller
     {
@@ -58,7 +58,7 @@ namespace AuthorizationCenter.Controllers
         {
             try
             {
-                // 1. 权限验证 ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Count(O.ID)>0
+                // 1. 权限验证 ROOT_ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Exist(O.ID)
                 // 2. 业务处理 -查询有权组织 森林列表
                 var orgnazitions = await OrganizationManager.FindPerOrgsByUserId(SignUser.Id);
 
@@ -117,7 +117,7 @@ namespace AuthorizationCenter.Controllers
 
             try{
                 // 1. 权限检查
-                if(!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_QUERY))
+                if(!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_QUERY, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_QUERY})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
@@ -148,11 +148,11 @@ namespace AuthorizationCenter.Controllers
         [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
         public async Task<IActionResult> Create(string id)
         {
-            Logger.Trace($"[{nameof(Create)}] 请求参数: id: " +id);
+            Logger.Trace($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})在组织({id})下创建组织, 跳转到创建界面, 请求参数: 组织ID({id})");
             try
             {
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_CREATE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_CREATE, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
@@ -160,7 +160,7 @@ namespace AuthorizationCenter.Controllers
                 }
                 // 2. 业务处理
                 var organizations = await OrganizationManager.Find().ToListAsync();
-                Logger.Trace($"[{nameof(Index)}] 响应数据：\r\n{JsonUtil.ToJson(organizations)}");
+                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(organizations)}");
                 if (id != null)
                 {
                     organizations =organizations.Where(org => org.Id == id).ToList();
@@ -170,7 +170,7 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
-                Logger.Error($"[{nameof(Create)}] 服务器错误：\r\n" + e);
+                Logger.Error($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})在组织({id})下创建组织, 失败, 服务器错误:\r\n" + e);
                 ModelState.AddModelError("All", "页面跳转失败");
                 return RedirectToAction(nameof(Index));
             }
@@ -183,9 +183,9 @@ namespace AuthorizationCenter.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ParentId,Name,Description")] OrganizationJson organization)
+        public async Task<IActionResult> Create(/*[Bind("Id,ParentId,Name,Description")]*/ OrganizationJson organization)
         {
-            Logger.Trace($"[{nameof(Create)}] 新增：请求参数：\r\n" + JsonUtil.ToJson(organization));
+            Logger.Trace($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})创建组织:\r\n{JsonUtil.ToJson(organization)}");
             try
             {
                 // 0. 参数检查
@@ -195,7 +195,7 @@ namespace AuthorizationCenter.Controllers
                     return View();
                 }
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, organization.ParentId, Constants.ORG_CREATE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_CREATE, organization.ParentId))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})操作组织({organization.ParentId})");
                     ModelState.AddModelError("All", "权限不足");
@@ -230,7 +230,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_UPDATE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_UPDATE, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_UPDATE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
@@ -273,7 +273,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_UPDATE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_UPDATE, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_UPDATE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
@@ -281,7 +281,7 @@ namespace AuthorizationCenter.Controllers
                 }
                 // 2. 业务处理
                 await OrganizationManager.Update(organization);
-                return View(organization);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
             {
@@ -308,7 +308,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_DELETE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_DELETE, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_DELETE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");
@@ -383,7 +383,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, id, Constants.ORG_DELETE))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_DELETE, id))
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_DELETE})操作组织({id})");
                     ModelState.AddModelError("All", "权限不足");

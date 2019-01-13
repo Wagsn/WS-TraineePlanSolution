@@ -145,6 +145,8 @@ namespace AuthorizationCenter
             // 初始权限
             string perRootId = Guid.NewGuid().ToString();
             string roleManageId = Guid.NewGuid().ToString();
+            string roleSaveId = Guid.NewGuid().ToString();
+            string roleCreateId = Guid.NewGuid().ToString();
             string userManageId = Guid.NewGuid().ToString();
             string userSaveId = Guid.NewGuid().ToString();
             string orgManageId = Guid.NewGuid().ToString();
@@ -214,6 +216,34 @@ namespace AuthorizationCenter
                     Name = Constants.ROLE_MANAGE,
                     Description = "角色管理",
                     ParentId = perRootId
+                },
+                new Permission
+                {
+                    Id = roleSaveId,
+                    Name = "ROLE_SAVE",
+                    Description = "角色保存",
+                    ParentId = roleManageId
+                },
+                new Permission
+                {
+                    Id = roleCreateId,
+                    Name = Constants.ROLE_CREATE,
+                    Description = "角色添加",
+                    ParentId = roleSaveId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ROLE_CREATE_VIEW,
+                    Description = "角色角色添加界面",
+                    ParentId = roleCreateId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ROLE_QUERY,
+                    Description = "角色查询",
+                    ParentId = roleManageId
                 },
                 new Permission
                 {

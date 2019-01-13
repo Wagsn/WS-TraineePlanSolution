@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Log;
+using WS.Text;
 
 namespace AuthorizationCenter.Stores
 {
@@ -30,22 +31,35 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task<TEntity> Create(TEntity entity)
         {
-            if (Context.Set<TEntity>().Contains(entity))
-            {
-                throw new Exception("实体已经存在不可以重复添加");
-            }
-            var result =Context.Add(entity).Entity;
-
+            //if (Context.Set<TEntity>().Contains(entity))
+            //{
+            //    throw new Exception("实体已经存在不可以重复添加");
+            //}
             try
             {
-                await Context.SaveChangesAsync();
+                Logger.Trace($"[{nameof(Create)}] 新建实体:\r\n{JsonUtil.ToJson(entity)}");
+                using(var trans = Context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        Context.Set<TEntity>().Add(entity);
+                        //var res =await Context.AddAsync(entity);
+                        await Context.SaveChangesAsync();
+                        trans.Commit();
+                    }
+                    catch(Exception e)
+                    {
+                        //trans.Rollback();
+                        Logger.Error($"[{nameof(Create)}] 事务提交失败:\r\n" + e);
+                    }
+                }
             }
             catch(Exception e)
             {
-                Logger.Error($"[{nameof(Create)}] 新建实体失败：\r\n"+e);
+                Logger.Error($"[{nameof(Create)}] 新建实体:\r\n{JsonUtil.ToJson(entity)}\r\n失败：\r\n"+e);
                 throw e;
             }
-            return result;
+            return entity;
         }
 
         /// <summary>
@@ -85,9 +99,9 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task<IQueryable<TEntity>> Update(Func<TEntity, bool> predicate, Action<TEntity> action)
         {
-            var ubs = Find(predicate);
-            await ubs.ForEachAsync(ub => action(ub));
-            Context.UpdateRange(ubs);
+            var entitys = Find(predicate);
+            await entitys.ForEachAsync(entity => action(entity));
+            Context.UpdateRange(entitys);
 
             try
             {
@@ -98,7 +112,7 @@ namespace AuthorizationCenter.Stores
                 Logger.Error($"[{nameof(Update)}] 条件更新失败: \r\n" + e);
                 throw e;
             }
-            return ubs;
+            return entitys;
         }
 
         /// <summary>
@@ -108,7 +122,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<TEntity> Find(Func<TEntity, bool> predicate)
         {
-            return Context.Set<TEntity>().Where(ub => predicate(ub));
+            return Context.Set<TEntity>().Where(entity => predicate(entity));
         }
 
         /// <summary>
@@ -149,7 +163,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public Task<bool> Exist(Func<TEntity, bool> predicate)
         {
-            return Context.Set<TEntity>().AnyAsync(ub => predicate(ub));
+            return Context.Set<TEntity>().AsNoTracking().AnyAsync(entity => predicate(entity));
         }
 
         /// <summary>
@@ -159,7 +173,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public Task<bool> ExistAll(Func<TEntity, bool> predicate)
         {
-            return Context.Set<TEntity>().AllAsync(ub => predicate(ub));
+            return Context.Set<TEntity>().AllAsync(entity => predicate(entity));
         }
 
         /// <summary>
@@ -169,8 +183,8 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task<IQueryable<TEntity>> Delete(Func<TEntity, bool> predicate)
         {
-            var ubs =Find().Where(ub => predicate(ub));
-            Context.RemoveRange(ubs);
+            var entitys =Find().Where(entity => predicate(entity));
+            Context.RemoveRange(entitys);
 
             try
             {
@@ -181,7 +195,7 @@ namespace AuthorizationCenter.Stores
                 Logger.Error($"[{nameof(Delete)}] 条件删除失败: \r\n" + e);
                 throw e;
             }
-            return ubs;
+            return entitys;
         }
         
         /// <summary>

@@ -24,5 +24,13 @@ namespace AuthorizationCenter.Stores
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
         IEnumerable<Role> FindByOrgId(string orgId);
+
+        /// <summary>
+        /// 用户(userId)删除角色(id)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="id">被删除角色ID</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, string id);
     }
 }

@@ -63,7 +63,7 @@
         </member>
         <member name="T:AuthorizationCenter.Controllers.OrganizationController">
             <summary>
-            组织控制
+            组织架构管理模块
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Controllers.OrganizationController.OrganizationManager">
@@ -339,16 +339,22 @@
             角色管理
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Controllers.RolesController.RoleOrgPerManager">
+            <summary>
+            角色组织权限管理
+            </summary>
+        </member>
         <member name="F:AuthorizationCenter.Controllers.RolesController.Logger">
             <summary>
             日志器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.RolesController.#ctor(AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson})">
+        <member name="M:AuthorizationCenter.Controllers.RolesController.#ctor(AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson},AuthorizationCenter.Managers.IRoleOrgPerManager)">
             <summary>
-            构造器
+            
             </summary>
             <param name="roleManager"></param>
+            <param name="roleOrgPerManager"></param>
         </member>
         <member name="M:AuthorizationCenter.Controllers.RolesController.Index">
             <summary>
@@ -579,12 +585,13 @@
             日志器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson},AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IRoleOrgPerManager,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Controllers.UserController.#ctor(AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson},AuthorizationCenter.Managers.IOrganizationManager{AuthorizationCenter.Dto.Jsons.OrganizationJson},AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IRoleOrgPerManager,AutoMapper.IMapper)">
             <summary>
-            构造器
+            
             </summary>
             <param name="userManager"></param>
             <param name="roleManager"></param>
+            <param name="organizationManager"></param>
             <param name="userRoleManager"></param>
             <param name="roleOrgPerManager"></param>
             <param name="mapper"></param>
@@ -602,16 +609,19 @@
             <param name="id">用户ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.Create">
+        <member name="M:AuthorizationCenter.Controllers.UserController.Create(System.String)">
             <summary>
-            MVC 创建 -跳转到新建界面
+            [MVC] 跳转到用户新建界面
+            在组织(orgId)下创建用户
             </summary>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.Create(AuthorizationCenter.Dto.Jsons.UserJson)">
+        <member name="M:AuthorizationCenter.Controllers.UserController.Create(System.String,AuthorizationCenter.Dto.Jsons.UserJson)">
             <summary>
             MVC 创建 -在数据库中添加数据
             </summary>
+            <param name="orgId">组织ID</param>
             <param name="userJson">被创建用户</param>
             <returns></returns>
         </member>
@@ -624,7 +634,7 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserController.Edit(System.String,AuthorizationCenter.Dto.Jsons.UserJson)">
             <summary>
-            MVC 编辑 -修改数据库记录
+            [MVC] 编辑用户
             </summary>
             <param name="id">用户ID</param>
             <param name="user">用户</param>
@@ -682,7 +692,7 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index">
             <summary>
-            主页
+            [MVC] 角色绑定
             </summary>
             <returns></returns>
         </member>
@@ -929,6 +939,21 @@
         <member name="F:AuthorizationCenter.Define.Constants.ROLE_MANAGE">
             <summary>
             角色管理 -角色项的增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_CREATE">
+            <summary>
+            角色添加
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_CREATE_VIEW">
+            <summary>
+            角色添加界面
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_QUERY">
+            <summary>
+            角色查询
             </summary>
         </member>
         <member name="F:AuthorizationCenter.Define.Constants.PER_MANAGE">
@@ -1825,7 +1850,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindFromUserOrgByUserId(System.String)">
             <summary>
-            查询通过用户ID
+            查询用户(userId)所在组织
             </summary>
             <param name="userId">用户ID</param>
             <returns></returns>
@@ -2017,6 +2042,14 @@
             <param name="id">ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleManager`1.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色(id)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="id">被删除角色ID</param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Managers.IRoleOrgPerManager">
             <summary>
             角色组织权限关联管理
@@ -2040,17 +2073,36 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.HasPermission(System.String,System.String)">
+        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.HasPermissionInSelfOrg(System.String,System.String)">
             <summary>
-            某用户在其组织下是否具有某项权限
+            用户(userId)在自身的组织下是否具有权限(perName)
             </summary>
             <param name="userId">用户ID</param>
             <param name="perName">权限名</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.HasPermission(System.String,System.String)">
+            <summary>
+            用户(userId)是否具有权限(perName)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.HasPermission``1(System.String,System.String,System.String)">
+            <summary>
+            判断用户(userId)有没权限(perName)操作资源(resourceId)
+            新增的有组织资源类型需要在<see cref="M:AuthorizationCenter.Stores.OrganizationStore.FindByUserIdSrcId``1(System.String,System.String)"/>中添加获取组织方法
+            </summary>
+            <typeparam name="TResource">资源类型</typeparam>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <param name="resourceId">资源ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.FindOrgByUserIdPerName(System.String,System.String)">
             <summary>
-            查询有权组织
+            查询用户(userId)有权限(perName)的组织
             </summary>
             <param name="userId">用户ID</param>
             <param name="perName">权限名</param>
@@ -2116,12 +2168,21 @@
             <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IUserManager`1.CreateToOrgByUserId(System.String,`0)">
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.CreateForOrgByUserId(System.String,`0)">
             <summary>
             用户在自己的组织下创建用户
             </summary>
             <param name="userId">用户ID</param>
             <param name="json">用户</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.CreateToOrgByUserId(System.String,`0,System.String)">
+            <summary>
+            用户(userId)添加用户(json)到组织(orgId)下
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="json">用户</param>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.Update(`0)">
@@ -2202,7 +2263,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.DeleteByUserId(System.String,System.String)">
             <summary>
-            删除通过用户ID
+            用户(userId)删除用户(id)
             </summary>
             <param name="userId">登陆用户ID</param>
             <param name="id">删除用户ID</param>
@@ -2363,7 +2424,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindPerOrgsByUserId(System.String)">
             <summary>
-            查询通过用户ID -先找角色-再找权限组织-再找子组织
+            查询用户(userId)具有组织查询的组织
             U.ID->R.ID->O.ID-O.ID
             </summary>
             <param name="userId">用户ID</param>
@@ -2406,6 +2467,14 @@
             <summary>
             类型映射
             </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.PermissionManager.#ctor(AuthorizationCenter.Stores.IPermissionStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="store"></param>
+            <param name="roleOrgPerStore"></param>
+            <param name="mapper"></param>
         </member>
         <member name="M:AuthorizationCenter.Managers.PermissionManager.Find">
             <summary>
@@ -2538,9 +2607,17 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.DeleteById(System.String)">
             <summary>
-            条件删除
+            删除角色(id)
             </summary>
-            <param name="roleId"></param>
+            <param name="roleId">角色ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleManger.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色(id)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="id">被删除角色ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.Exist(System.Func{AuthorizationCenter.Dto.Jsons.RoleJson,System.Boolean})">
@@ -2688,12 +2765,30 @@
             <param name="id">用户ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermission(System.String,System.String)">
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermissionInSelfOrg(System.String,System.String)">
             <summary>
-            某用户在其组织下是否具有某项权限
+            用户(userId)在自身的组织下是否具有权限(perName)
             </summary>
             <param name="userId">用户ID</param>
             <param name="perName">权限名</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermission(System.String,System.String)">
+            <summary>
+            用户(userId)是否具有权限(perName)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermission``1(System.String,System.String,System.String)">
+            <summary>
+            判断用户(userId)有没权限(perName)操作资源(resourceId)
+            </summary>
+            <typeparam name="TResource">资源类型</typeparam>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <param name="resourceId">资源ID(主键)</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.FindOrgByUserIdPerName(System.String,System.String)">
@@ -2724,6 +2819,11 @@
             用户存储
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Managers.UserManager.UserOrgStore">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Managers.UserManager.RoleOrgPerStore">
             <summary>
             角色组织权限存储
@@ -2744,11 +2844,12 @@
             日志记录器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AuthorizationCenter.Stores.IOrganizationStore,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Managers.UserManager.#ctor(AuthorizationCenter.Stores.IUserStore,AuthorizationCenter.Stores.IUserOrgStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AuthorizationCenter.Stores.IOrganizationStore,AutoMapper.IMapper)">
             <summary>
             
             </summary>
             <param name="store"></param>
+            <param name="userOrgStore"></param>
             <param name="roleOrgPerStore"></param>
             <param name="organizationStore"></param>
             <param name="mapper"></param>
@@ -2768,12 +2869,21 @@
             <param name="json"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.UserManager.CreateToOrgByUserId(System.String,AuthorizationCenter.Dto.Jsons.UserJson)">
+        <member name="M:AuthorizationCenter.Managers.UserManager.CreateForOrgByUserId(System.String,AuthorizationCenter.Dto.Jsons.UserJson)">
             <summary>
             用户在自己的组织下创建用户
             </summary>
             <param name="userId">用户ID</param>
             <param name="json">用户</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.CreateToOrgByUserId(System.String,AuthorizationCenter.Dto.Jsons.UserJson,System.String)">
+            <summary>
+            用户(userId)添加用户(json)到组织(orgId)下
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="json">用户</param>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.List(WS.Core.Dto.PagingResponseMessage{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Dto.Requests.ModelRequest{AuthorizationCenter.Dto.Jsons.UserJson})">
@@ -2877,7 +2987,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.DeleteByUserId(System.String,System.String)">
             <summary>
-            删除通过用户ID
+            用户(userId)删除用户(id)
             </summary>
             <param name="userId">登陆用户ID</param>
             <param name="id">删除用户ID</param>
@@ -3100,6 +3210,15 @@
             <param name="userId">用户ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindByUserIdSrcId``1(System.String,System.String)">
+            <summary>
+            查询资源所在组织
+            </summary>
+            <typeparam name="TResource">资源类型</typeparam>
+            <param name="userId">用户ID</param>
+            <param name="resourceId">资源ID</param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IPermissionStore">
             <summary>
             权限存储
@@ -3140,6 +3259,14 @@
             查询通过组织ID
             </summary>
             <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色(id)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="id">被删除角色ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.IStore`1">
@@ -3252,7 +3379,7 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserStore.CreateToOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
+        <member name="M:AuthorizationCenter.Stores.IUserStore.CreateForOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
             <summary>
             用户在其组织下创建用户
             </summary>
@@ -3260,11 +3387,12 @@
             <param name="user">用户</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.IUserStore.DeleteByUserId(System.String)">
+        <member name="M:AuthorizationCenter.Stores.IUserStore.DeleteByUserId(System.String,System.String)">
             <summary>
             删除通过用户ID
             </summary>
             <param name="userId">用户ID</param>
+            <param name="id">被删除用户ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.OrganizationStore">
@@ -3304,6 +3432,16 @@
             查询通过用户ID在UserOrg表中
             </summary>
             <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindByUserIdSrcId``1(System.String,System.String)">
+            <summary>
+            查询资源所在组织 -级联查询
+            TODO: 改成返回IQueryble
+            </summary>
+            <typeparam name="TResource">资源类型</typeparam>
+            <param name="userId">用户ID</param>
+            <param name="resourceId">资源ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildrenById(System.String)">
@@ -3447,6 +3585,14 @@
             通过ID删除
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色(id)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="id">被删除角色ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteByName(System.String)">
@@ -3641,13 +3787,14 @@
             用户核心表存储实现
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+        <member name="M:AuthorizationCenter.Stores.UserStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Stores.ITransaction)">
             <summary>
             构造器
             </summary>
             <param name="context"></param>
+            <param name="transaction"></param>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserStore.CreateToOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
+        <member name="M:AuthorizationCenter.Stores.UserStore.CreateForOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
             <summary>
             用户在其组织下创建用户
             </summary>
@@ -3683,11 +3830,12 @@
             <param name="id">用户ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String)">
+        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String,System.String)">
             <summary>
             删除通过用户ID
             </summary>
             <param name="userId">用户ID</param>
+            <param name="id">被删除用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByName(System.String)">

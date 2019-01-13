@@ -41,21 +41,23 @@ namespace AuthorizationCenter.Stores
         {
             // 1. 查询该操作的所有权限（包含父级权限）
             // 1.1 通过权限名称查询权限ID
-            var perId = (from per in Context.Permissions
+            var perId = await (from per in Context.Permissions
                          where per.Name == perName
-                         select per.Id).Single();
+                         select per.Id).AsNoTracking().SingleAsync();
             // 1.2 查询权限ID的所有父级权限构成权限ID集合（包含自身）
             var perIds = (await FindParentById(perId)).Select(per => per.Id);
             // 2. 查询用户包含的角色Id列表
-            var roleIds = from ur in Context.UserRoles
-                          where ur.UserId == userId
-                          select ur.RoleId;
+            var roleIds = await(from ur in Context.UserRoles
+                           where ur.UserId == userId
+                           select ur.RoleId).AsNoTracking().ToListAsync();
             // 3. 通过权限ID集合和角色ID集合查询有权根组织ID集合
+            var orgIds =  await(from rop in Context.RoleOrgPers
+                          where perIds.Contains(rop.PerId) &&
+                          (roleIds).Contains(rop.RoleId) // 通过权限和角色查询组织
+                          select rop.OrgId).AsNoTracking().ToListAsync();
             var orgs = await (from org in Context.Organizations
-                              where (from rop in Context.RoleOrgPers
-                                     where perIds.Contains(rop.PerId) && roleIds.Contains(rop.RoleId) // 通过权限和角色查询组织
-                                     select rop.OrgId).Contains(org.Id)
-                              select org).ToListAsync();
+                              where (orgIds).Contains(org.Id)
+                              select org).AsNoTracking().ToListAsync();
             // 4. 扩展成组织列表
             var orgList = new List<Organization>();
             orgList.AddRange(orgs);
@@ -78,9 +80,9 @@ namespace AuthorizationCenter.Stores
             {
                 return perList;
             }
-            var per = await (from p in Context.Permissions
+            var per = await (from p in Context.Set<Permission>()
                              where p.Id == perId
-                             select p).Include(p => p.Parent).SingleAsync();
+                             select p).AsNoTracking().Include(p => p.Parent).SingleAsync();
             perList.Add(per);
             perList.AddRange(await FindParentById(per.ParentId));
             return perList;

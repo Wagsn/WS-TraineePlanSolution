@@ -46,5 +46,14 @@ namespace AuthorizationCenter.Stores
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
         IQueryable<Organization> FindByUserId(string userId);
+
+        /// <summary>
+        /// 查询资源所在组织
+        /// </summary>
+        /// <typeparam name="TResource">资源类型</typeparam>
+        /// <param name="userId">用户ID</param>
+        /// <param name="resourceId">资源ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<Organization>> FindByUserIdSrcId<TResource>(string userId, string resourceId) where TResource : class;
     }
 }

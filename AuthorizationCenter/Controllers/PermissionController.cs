@@ -93,7 +93,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     ViewData["AllErr"] = "没有权限";
@@ -122,7 +122,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if(!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if(!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     return RedirectToAction(nameof(Index));
@@ -154,7 +154,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     return RedirectToAction(nameof(Index));
@@ -202,7 +202,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     return RedirectToAction(nameof(Index));
@@ -239,7 +239,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     return RedirectToAction(nameof(Index));
@@ -278,7 +278,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.PER_MANAGE))
+                if (!await RoleOrgPerManager.HasPermissionInSelfOrg(SignUser.Id, Constants.PER_MANAGE))
                 {
                     ModelState.AddModelError("All", "没有权限");
                     return RedirectToAction(nameof(Index));

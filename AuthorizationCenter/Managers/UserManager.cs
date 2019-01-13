@@ -26,6 +26,11 @@ namespace AuthorizationCenter.Managers
         public IUserStore Store { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public IUserOrgStore UserOrgStore { get; set; }
+
+        /// <summary>
         /// 角色组织权限存储
         /// </summary>
         public IRoleOrgPerStore RoleOrgPerStore { get; set; }
@@ -49,12 +54,14 @@ namespace AuthorizationCenter.Managers
         /// 
         /// </summary>
         /// <param name="store"></param>
+        /// <param name="userOrgStore"></param>
         /// <param name="roleOrgPerStore"></param>
         /// <param name="organizationStore"></param>
         /// <param name="mapper"></param>
-        public UserManager(IUserStore store, IRoleOrgPerStore roleOrgPerStore, IOrganizationStore organizationStore, IMapper mapper)
+        public UserManager(IUserStore store, IUserOrgStore userOrgStore, IRoleOrgPerStore roleOrgPerStore, IOrganizationStore organizationStore, IMapper mapper)
         {
             Store = store ?? throw new ArgumentNullException(nameof(store));
+            UserOrgStore = userOrgStore ?? throw new ArgumentNullException(nameof(userOrgStore));
             RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
             OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -105,13 +112,35 @@ namespace AuthorizationCenter.Managers
         /// <param name="userId">用户ID</param>
         /// <param name="json">用户</param>
         /// <returns></returns>
-        public async Task<UserJson> CreateToOrgByUserId(string userId, UserJson json)
+        public async Task<UserJson> CreateForOrgByUserId(string userId, UserJson json)
         {
-            var user = Mapper.Map<User>(json);
-            user.Id = Guid.NewGuid().ToString();
-            var dbUser =await Store.CreateToOrgByUserId(userId, user);
-            return Mapper.Map<UserJson>(dbUser);
+            json.Id = Guid.NewGuid().ToString();
+            await Store.CreateForOrgByUserId(userId, Mapper.Map<User>(json));
+            return json;
         }
+
+        /// <summary>
+        /// 用户(userId)添加用户(json)到组织(orgId)下
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="json">用户</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task<UserJson> CreateToOrgByUserId(string userId, UserJson json, string orgId)
+        {
+            json.Id = Guid.NewGuid().ToString();
+            // 1. 创建用户
+            await Store.Create(Mapper.Map<User>(json));
+            // 2. 创建用户组织关联
+            await UserOrgStore.Create(new UserOrg
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = json.Id,
+                OrgId = orgId
+            });
+            return json;
+        }
+
         /// <summary>
         /// 批量 查询
         /// </summary>
@@ -198,7 +227,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> FindByName(string name)
         {
-            return Store.FindByName(name).Select(ub => Mapper.Map<UserJson>(ub));
+            return Store.FindByName(name).AsNoTracking().Select(ub => Mapper.Map<UserJson>(ub));
         }
 
         /// <summary>
@@ -262,14 +291,15 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 删除通过用户ID
+        /// 用户(userId)删除用户(id)
         /// </summary>
         /// <param name="userId">登陆用户ID</param>
         /// <param name="id">删除用户ID</param>
         /// <returns></returns>
         public async Task DeleteByUserId(string userId, string id)
         {
-            await Store.DeleteById(id);
+            // 删除该用户的所有关联
+            await Store.DeleteByUserId(userId, id);
         }
     }
 }

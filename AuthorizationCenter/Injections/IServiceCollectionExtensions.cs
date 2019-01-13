@@ -29,9 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // 依赖注入
 
-            services.AddScoped<ApplicationDbContext>();
-
-            services.AddScoped<DbContext, ApplicationDbContext>();
+            services.AddTransient<ApplicationDbContext>();
+            services.AddScoped<ITransaction, Transaction<ApplicationDbContext>>();
 
             #region << Store >>
 
