@@ -22,11 +22,10 @@ namespace AuthorizationCenter.Stores
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public RoleOrgPerStore(ApplicationDbContext context, IOrganizationStore organizationStore)
+        /// <param name="organizationStore"></param>
+        public RoleOrgPerStore(ApplicationDbContext context, IOrganizationStore organizationStore):base(context)
         {
-            Context = context;
             OrganizationStore = organizationStore;
-            Logger = LoggerManager.GetLogger<RoleOrgPerStore>();
         }
 
         /// <summary>

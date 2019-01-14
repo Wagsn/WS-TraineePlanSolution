@@ -60,8 +60,19 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 日志器
         /// </summary>
-        readonly ILogger Logger = LoggerManager.GetLogger(nameof(RoleManger));
+        readonly ILogger Logger = LoggerManager.GetLogger<RoleManger>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="permissionStore"></param>
+        /// <param name="organizationStore"></param>
+        /// <param name="userRoleStore"></param>
+        /// <param name="userOrgStore"></param>
+        /// <param name="roleOrgStore"></param>
+        /// <param name="roleOrgPerStore"></param>
+        /// <param name="mapper"></param>
         public RoleManger(IRoleStore store, IPermissionStore permissionStore, IOrganizationStore organizationStore, IUserRoleStore userRoleStore, IUserOrgStore userOrgStore, IRoleOrgStore roleOrgStore, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
             Store = store ?? throw new ArgumentNullException(nameof(store));

@@ -1,7 +1,7 @@
 {
   "Data": {
     "DefaultConnection": {
-      "ConnectionString": "server=192.168.100.132;database=ws_internship;user=admin;password=123456;Pooling=true;ConnectionReset=false;maxpoolsize=20"
+      "ConnectionString": "server=192.168.100.132;database=ws_internship2;user=admin;password=123456;Pooling=true;ConnectionReset=false;maxpoolsize=20"
     }
   },
   "Port": "7001" /*debug port: xx01*/

@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Log;
+using WS.Text;
 
 namespace AuthorizationCenter.Stores
 {
     /// <summary>
-    /// 组织存储
+    /// 组织存储 -Create Update Delete Find
     /// </summary>
     public class OrganizationStore : StoreBase<Organization>, IOrganizationStore
     {
@@ -18,14 +19,246 @@ namespace AuthorizationCenter.Stores
         /// 组织存储
         /// </summary>
         /// <param name="context"></param>
-        public OrganizationStore(ApplicationDbContext context)
+        public OrganizationStore(ApplicationDbContext context):base(context){}
+
+        /// <summary>
+        /// [组织关系表] 用户(userId)创建组织(organization)
+        /// 添加一个组织会在组织扩展表中添加数据
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organization">组织</param>
+        /// <returns></returns>
+        public async Task CreateByUserId(string userId, Organization organization)
         {
-            Context = context;
-            Logger = LoggerManager.GetLogger(GetType().Name);
+            Logger.Trace($"[{nameof(CreateByUserId)}] 用户({userId})创建组织:\r\n{JsonUtil.ToJson(organization)}");
+            if (organization == null || organization.Id == null || organization.ParentId == null)
+            {
+                throw new ArgumentNullException("参数不能为空");
+            }
+            using(var trans = await Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. 创建组织
+                    Context.Add(organization);
+                    await Context.SaveChangesAsync();
+                    // 2. 创建组织关系
+                    await CreateRelById(organization.Id, organization.ParentId);
+                    trans.Commit();
+                }
+                catch(Exception e)
+                {
+                    Logger.Trace($"[{nameof(CreateByUserId)}] 用户({userId})创建组织:\r\n{JsonUtil.ToJson(organization)}\r\n失败:\r\n{e}");
+                    trans.Rollback();
+                    throw new Exception("创建组织失败", e);
+                }
+            }
         }
 
         /// <summary>
-        /// 删除通过ID
+        /// [组织关系表] 用户(userId)更新组织(organization)
+        /// ID和ParentId不可修改
+        /// TODO：可以更改组织架构（即修改ParentId）
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organization">组织</param>
+        /// <returns></returns>
+        public async Task UpdateByUserId(string userId, Organization organization)
+        {
+            Logger.Trace($"[{nameof(CreateByUserId)}] 用户({userId})更新组织:\r\n{JsonUtil.ToJson(organization)}");
+            if (organization == null || organization.Id == null || organization.ParentId == null)
+            {
+                throw new ArgumentNullException("参数不能为空");
+            }
+            using (var trans = await Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. 查询数据库中组织信息
+                    var dbOrg = await Context.Set<Organization>().FindAsync(organization.Id);
+                    if(dbOrg == null)
+                    {
+                        throw new ArgumentException("找不到编辑的组织");
+                    }
+                    // 2. 是否修改组织架构
+                    if(organization.ParentId == dbOrg.ParentId)
+                    {
+                        // 2.1 没有修改组织架构
+                        Context.Attach(organization);
+                        Context.Update(organization);
+                    }
+                    else
+                    {
+                        // 2.2 修改了组织架构
+                        // 2.2.1 删除原始关系表
+                        await DeleteRelById(dbOrg.Id, dbOrg.ParentId);
+                        // 2.2.2 创建新的关系表
+                        await CreateRelById(organization.Id, organization.ParentId);
+                        // 2.2.3 更新组织
+                        Context.Attach(organization);
+                        Context.Update(organization);
+                    }
+                    await Context.SaveChangesAsync();
+                    trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    Logger.Trace($"[{nameof(CreateByUserId)}] 用户({userId})更新组织:\r\n{JsonUtil.ToJson(organization)}\r\n失败:\r\n{e}");
+                    trans.Rollback();
+                    throw new Exception("更新组织失败", e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// [组织关系表] 删除关联
+        /// </summary>
+        /// <param name="sonId">子组织ID</param>
+        /// <param name="parentId">父组织ID</param>
+        /// <param name="isDirect">直接关系</param>
+        /// <returns></returns>
+        public async Task DeleteRelById(string sonId, string parentId, bool isDirect = true)
+        {
+            // 是否直接关系
+            if (isDirect)
+            {
+                var newOrgRels = new List<OrganizationRelation>();
+                // 2. 当组织(sonId)含有子组织时, 组织(parentId)含有父组织时, 要为每一个子组织添加每一个父组织
+                // 2.1 获取组织(sonId)的子组织
+                var allSonIds = await (from orgRel in Context.Set<OrganizationRelation>()
+                                       where orgRel.ParentId == sonId
+                                       select orgRel.SonId).AsNoTracking().ToListAsync();
+                allSonIds.Add(sonId);
+                // 2.2 获取组织(parentId)的父组织
+                var allParentIds = await (from orgRel in Context.Set<OrganizationRelation>()
+                                          where orgRel.SonId == parentId
+                                          select orgRel.ParentId).AsNoTracking().ToListAsync();
+                allParentIds.Add(parentId);
+                // 2.3 为每一个子组织添加每一个父组织
+                // 示例: 子组织04有05和06两个子组织，父组织03有01和02两个父组织，04为子组织，有子组织集合：01、02、03，父组织集合：04、05、06，两两删除关联
+                var delOrgRels = from orgRel in Context.Set<OrganizationRelation>()
+                                 where allSonIds.Contains(orgRel.SonId) && allParentIds.Contains(orgRel.ParentId)
+                                 select orgRel;
+                Context.AttachRange(delOrgRels);
+                Context.RemoveRange(delOrgRels);
+            }
+            else
+            {
+                var delOrgRels = from orgRel in Context.Set<OrganizationRelation>()
+                                 where orgRel.SonId == sonId && orgRel.ParentId == parentId
+                                 select orgRel;
+                Context.AttachRange(delOrgRels);
+                Context.RemoveRange(delOrgRels);
+            }
+            await Context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// [组织关系表] 删除与组织(orgId)有关的关联
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task DeleteRelById(string orgId)
+        {
+            // 1. 删除关系表 -删除条件: 以其为子组织以其为父组织
+            var orgRels = from orgRel in Context.Set<OrganizationRelation>()
+                          where orgRel.SonId == orgId && orgRel.ParentId == orgId
+                          select orgRel;
+            Context.AttachRange(orgRels);
+            Context.RemoveRange(orgRels);
+            await Context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// [组织关系表] 添加关联
+        /// </summary>
+        /// <param name="sonId">子组织ID</param>
+        /// <param name="parentId">父组织ID</param>
+        /// <param name="isDirect">直接关系</param>
+        /// <returns></returns>
+        public async Task CreateRelById(string sonId, string parentId, bool isDirect = true)
+        {
+            // 是否直接关系
+            if (isDirect)
+            {
+                var newOrgRels = new List<OrganizationRelation>();
+                // 2. 当组织(sonId)含有子组织时, 组织(parentId)含有父组织时, 要为每一个子组织添加每一个父组织
+                // 2.1 获取组织(sonId)的子组织
+                var allSonIds =await (from orgRel in Context.Set<OrganizationRelation>()
+                                  where orgRel.ParentId == sonId
+                                  select orgRel.SonId).AsNoTracking().ToListAsync();
+                allSonIds.Add(sonId);
+                // 2.2 获取组织(parentId)的父组织
+                var allParentIds =await (from orgRel in Context.Set<OrganizationRelation>()
+                                    where orgRel.SonId == parentId
+                                    select orgRel.ParentId).AsNoTracking().ToListAsync();
+                allParentIds.Add(parentId);
+                // 2.3 为每一个子组织添加每一个父组织
+                // 示例: 子组织04有05和06两个子组织，父组织03有01和02两个父组织，04为子组织，有子组织集合：01、02、03，父组织集合：04、05、06，两两创建关联
+                foreach(var sId in allSonIds)
+                {
+                    foreach(var pId in allParentIds)
+                    {
+                        newOrgRels.Add(new OrganizationRelation
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SonId = sId,
+                            ParentId = pId,
+                            IsDirect = sId==sonId&&pId==parentId
+                        });
+                    }
+                }
+                Context.AddRange(newOrgRels);
+            }
+            else
+            {
+                Context.Add(new OrganizationRelation
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SonId = sonId,
+                    ParentId = parentId,
+                    IsDirect = isDirect
+                });
+            }
+            await Context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// [组织关系表] 用户(userId)删除组织(orgId)
+        /// 删除关联表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, string orgId)
+        {
+            Logger.Trace($"[{nameof(DeleteByUserId)}] 用户({userId})删除组织({orgId})");
+            if (orgId == null)
+            {
+                throw new ArgumentNullException("参数不能为空");
+            }
+            using(var trans = await Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. 删除关系表 -删除条件: 以其为子组织以其为父组织
+                    await DeleteRelById(orgId);
+                    // 2. 删除组织
+                    await Delete(org => org.Id == orgId);
+                    trans.Commit();
+                }
+                catch(Exception e)
+                {
+                    Logger.Trace($"[{nameof(DeleteByUserId)}] 用户({userId})删除组织({orgId})失败:\r\n{e}");
+                    trans.Rollback();
+                    throw new Exception("删除组织失败", e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 删除通过ID 
+        /// 单元操作
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -36,8 +269,9 @@ namespace AuthorizationCenter.Stores
 
         /// <summary>
         /// 删除通过名称
+        /// 单元操作
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">组织名</param>
         /// <returns></returns>
         public Task<IQueryable<Organization>> DeleteByName(string name)
         {
@@ -126,6 +360,21 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// [组织关系表] 通过组织ID找到其所有子组织包含其自身
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public IQueryable<Organization> FindChildrenFromRelById(string orgId)
+        {
+            return from org in Context.Set<Organization>()
+                   where (from orgRel in Context.Set<OrganizationRelation>()
+                          where orgRel.ParentId == orgId
+                          select orgRel.SonId).Contains(org.Id)  // 所有子组织
+                          || org.Id == orgId  // 组织自身
+                   select org;
+        }
+
+        /// <summary>
         /// 通过组织找到所有子组织（不包含自身）
         /// </summary>
         /// <param name="organization">组织</param>
@@ -200,7 +449,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 查询所有父组织
+        /// [组织表] 查询所有父组织
         /// </summary>
         /// <param name="id">组织ID</param>
         /// <returns></returns>
@@ -215,6 +464,21 @@ namespace AuthorizationCenter.Stores
                 org = temp;
             }
             return result;
+        }
+
+        /// <summary>
+        /// [组织关系表] 查询组织(orgId)的所有父组织包含自身
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public IQueryable<Organization> FindParentFromRelById(string orgId)
+        {
+            return from org in Context.Set<Organization>()
+                   where (from orgRel in Context.Set<OrganizationRelation>()
+                          where orgRel.SonId == orgId
+                          select orgRel.SonId).Contains(org.Id)  // 所有子组织
+                          || org.Id == orgId  // 组织自身
+                   select org;
         }
     }
 }

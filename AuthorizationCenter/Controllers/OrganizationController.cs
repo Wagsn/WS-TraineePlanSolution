@@ -54,7 +54,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Organization
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
             try
             {

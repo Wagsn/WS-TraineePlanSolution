@@ -19,15 +19,13 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="context"></param>
         /// <param name="transaction"></param>
-        public UserStore(ApplicationDbContext context, ITransaction transaction)
+        public UserStore(ApplicationDbContext context, ITransaction transaction):base(context)
         {
-            Context = context;
             _transaction = transaction;
-            Logger = LoggerManager.GetLogger<UserStore>();
         }
 
         /// <summary>
-        /// 用户在其组织下创建用户
+        /// 用户(userId)在其组织下创建用户(user)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="user">用户</param>

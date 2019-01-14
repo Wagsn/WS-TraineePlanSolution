@@ -12,6 +12,36 @@ namespace AuthorizationCenter.Define
     public static class Functions
     {
         /// <summary>
+        /// 分页查询 
+        /// </summary>
+        /// <typeparam name="E"></typeparam>
+        /// <param name="data">数据来源</param>
+        /// <param name="pageIndex">分页索引，从0开始</param>
+        /// <param name="pageSize">每页数量{0,}</param>
+        /// <returns></returns>
+        public static PageBody<E> Page<E>(this IQueryable<E> data, int pageIndex, int pageSize)
+        {
+            if (pageSize < 1 || pageIndex <0)
+            {
+                throw new ArgumentOutOfRangeException("参数范围错误");
+            }
+            // 总数
+            int count = data.Count();
+            // 判断索引有效
+            int pageNum = (int)Math.Ceiling((double)count / pageSize);
+            //pIndex = (pageIndex % pageNum + pageNum) % pageNum;
+            // 获取数据
+            return new PageBody<E>
+            {
+                Data = data.Skip(pageIndex * pageSize).Take(pageSize).ToList(),
+                Total = count,
+                PageIndex = pageIndex,
+                PageCount = pageNum,
+                PageSize = pageSize
+            };
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <typeparam name="E"></typeparam>
@@ -19,7 +49,7 @@ namespace AuthorizationCenter.Define
         /// <param name="pageIndex">分页索引，从0开始</param>
         /// <param name="pageSize">每页数量{0,}</param>
         /// <returns></returns>
-        public static IQueryable<E> Page<E>(this IQueryable<E> data, int pageIndex, int pageSize)
+        public static IEnumerable<E> Page<E>(this IEnumerable<E> data, int pageIndex, int pageSize)
         {
             //// 总数
             //int count = data.Count();

@@ -25,11 +25,20 @@ namespace AuthorizationCenter.Stores
         public ILogger Logger { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public StoreBase(ApplicationDbContext context)
+        {
+            Context = context;
+            Logger = LoggerManager.GetLogger(GetType());
+        }
+
+        /// <summary>
         /// 新建实体
         /// </summary>
         /// <param name="entity">实体</param>
         /// <returns></returns>
-        public async Task<TEntity> Create(TEntity entity)
+        public virtual async Task<TEntity> Create(TEntity entity)
         {
             //if (Context.Set<TEntity>().Contains(entity))
             //{
@@ -66,7 +75,7 @@ namespace AuthorizationCenter.Stores
         /// 批量查询
         /// </summary>
         /// <returns></returns>
-        public IQueryable<TEntity> Find()
+        public virtual IQueryable<TEntity> Find()
         {
             return Context.Set<TEntity>();
         }
@@ -76,7 +85,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="entity">实体</param>
         /// <returns></returns>
-        public async Task<TEntity> Update(TEntity entity)
+        public virtual async Task<TEntity> Update(TEntity entity)
         {
             var result = Context.Update(entity).Entity;
             try
@@ -97,7 +106,7 @@ namespace AuthorizationCenter.Stores
         /// <param name="predicate">条件表达式</param>
         /// <param name="action">动作表达式</param>
         /// <returns></returns>
-        public async Task<IQueryable<TEntity>> Update(Func<TEntity, bool> predicate, Action<TEntity> action)
+        public virtual async Task<IQueryable<TEntity>> Update(Func<TEntity, bool> predicate, Action<TEntity> action)
         {
             var entitys = Find(predicate);
             await entitys.ForEachAsync(entity => action(entity));
@@ -120,7 +129,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        public IQueryable<TEntity> Find(Func<TEntity, bool> predicate)
+        public virtual IQueryable<TEntity> Find(Func<TEntity, bool> predicate)
         {
             return Context.Set<TEntity>().Where(entity => predicate(entity));
         }
@@ -131,7 +140,7 @@ namespace AuthorizationCenter.Stores
         /// <typeparam name="TProperty"></typeparam>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public IQueryable<TEntity> Find<TProperty>(Func<TEntity, TProperty> predicate)
+        public virtual IQueryable<TEntity> Find<TProperty>(Func<TEntity, TProperty> predicate)
         {
             return Context.Set<TEntity>().Where(entity => Compare(entity, predicate(entity)));
         }
@@ -161,7 +170,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        public Task<bool> Exist(Func<TEntity, bool> predicate)
+        public virtual Task<bool> Exist(Func<TEntity, bool> predicate)
         {
             return Context.Set<TEntity>().AsNoTracking().AnyAsync(entity => predicate(entity));
         }
@@ -171,7 +180,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        public Task<bool> ExistAll(Func<TEntity, bool> predicate)
+        public virtual Task<bool> ExistAll(Func<TEntity, bool> predicate)
         {
             return Context.Set<TEntity>().AllAsync(entity => predicate(entity));
         }
@@ -181,7 +190,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        public async Task<IQueryable<TEntity>> Delete(Func<TEntity, bool> predicate)
+        public virtual async Task<IQueryable<TEntity>> Delete(Func<TEntity, bool> predicate)
         {
             var entitys =Find().Where(entity => predicate(entity));
             Context.RemoveRange(entitys);
@@ -203,7 +212,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="entity">实体</param>
         /// <returns></returns>
-        public async Task<TEntity> Delete(TEntity entity)
+        public virtual async Task<TEntity> Delete(TEntity entity)
         {
             var result =Context.Remove(entity).Entity;
 

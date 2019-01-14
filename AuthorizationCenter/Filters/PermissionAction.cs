@@ -41,7 +41,7 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 日志记录器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(CheckPermission));
+        public ILogger Logger = LoggerManager.GetLogger<CheckPermission>();
 
         /// <summary>
         /// 权限

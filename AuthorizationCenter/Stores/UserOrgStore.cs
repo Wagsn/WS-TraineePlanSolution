@@ -16,11 +16,7 @@ namespace AuthorizationCenter.Stores
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public UserOrgStore(ApplicationDbContext context)
-        {
-            Context = context;
-            Logger = LoggerManager.GetLogger(nameof(UserOrgStore));
-        }
+        public UserOrgStore(ApplicationDbContext context):base(context){}
 
     }
 }

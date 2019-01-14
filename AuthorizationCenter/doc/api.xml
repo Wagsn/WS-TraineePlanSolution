@@ -88,7 +88,7 @@
             <param name="organizationManager"></param>
             <param name="roleOrgPerManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index(System.Int32,System.Int32)">
             <summary>
             [MVC] 组织管理-组织列表
             只能查看ORG_QUERY的组织森林
@@ -182,7 +182,7 @@
             <param name="permissionManager"></param>
             <param name="roleOrgPerManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.PermissionController.Index">
+        <member name="M:AuthorizationCenter.Controllers.PermissionController.Index(System.Int32,System.Int32)">
             <summary>
             列表
             </summary>
@@ -265,7 +265,7 @@
             </summary>
             <param name="context"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.RoleOrgPerController.Index">
+        <member name="M:AuthorizationCenter.Controllers.RoleOrgPerController.Index(System.Int32,System.Int32)">
             <summary>
             跳转到列表
             </summary>
@@ -356,7 +356,7 @@
             <param name="roleManager"></param>
             <param name="roleOrgPerManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.RolesController.Index">
+        <member name="M:AuthorizationCenter.Controllers.RolesController.Index(System.Int32,System.Int32)">
             <summary>
             [MVC] 角色管理-角色列表
             管理属于自己组织的角色（包含子组织的角色）
@@ -681,16 +681,25 @@
             角色管理
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserRolesController.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson})">
+        <member name="P:AuthorizationCenter.Controllers.UserRolesController.RoleOrgPerManager">
+            <summary>
+            角色组织权限管理
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Controllers.UserRolesController.Logger">
+            <summary>
+            日志记录器
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.#ctor(AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson})">
             <summary>
             构造器
             </summary>
-            <param name="context"></param>
             <param name="userRoleManager"></param>
             <param name="userManager"></param>
             <param name="roleManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index">
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index(System.Int32,System.Int32)">
             <summary>
             [MVC] 角色绑定
             </summary>
@@ -744,6 +753,15 @@
             </summary>
             <param name="id"></param>
             <returns></returns>
+        </member>
+        <member name="P:AuthorizationCenter.Controllers.UserRolesController.SignUser">
+            <summary>
+            获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+            </summary>
+            <returns></returns>
+            <summary>
+            登陆用户
+            </summary>
         </member>
         <member name="T:AuthorizationCenter.DbIntializer">
             <summary>
@@ -861,7 +879,7 @@
             用户角色 复数
             </summary>
         </member>
-        <member name="F:AuthorizationCenter.Define.Constants.CONFIGPATH">
+        <member name="F:AuthorizationCenter.Define.Constants.CONFIG_PATH">
             <summary>
             配置文件路径
             </summary>
@@ -906,6 +924,11 @@
             用户查询
             </summary>
         </member>
+        <member name="F:AuthorizationCenter.Define.Constants.USER_DETAILS">
+            <summary>
+            用户详情
+            </summary>
+        </member>
         <member name="F:AuthorizationCenter.Define.Constants.ORG_MANAGE">
             <summary>
             组织管理 -组织的增删查改
@@ -939,6 +962,11 @@
         <member name="F:AuthorizationCenter.Define.Constants.ROLE_MANAGE">
             <summary>
             角色管理 -角色项的增删查改
+            </summary>
+        </member>
+        <member name="F:AuthorizationCenter.Define.Constants.ROLE_SAVE">
+            <summary>
+            用户保存
             </summary>
         </member>
         <member name="F:AuthorizationCenter.Define.Constants.ROLE_CREATE">
@@ -983,6 +1011,16 @@
         </member>
         <member name="M:AuthorizationCenter.Define.Functions.Page``1(System.Linq.IQueryable{``0},System.Int32,System.Int32)">
             <summary>
+            分页查询 
+            </summary>
+            <typeparam name="E"></typeparam>
+            <param name="data">数据来源</param>
+            <param name="pageIndex">分页索引，从0开始</param>
+            <param name="pageSize">每页数量{0,}</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Define.Functions.Page``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Int32)">
+            <summary>
             分页查询
             </summary>
             <typeparam name="E"></typeparam>
@@ -1006,6 +1044,36 @@
             <param name="theCollection"></param>
             <param name="collection"></param>
             <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Define.PageBody`1">
+            <summary>
+            分页实体
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Define.PageBody`1.Data">
+            <summary>
+            分页数据
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Define.PageBody`1.Total">
+            <summary>
+            数据总数
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Define.PageBody`1.PageIndex">
+            <summary>
+            分页索引
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Define.PageBody`1.PageSize">
+            <summary>
+            分页大小
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Define.PageBody`1.PageCount">
+            <summary>
+            分页数量
+            </summary>
         </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.OrganizationJson">
             <summary>
@@ -1382,6 +1450,11 @@
             角色组织
             </summary>
         </member>
+        <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.UserPermissionExpansions">
+            <summary>
+            用户权限扩展表
+            </summary>
+        </member>
         <member name="P:AuthorizationCenter.Entitys.ApplicationDbContext.TodoItems">
             <summary>
             待办项
@@ -1696,6 +1769,57 @@
         <member name="P:AuthorizationCenter.Entitys.UserOrg.Org">
             <summary>
             组织
+            </summary>
+        </member>
+        <member name="T:AuthorizationCenter.Entitys.UserPermissionExpansion">
+            <summary>
+            用户角色组织权限扩展表
+            扩展表不包含业务逻辑，主要用于查询
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.Id">
+            <summary>
+            关系主键
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.UserId">
+            <summary>
+            用户ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.User">
+            <summary>
+            用户
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.RoleId">
+            <summary>
+            角色ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.Role">
+            <summary>
+            角色
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.OrganizationId">
+            <summary>
+            组织ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.Organization">
+            <summary>
+            组织
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.PermissionId">
+            <summary>
+            权限ID
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Entitys.UserPermissionExpansion.Permission">
+            <summary>
+            权限
             </summary>
         </member>
         <member name="T:AuthorizationCenter.Entitys.UserRole">
@@ -2574,6 +2698,19 @@
             日志器
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Managers.RoleManger.#ctor(AuthorizationCenter.Stores.IRoleStore,AuthorizationCenter.Stores.IPermissionStore,AuthorizationCenter.Stores.IOrganizationStore,AuthorizationCenter.Stores.IUserRoleStore,AuthorizationCenter.Stores.IUserOrgStore,AuthorizationCenter.Stores.IRoleOrgStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="store"></param>
+            <param name="permissionStore"></param>
+            <param name="organizationStore"></param>
+            <param name="userRoleStore"></param>
+            <param name="userOrgStore"></param>
+            <param name="roleOrgStore"></param>
+            <param name="roleOrgPerStore"></param>
+            <param name="mapper"></param>
+        </member>
         <member name="M:AuthorizationCenter.Managers.RoleManger.Create(AuthorizationCenter.Dto.Jsons.RoleJson)">
             <summary>
             创建
@@ -3077,20 +3214,16 @@
             <summary>
             获取配置文件
             </summary>
+            <param name="args">参数</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.ConfigManager.HostInit(System.String[],System.String)">
+        <member name="M:AuthorizationCenter.ConfigManager.GetHost(System.String[],Microsoft.Extensions.Configuration.IConfigurationRoot)">
             <summary>
             主机初始化
             </summary>
             <param name="args">参数</param>
-            <param name="port">端口</param>
+            <param name="configuration">配置</param>
             <returns></returns>
-        </member>
-        <member name="M:AuthorizationCenter.ConfigManager.Init">
-            <summary>
-            初始化
-            </summary>
         </member>
         <member name="T:AuthorizationCenter.Properties.Resources">
             <summary>
@@ -3175,9 +3308,42 @@
             组织存储
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.CreateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            用户(userId)创建组织(organization)
+            添加一个组织会在组织扩展表中添加数据
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="organization">组织</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.UpdateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            用户(userId)更新组织(organization)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="organization">组织</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除组织(orgId)
+            删除关联表
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenById(System.String)">
             <summary>
-            通过组织ID找到所有子组织（包括间接子组织，但是不包括自身）
+            通过组织ID找到所有子组织（包括间接子组织，包括自身）
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenFromRelById(System.String)">
+            <summary>
+            通过组织ID找到所有子组织（包括间接子组织，包括自身）
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>
@@ -3192,6 +3358,13 @@
         <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindParentById(System.String)">
             <summary>
             查询所有父组织
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindParentFromRelById(System.String)">
+            <summary>
+            查询组织(orgId)的所有父组织包含自身
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>
@@ -3357,6 +3530,17 @@
             待办项存储
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Stores.ITransaction">
+            <summary>
+            数据库事务
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.ITransaction.BeginTransaction">
+            <summary>
+            开启事务
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IUserOrgStore">
             <summary>
             用户组织关联存储
@@ -3397,7 +3581,7 @@
         </member>
         <member name="T:AuthorizationCenter.Stores.OrganizationStore">
             <summary>
-            组织存储
+            组织存储 -Create Update Delete Find
             </summary>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
@@ -3406,9 +3590,63 @@
             </summary>
             <param name="context"></param>
         </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.CreateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            [组织关系表] 用户(userId)创建组织(organization)
+            添加一个组织会在组织扩展表中添加数据
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="organization">组织</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.UpdateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
+            <summary>
+            [组织关系表] 用户(userId)更新组织(organization)
+            ID和ParentId不可修改
+            TODO：可以更改组织架构（即修改ParentId）
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="organization">组织</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteRelById(System.String,System.String,System.Boolean)">
+            <summary>
+            [组织关系表] 删除关联
+            </summary>
+            <param name="sonId">子组织ID</param>
+            <param name="parentId">父组织ID</param>
+            <param name="isDirect">直接关系</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteRelById(System.String)">
+            <summary>
+            [组织关系表] 删除与组织(orgId)有关的关联
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.CreateRelById(System.String,System.String,System.Boolean)">
+            <summary>
+            [组织关系表] 添加关联
+            </summary>
+            <param name="sonId">子组织ID</param>
+            <param name="parentId">父组织ID</param>
+            <param name="isDirect">直接关系</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            [组织关系表] 用户(userId)删除组织(orgId)
+            删除关联表
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteById(System.String)">
             <summary>
-            删除通过ID
+            删除通过ID 
+            单元操作
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -3416,8 +3654,9 @@
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteByName(System.String)">
             <summary>
             删除通过名称
+            单元操作
             </summary>
-            <param name="name"></param>
+            <param name="name">组织名</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindById(System.String)">
@@ -3447,6 +3686,13 @@
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildrenById(System.String)">
             <summary>
             通过组织ID找到所有子组织（包含自身）
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildrenFromRelById(System.String)">
+            <summary>
+            [组织关系表] 通过组织ID找到其所有子组织包含其自身
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>
@@ -3481,9 +3727,16 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindParentById(System.String)">
             <summary>
-            查询所有父组织
+            [组织表] 查询所有父组织
             </summary>
             <param name="id">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindParentFromRelById(System.String)">
+            <summary>
+            [组织关系表] 查询组织(orgId)的所有父组织包含自身
+            </summary>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.PermissionStore">
@@ -3540,6 +3793,7 @@
             构造器
             </summary>
             <param name="context"></param>
+            <param name="organizationStore"></param>
         </member>
         <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.FindOrgByUserIdPerName(System.String,System.String)">
             <summary>
@@ -3646,6 +3900,11 @@
             日志工具
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.StoreBase`1.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:AuthorizationCenter.Stores.StoreBase`1.Create(`0)">
             <summary>
             新建实体
@@ -3732,6 +3991,12 @@
             待办项存储
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.TodoItemStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+        </member>
         <member name="M:AuthorizationCenter.Stores.TodoItemStore.DeleteById(System.String)">
             <summary>
             通过ID删除
@@ -3758,6 +4023,24 @@
             通过名称查询
             </summary>
             <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AuthorizationCenter.Stores.Transaction`1">
+            <summary>
+            事务
+            </summary>
+            <typeparam name="TContext"></typeparam>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.Transaction`1.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+            <summary>
+            构造器
+            </summary>
+            <param name="_dbContext"></param>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.Transaction`1.BeginTransaction">
+            <summary>
+            开始事务
+            </summary>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.UserOrgStore">
@@ -3796,7 +4079,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.CreateForOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
             <summary>
-            用户在其组织下创建用户
+            用户(userId)在其组织下创建用户(user)
             </summary>
             <param name="userId">用户ID</param>
             <param name="user">用户</param>

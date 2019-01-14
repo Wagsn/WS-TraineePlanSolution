@@ -17,7 +17,7 @@ namespace AuthorizationCenter.Filters
         /// <summary>
         /// 日志器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(SignFilter));
+        public ILogger Logger = LoggerManager.GetLogger<SignFilter>();
 
         /// <summary>
         /// 当动作执行中 

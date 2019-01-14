@@ -16,11 +16,7 @@ namespace AuthorizationCenter.Stores
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public RoleStore(ApplicationDbContext context)
-        {
-            Context = context;
-            Logger = LoggerManager.GetLogger(GetType().Name);
-        }
+        public RoleStore(ApplicationDbContext context):base(context){ }
 
         /// <summary>
         /// 通过ID删除

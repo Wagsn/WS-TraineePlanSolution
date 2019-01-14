@@ -30,7 +30,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 日志器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(SignController));
+        public ILogger Logger = LoggerManager.GetLogger<SignController>();
 
         /// <summary>
         /// 用户管理

@@ -48,7 +48,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 日志记录器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(UserManager));
+        public ILogger Logger = LoggerManager.GetLogger<UserManager>();
 
         /// <summary>
         /// 

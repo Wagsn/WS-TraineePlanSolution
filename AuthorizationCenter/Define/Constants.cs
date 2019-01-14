@@ -117,7 +117,7 @@ namespace AuthorizationCenter.Define
         /// <summary>
         /// 配置文件路径
         /// </summary>
-        public const string CONFIGPATH = "./cfg/config.json";
+        public const string CONFIG_PATH = "./cfg/config.json";
 
         /// <summary>
         /// 文档文件夹
@@ -164,6 +164,11 @@ namespace AuthorizationCenter.Define
         public const string USER_QUERY = "USER_QUERY";
 
         /// <summary>
+        /// 用户详情
+        /// </summary>
+        public const string USER_DETAILS = "USER_DETAILS";
+
+        /// <summary>
         /// 组织管理 -组织的增删查改
         /// </summary>
         public const string ORG_MANAGE = "ORG_MANAGE";
@@ -197,6 +202,11 @@ namespace AuthorizationCenter.Define
         /// 角色管理 -角色项的增删查改
         /// </summary>
         public const string ROLE_MANAGE = "ROLE_MANAGE";
+
+        /// <summary>
+        /// 用户保存
+        /// </summary>
+        public const string ROLE_SAVE = "ROLE_SAVE";
 
         /// <summary>
         /// 角色添加

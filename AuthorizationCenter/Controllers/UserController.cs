@@ -95,7 +95,7 @@ namespace AuthorizationCenter.Controllers
                 // 2. 业务处理
                 var users = await UserManager.FindByUserId(SignUser.Id);
                 // 分页查询用户列表 
-                var data = users.AsQueryable().Page(pageIndex, pageSize).ToList();
+                var data = users.Page(pageIndex, pageSize).ToList();
                 Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
                 return View(data);
             }
@@ -210,6 +210,9 @@ namespace AuthorizationCenter.Controllers
             if (string.IsNullOrWhiteSpace(userJson.SignName) || string.IsNullOrWhiteSpace(userJson.PassWord))
             {
                 ModelState.AddModelError("All", "用户名或密码不能为空");
+                // 查询有权限添加用户的组织
+                var organizations = await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.USER_CREATE);
+                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name), orgId);
                 return View();
             }
             try

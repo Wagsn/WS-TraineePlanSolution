@@ -72,6 +72,11 @@ namespace AuthorizationCenter.Entitys
         public DbSet<RoleOrg> RoleOrgs { get; set; }
 
         /// <summary>
+        /// 用户权限扩展表
+        /// </summary>
+        public DbSet<UserPermissionExpansion> UserPermissionExpansions { get; set; }
+
+        /// <summary>
         /// 待办项
         /// </summary>
         public DbSet<TodoItem> TodoItems { get; set; }
@@ -103,7 +108,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserRole>(b =>
             {
-                b.ToTable("user_role"); // .HasKey(prop => new { prop.RoleId, prop.UserId });
+                b.ToTable("user_role_relation"); // .HasKey(prop => new { prop.RoleId, prop.UserId });
                 // 多对多关联
                 b.HasOne(e => e.User).WithMany(u => u.UserRoles);
                 b.HasOne(e => e.Role).WithMany(r => r.UserRoles);
@@ -111,7 +116,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserOrg>(b =>
             {
-                b.ToTable("user_org");
+                b.ToTable("user_organization_relation");
             });
 
             builder.Entity<Permission>(b =>
@@ -122,18 +127,28 @@ namespace AuthorizationCenter.Entitys
             builder.Entity<Organization>(b =>
             {
                 b.ToTable("organization");
-                b.HasOne(e => e.Parent).WithMany(org => org.Children);
+                b.HasOne(e => e.Parent).WithMany(org => org.Children);  // 外键关联
+            });
+
+            builder.Entity<OrganizationRelation>(b =>
+            {
+                b.ToTable("organization_relation");
             });
 
             builder.Entity<RoleOrgPer>(b =>
             {
-                b.ToTable("role_org_per");
+                b.ToTable("role_organization_permission_relation");
                 //b.Property(p => p.Id).ValueGeneratedOnAddOrUpdate();
             });
 
             builder.Entity<RoleOrg>(b =>
             {
-                b.ToTable("role_org");
+                b.ToTable("role_organization_relation");
+            });
+
+            builder.Entity<UserPermissionExpansion>(b =>
+            {
+                b.ToTable("user_role_organization_permission_expansion");
             });
             #endregion
         }

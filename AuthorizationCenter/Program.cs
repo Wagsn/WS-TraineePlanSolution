@@ -19,7 +19,7 @@ namespace AuthorizationCenter
     /// </summary>
     public class Program
     {
-        static readonly WS.Log.ILogger Logger = LoggerManager.GetLogger(nameof(Program));
+        static readonly WS.Log.ILogger Logger = LoggerManager.GetLogger<Program>();
         
         /// <summary>
         /// 入口
@@ -31,10 +31,9 @@ namespace AuthorizationCenter
             {
                 // 读取配置文件
                 var configuration = ConfigManager.GetConfig(args);
-
-                // 配置文件设置端口号，检查是否符合端口规范，默认端口 5000
-                string port = configuration["Port"] ?? "5000";
-                var host = ConfigManager.HostInit(args, port);
+                // 获取主机
+                var host = ConfigManager.GetHost(args, configuration);
+                // 数据库初始化
                 using (var scope = host.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
@@ -42,7 +41,6 @@ namespace AuthorizationCenter
                     {
                         var context = services.GetRequiredService<ApplicationDbContext>();
                         DbIntializer.Initialize(context);
-
                     }
                     catch (Exception e)
                     {
@@ -55,7 +53,7 @@ namespace AuthorizationCenter
             }
             catch(Exception e)
             {
-                Logger.Error($"[{nameof(Main)}] 应用程序错误:\r\n{e.ToString()}");
+                Logger.Error($"[{nameof(Main)}] 应用程序错误:\r\n{e}");
             }
         }
     }
@@ -68,12 +66,13 @@ namespace AuthorizationCenter
         /// <summary>
         /// 获取配置文件
         /// </summary>
+        /// <param name="args">参数</param>
         /// <returns></returns>
         public static IConfigurationRoot GetConfig(string[] args)
         {
             // 检查配置文件??
             return new ConfigurationBuilder()
-                .AddJsonFile(Constants.CONFIGPATH)
+                .AddJsonFile(Constants.CONFIG_PATH)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
@@ -83,23 +82,24 @@ namespace AuthorizationCenter
         /// 主机初始化
         /// </summary>
         /// <param name="args">参数</param>
-        /// <param name="port">端口</param>
+        /// <param name="configuration">配置</param>
         /// <returns></returns>
-        public static IWebHost HostInit(string[] args, string port)
+        public static IWebHost GetHost(string[] args, IConfigurationRoot configuration)
         {
+            // 配置文件设置端口号，检查是否符合端口规范，默认端口 5000
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls($"http://*:{port}")
+                .UseUrls($"http://*:{configuration["Port"]??"5000"}")
                 .Build();
         }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        public static void Init()
-        {
+        ///// <summary>
+        ///// 初始化
+        ///// </summary>
+        //public static void Init()
+        //{
 
-        }
+        //}
     }
 
     ///// <summary>

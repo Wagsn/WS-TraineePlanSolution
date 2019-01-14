@@ -33,7 +33,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 日志器
         /// </summary>
-        readonly ILogger Logger = LoggerManager.GetLogger(nameof(RolesController));
+        readonly ILogger Logger = LoggerManager.GetLogger<RolesController>();
 
         /// <summary>
         /// 
@@ -54,7 +54,7 @@ namespace AuthorizationCenter.Controllers
         /// TODO：管理自己有权限管理角色的组织的角色
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
             try
             {

@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using AuthorizationCenter.Entitys;
 using AuthorizationCenter.Managers;
 using AuthorizationCenter.Dto.Jsons;
+using WS.Log;
+using AuthorizationCenter.Define;
+using Microsoft.AspNetCore.Http;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -16,8 +19,6 @@ namespace AuthorizationCenter.Controllers
     /// </summary>
     public class UserRolesController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
         /// <summary>
         /// 用户角色管理
         /// </summary>
@@ -34,15 +35,23 @@ namespace AuthorizationCenter.Controllers
         public IRoleManager<RoleJson> RoleManager { get; set; }
 
         /// <summary>
+        /// 角色组织权限管理
+        /// </summary>
+        public IRoleOrgPerManager RoleOrgPerManager { get; set; }
+
+        /// <summary>
+        /// 日志记录器
+        /// </summary>
+        readonly ILogger Logger = LoggerManager.GetLogger<UserRolesController>();
+
+        /// <summary>
         /// 构造器
         /// </summary>
-        /// <param name="context"></param>
         /// <param name="userRoleManager"></param>
         /// <param name="userManager"></param>
         /// <param name="roleManager"></param>
-        public UserRolesController(ApplicationDbContext context, IUserRoleManager userRoleManager, IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager)
+        public UserRolesController(IUserRoleManager userRoleManager, IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager)
         {
-            _context = context;
             UserRoleManager = userRoleManager;
             UserManager = userManager;
             RoleManager = roleManager;
@@ -53,11 +62,21 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserRoles
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
-            // 1. 权限验证
-            // 2. 业务处理
-            return View(await UserRoleManager.Find().ToListAsync());
+            //try
+            //{
+            //    // 1. 权限验证
+            //    if(!await RoleOrgPerManager.HasPermission())
+                // 2. 业务处理
+                return View(await UserRoleManager.Find().ToListAsync());
+            //}
+            //catch(Exception e)
+            //{
+            //    Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+            //    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            //}
+            
         }
 
         /// <summary>
@@ -230,6 +249,45 @@ namespace AuthorizationCenter.Controllers
         {
             await UserRoleManager.DeleteById(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// 获取登陆用户简要信息 -每次都是新建一个UserBaseJson对象
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// 登陆用户
+        /// </summary>
+        private UserJson SignUser
+        {
+            get
+            {
+                if (HttpContext.Session.GetString(Constants.USERID) == null)
+                {
+                    return null;
+                }
+                return new UserJson
+                {
+                    Id = HttpContext.Session.GetString(Constants.USERID),
+                    SignName = HttpContext.Session.GetString(Constants.SIGNNAME),
+                    PassWord = HttpContext.Session.GetString(Constants.PASSWORD)
+                };
+            }
+            set
+            {
+                if (value == null)
+                {
+                    HttpContext.Session.Remove(Constants.USERID);
+                    HttpContext.Session.Remove(Constants.SIGNNAME);
+                    HttpContext.Session.Remove(Constants.PASSWORD);
+                }
+                else
+                {
+                    HttpContext.Session.SetString(Constants.USERID, value.Id);
+                    HttpContext.Session.SetString(Constants.SIGNNAME, value.SignName);
+                    HttpContext.Session.SetString(Constants.PASSWORD, value.PassWord);
+                }
+            }
         }
     }
 }

@@ -12,6 +12,12 @@ namespace AuthorizationCenter.Stores
     public class TodoItemStore : StoreBase<TodoItem>, ITodoItemStore
     {
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        public TodoItemStore(ApplicationDbContext context) : base(context) { }
+
+        /// <summary>
         /// 通过ID删除
         /// </summary>
         /// <param name="id"></param>

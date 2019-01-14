@@ -30,7 +30,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 日志器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(RoleOrgPerController));
+        public ILogger Logger = LoggerManager.GetLogger<RoleOrgPerController>();
 
         /// <summary>
         /// 构造器
@@ -46,7 +46,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: RoleOrgPer
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
             var applicationDbContext = _context.RoleOrgPers.Include(r => r.Org).Include(r => r.Per).Include(r => r.Role);
             return View(await applicationDbContext.ToListAsync());

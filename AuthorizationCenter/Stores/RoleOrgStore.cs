@@ -16,10 +16,6 @@ namespace AuthorizationCenter.Stores
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        public RoleOrgStore(ApplicationDbContext context)
-        {
-            Context = context;
-            Logger = LoggerManager.GetLogger(nameof(RoleOrgStore));
-        }
+        public RoleOrgStore(ApplicationDbContext context):base(context){ }
     }
 }

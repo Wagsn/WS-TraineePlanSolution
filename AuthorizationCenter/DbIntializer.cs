@@ -3,7 +3,6 @@ using AuthorizationCenter.Entitys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using WS.Log;
 
 namespace AuthorizationCenter
@@ -16,7 +15,7 @@ namespace AuthorizationCenter
         /// <summary>
         /// 日志器
         /// </summary>
-        public static ILogger Logger = LoggerManager.GetLogger(nameof(DbIntializer));
+        public static ILogger Logger = LoggerManager.GetLogger<DbIntializer>();
 
         /// <summary>
         /// 数据库初始化
@@ -185,7 +184,7 @@ namespace AuthorizationCenter
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = "USER_DETAILS",
+                    Name = Constants.USER_DETAILS,
                     Description = "用户详情", // 用户的详细信息（不包括，用户ID，用户名等基础信息）
                     ParentId = userManageId
                 },
@@ -220,7 +219,7 @@ namespace AuthorizationCenter
                 new Permission
                 {
                     Id = roleSaveId,
-                    Name = "ROLE_SAVE",
+                    Name = Constants.ROLE_SAVE,
                     Description = "角色保存",
                     ParentId = roleManageId
                 },

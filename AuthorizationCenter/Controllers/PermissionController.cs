@@ -45,7 +45,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Permission
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
             var data = await PermissionManager.Find().ToListAsync();
             return View(data);

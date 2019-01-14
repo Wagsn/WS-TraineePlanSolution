@@ -46,7 +46,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 日志记录器
         /// </summary>
-        public ILogger Logger = LoggerManager.GetLogger(nameof(OrganizationManager));
+        public ILogger Logger = LoggerManager.GetLogger<OrganizationManager>();
 
         /// <summary>
         /// 构造器
@@ -86,8 +86,7 @@ namespace AuthorizationCenter.Managers
             }
             return json;
         }
-
-
+        
         /// <summary>
         /// 创建
         /// </summary>
