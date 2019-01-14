@@ -215,11 +215,10 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId)
         {
-            throw new NotImplementedException("未实现");
             // 1. 查询有权组织集合
             var orgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY);
             // 2. 查询组织ID所在组织
-            return null;
+            throw new NotImplementedException("未实现");
         }
 
         /// <summary>

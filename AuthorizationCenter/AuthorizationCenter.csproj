@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyVersion>1.0.0.1149</AssemblyVersion>
+    <FileVersion>1.0.0.1149</FileVersion>
+    <Version>1.0.1.1149</Version>
+    <Description>中心</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

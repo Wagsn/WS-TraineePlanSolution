@@ -257,10 +257,9 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Error($"[{nameof(Edit)}] 服务器错误: \r\n{e.ToString()}");
                     ModelState.AddModelError("All", e.Message);
-                    return View(nameof(Edit), id);  // 测试一下
+                    return View(role);
                 }
             }
-            return View(role);
         }
 
         /// <summary>
