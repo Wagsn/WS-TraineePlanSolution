@@ -211,9 +211,7 @@ namespace AuthorizationCenter.Controllers
             {
                 ModelState.AddModelError("All", "用户名或密码不能为空");
                 // 查询有权限添加用户的组织
-                var organizations = await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.USER_CREATE);
-                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name), orgId);
-                return View();
+                return RedirectToAction(nameof(Create));
             }
             try
             {

@@ -64,19 +64,21 @@ namespace AuthorizationCenter.Controllers
         // GET: UserRoles
         public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
-            //try
-            //{
-            //    // 1. 权限验证
-            //    if(!await RoleOrgPerManager.HasPermission())
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLES))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
                 // 2. 业务处理
                 return View(await UserRoleManager.Find().ToListAsync());
-            //}
-            //catch(Exception e)
-            //{
-            //    Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
-            //    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
-            //}
-            
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
