@@ -54,6 +54,17 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
+        /// 用户(userId)条件(predicate)删除角色权限
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate">条件</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate)
+        {
+            await RoleOrgPerStore.Delete(predicate);
+        }
+
+        /// <summary>
         /// 通过ID查询
         /// </summary>
         /// <param name="id"></param>
@@ -74,13 +85,17 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 通过用户ID查询
+        /// 查询用户(userId)的角色组织权限列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public IQueryable<RoleOrgPer> FindByUserId(string id)
+        public IQueryable<RoleOrgPer> FindByUserId(string userId)
         {
-            throw new NotImplementedException();
+            return from rop in RoleOrgPerStore.Context.Set<RoleOrgPer>()
+                   where (from ur in RoleOrgPerStore.Context.Set<UserRole>()
+                          where ur.UserId == userId  
+                          select ur.RoleId).Contains(rop.RoleId) // 1. 查询用户的角色
+                   select rop; // 2. 查询角色组织权限关联
         }
 
         /// <summary>
@@ -205,6 +220,29 @@ namespace AuthorizationCenter.Managers
             perOrgIds.AddRange(rootOrgIds);
             // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
             return perOrgIds.ContainsAll(orgIds);
+        }
+
+        /// <summary>
+        /// 用户(userId)为角色授权(roleOrgPer)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="roleOrgPer">角色组织权限关系</param>
+        /// <returns></returns>
+        public async Task CreateByUserId(string userId, RoleOrgPer roleOrgPer)
+        {
+            
+            await RoleOrgPerStore.Create(roleOrgPer);
+        }
+
+        /// <summary>
+        /// 用户(userId)更新角色授权(json)
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="roleOrgPer"></param>
+        /// <returns></returns>
+        public async Task UpdateByUserId(string userId, RoleOrgPer roleOrgPer)
+        {
+            await RoleOrgPerStore.Update(roleOrgPer);
         }
     }
 }

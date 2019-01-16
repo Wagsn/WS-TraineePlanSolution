@@ -104,7 +104,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 删除通过用户ID
+        /// 用户(userIds)删除用户(id)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="id">被删除用户ID</param>

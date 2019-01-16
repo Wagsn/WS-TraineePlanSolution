@@ -22,7 +22,7 @@ namespace AuthorizationCenter.Stores
         public OrganizationStore(ApplicationDbContext context):base(context){}
 
         /// <summary>
-        /// [组织关系表] 用户(userId)创建组织(organization)
+        /// [组织扩展表] 用户(userId)创建组织(organization)
         /// 添加一个组织会在组织扩展表中添加数据
         /// </summary>
         /// <param name="userId">用户ID</param>
@@ -40,8 +40,7 @@ namespace AuthorizationCenter.Stores
                 try
                 {
                     // 1. 创建组织
-                    Context.Add(organization);
-                    await Context.SaveChangesAsync();
+                    await Create(organization);
                     // 2. 创建组织关系
                     await CreateRelById(organization.Id, organization.ParentId);
                     trans.Commit();
@@ -56,7 +55,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// [组织关系表] 用户(userId)更新组织(organization)
+        /// [组织扩展表] 用户(userId)更新组织(organization)
         /// ID和ParentId不可修改
         /// TODO：可以更改组织架构（即修改ParentId）
         /// </summary>
@@ -111,7 +110,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// [组织关系表] 删除关联
+        /// [组织扩展表] 删除关联
         /// </summary>
         /// <param name="sonId">子组织ID</param>
         /// <param name="parentId">父组织ID</param>
@@ -154,23 +153,25 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// [组织关系表] 删除与组织(orgId)有关的关联
+        /// [组织扩展表] 删除与组织(orgId)有关的关联
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
         public async Task DeleteRelById(string orgId)
         {
-            // 1. 删除关系表 -删除条件: 以其为子组织以其为父组织
-            var orgRels = from orgRel in Context.Set<OrganizationRelation>()
-                          where orgRel.SonId == orgId && orgRel.ParentId == orgId
-                          select orgRel;
-            Context.AttachRange(orgRels);
-            Context.RemoveRange(orgRels);
-            await Context.SaveChangesAsync();
+            // 1. 查询与orgId直接关联的orgRel
+            var directOrgRels = await (from orgRel in Context.Set<OrganizationRelation>()
+                                       where (orgRel.SonId == orgId || orgRel.ParentId == orgId) && orgRel.IsDirect == true
+                                       select orgRel).AsNoTracking().ToListAsync();
+            // 2. 断开所有直接关联的orgRel
+            foreach (var directOrgRel in directOrgRels)
+            {
+                await DeleteRelById(directOrgRel.SonId, directOrgRel.ParentId);
+            }
         }
 
         /// <summary>
-        /// [组织关系表] 添加关联
+        /// [组织扩展表] 添加关联
         /// </summary>
         /// <param name="sonId">子组织ID</param>
         /// <param name="parentId">父组织ID</param>
@@ -224,7 +225,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// [组织关系表] 用户(userId)删除组织(orgId)
+        /// [组织扩展表] 用户(userId)删除组织(orgId)
         /// 删除关联表
         /// </summary>
         /// <param name="userId">用户ID</param>
@@ -387,7 +388,7 @@ namespace AuthorizationCenter.Stores
                 return result;
             }
             // 根据 orgid查询其所有直接子组织
-            var orgs = await Find(org => organization.Id == org.ParentId).AsNoTracking().ToListAsync();
+            var orgs = await Find(org => organization.Id == org.ParentId).Include(org => org.Parent).AsNoTracking().ToListAsync();
             result.AddRange(orgs);
             // 遍历其直接子组织
             foreach (var org in orgs)

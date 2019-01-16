@@ -35,7 +35,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<TJson>> FindByUserId(string userId);
+        Task<IEnumerable<TJson>> FindPerByUserId(string userId);
 
         /// <summary>
         /// 创建

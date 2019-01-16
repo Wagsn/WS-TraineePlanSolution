@@ -7,22 +7,22 @@
 <h2>组织管理</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">新增组织</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                Parent Name
+                父组织名
                 @*@Html.DisplayNameFor(model => model.Parent.Name)*@
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                组织名称
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                组织描述
             </th>
-            <th></th>
+            <th>可用操作</th>
         </tr>
     </thead>
     <tbody>
@@ -39,11 +39,13 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    <a asp-action="Create" asp-controller="User" asp-route-orgId="@item.Id">Add User</a> |
-                    <a asp-action="Create" asp-controller="Organization" asp-route-id="@item.Id">Add Organization</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Index" asp-controller="User" asp-route-orgId="@item.Id" title="User List">用户列表</a> |
+                    <a asp-action="Create" asp-controller="User" asp-route-orgId="@item.Id" title="Add User">添加用户</a> |
+                    <a asp-action="Create" asp-controller="Organization" asp-route-id="@item.Id" title="Add Organization">添加组织</a> |
+                    <a asp-route-id="@item.Id" title="Move Organization">移动组织(TODO)</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id" title="Edit Organization">编辑组织</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" title="Organization Details">组织详情</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" title="Delete Organization">删除组织</a>
                 </td>
             </tr>
         }
@@ -52,7 +54,7 @@
 @* 在这里创建一个组织显示树 *@
 <link rel="stylesheet" href="/css/bootstrapStyle.css" type="text/css">
 
-<h1>zTree - bootstrap 风格</h1>
+<h3>树状结构组织树</h3>
 <ul id="treeDemo" class="ztree">
 
 </ul>

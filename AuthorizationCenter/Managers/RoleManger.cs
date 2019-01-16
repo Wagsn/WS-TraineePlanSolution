@@ -20,7 +20,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 角色管理
         /// </summary>
-        IRoleStore Store { get; set; }
+        IRoleStore RoleStore { get; set; }
 
         /// <summary>
         /// 权限存储
@@ -75,7 +75,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="mapper"></param>
         public RoleManger(IRoleStore store, IPermissionStore permissionStore, IOrganizationStore organizationStore, IUserRoleStore userRoleStore, IUserOrgStore userOrgStore, IRoleOrgStore roleOrgStore, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
-            Store = store ?? throw new ArgumentNullException(nameof(store));
+            RoleStore = store ?? throw new ArgumentNullException(nameof(store));
             PermissionStore = permissionStore ?? throw new ArgumentNullException(nameof(permissionStore));
             OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
             UserRoleStore = userRoleStore ?? throw new ArgumentNullException(nameof(userRoleStore));
@@ -92,7 +92,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<RoleJson> Create(RoleJson json)
         {
-            return Mapper.Map<RoleJson>(await Store.Create(Mapper.Map<Role>(json)));
+            return Mapper.Map<RoleJson>(await RoleStore.Create(Mapper.Map<Role>(json)));
         }
         
         /// <summary>
@@ -106,7 +106,7 @@ namespace AuthorizationCenter.Managers
             // 1. 创建角色
             string roleId = Guid.NewGuid().ToString();
             json.Id = roleId;
-            await Store.Create(Mapper.Map<Role>(json));
+            await RoleStore.Create(Mapper.Map<Role>(json));
             // 2. 创建角色组织关联
             await RoleOrgStore.Create(new RoleOrg
             {
@@ -128,9 +128,9 @@ namespace AuthorizationCenter.Managers
             // 1. 创建角色
             string roleId = Guid.NewGuid().ToString();
             json.Id = roleId;
-            await Store.Create(Mapper.Map<Role>(json));
+            await RoleStore.Create(Mapper.Map<Role>(json));
             // 2. 通过用户ID查询组织ID -用户不能有多个组织
-            var orgId = (from uo in Store.Context.UserOrgs
+            var orgId = (from uo in RoleStore.Context.UserOrgs
                         where uo.UserId == userId
                         select uo.OrgId).Single();
             // TODO：角色名称不能重复
@@ -150,7 +150,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task Delete(RoleJson json)
         {
-            return Store.Delete(Mapper.Map<Role>(json));
+            return RoleStore.Delete(Mapper.Map<Role>(json));
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task DeleteById(string roleId)
         {
-            return Store.Delete(role => role.Id == roleId);
+            return RoleStore.Delete(role => role.Id == roleId);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task DeleteByUserId(string userId, string id)
         {
-            await Store.DeleteByUserId(userId, id);
+            await RoleStore.DeleteByUserId(userId, id);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> Exist(Func<RoleJson, bool> predicate)
         {
-            return Store.Exist(role=> predicate(Mapper.Map<RoleJson>(role)));
+            return RoleStore.Exist(role=> predicate(Mapper.Map<RoleJson>(role)));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> ExistById(string roleId)
         {
-            return Store.Exist(role => role.Id == roleId);
+            return RoleStore.Exist(role => role.Id == roleId);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> ExistByName(string name)
         {
-            return Store.Exist(role => role.Name == name);
+            return RoleStore.Exist(role => role.Name == name);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<RoleJson> Find(Func<RoleJson, bool> predicate)
         {
-            return  Store.Find(role => predicate(Mapper.Map<RoleJson>(role))).Select(role=>Mapper.Map<RoleJson>(role));
+            return  RoleStore.Find(role => predicate(Mapper.Map<RoleJson>(role))).Select(role=>Mapper.Map<RoleJson>(role));
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<RoleJson> FindById(string id)
         {
-            return Store.Find(role => role.Id == id).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
+            return RoleStore.Find(role => role.Id == id).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<IEnumerable<RoleJson>> FindByUserId(string userId)
         {
-            return await Store.FindByUserId(userId).Select(r => Mapper.Map<RoleJson>(r)).ToListAsync();
+            return await RoleStore.FindByUserId(userId).Select(r => Mapper.Map<RoleJson>(r)).ToListAsync();
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace AuthorizationCenter.Managers
                                  where orgIds.Contains(ro.OrgId)
                                  select ro.RoleId).ToListAsync();
             // 2.2 查询角色
-            var roles = await (from role in Store.Context.Roles
+            var roles = await (from role in RoleStore.Context.Roles
                                where roleIds.Contains(role.Id)
                                select role).AsNoTracking().Select(role => Mapper.Map<RoleJson>(role)).ToListAsync();
             return roles;
@@ -265,7 +265,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<RoleJson> FindByName(string name)
         {
-            return Store.Find(role => role.Name == name).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
+            return RoleStore.Find(role => role.Name == name).Select(role => Mapper.Map<RoleJson>(role)).SingleOrDefaultAsync();
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<RoleJson> Update(RoleJson json)
         {
-            return Mapper.Map<RoleJson>(await Store.Update(Mapper.Map<Role>(json)));
+            return Mapper.Map<RoleJson>(await RoleStore.Update(Mapper.Map<Role>(json)));
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<RoleJson> Find()
         {
-            return Store.Find(role=>true).Select(role=> Mapper.Map<RoleJson>(role));
+            return RoleStore.Find(role=>true).Select(role=> Mapper.Map<RoleJson>(role));
         }
 
         ///// <summary>

@@ -20,26 +20,33 @@ namespace AuthorizationCenter.Controllers
     /// </summary>
     public class RoleOrgPerController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
         /// <summary>
         /// 角色组织权限关联
         /// </summary>
         public IRoleOrgPerManager RoleOrgPerManager { get; set; }
 
         /// <summary>
+        /// 权限项管理
+        /// </summary>
+        public IPermissionManager<PermissionJson> PermissionManager { get; set; }
+
+        /// <summary>
+        /// 角色管理
+        /// </summary>
+        public IRoleManager<RoleJson> RoleManager { get; set; }
+
+        /// <summary>
         /// 日志器
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger<RoleOrgPerController>();
 
-        /// <summary>
-        /// 构造器
-        /// </summary>
-        /// <param name="context"></param>
-        public RoleOrgPerController(ApplicationDbContext context)
+        public RoleOrgPerController(IRoleOrgPerManager roleOrgPerManager, IPermissionManager<PermissionJson> permissionManager, IRoleManager<RoleJson> roleManager)
         {
-            _context = context;
+            RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
+            PermissionManager = permissionManager ?? throw new ArgumentNullException(nameof(permissionManager));
+            RoleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
+
 
         /// <summary>
         /// 跳转到列表
@@ -48,8 +55,38 @@ namespace AuthorizationCenter.Controllers
         // GET: RoleOrgPer
         public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
         {
-            var applicationDbContext = _context.RoleOrgPers.Include(r => r.Org).Include(r => r.Per).Include(r => r.Role);
-            return View(await applicationDbContext.ToListAsync());
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理 -查询用户(userId)的角色组织权限列表
+                var roleOrgPers = await RoleOrgPerManager.FindByUserId(SignUser.Id).Include(r => r.Org).Include(r => r.Per).Include(r => r.Role).ToListAsync();
+                // 分页（TODO）
+                return View(roleOrgPers);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -60,22 +97,36 @@ namespace AuthorizationCenter.Controllers
         // GET: RoleOrgPer/Details/5
         public async Task<IActionResult> Details(string id)
         {
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
-
-            var roleOrgPer = await _context.RoleOrgPers
-                .Include(r => r.Org)
-                .Include(r => r.Per)
-                .Include(r => r.Role)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (roleOrgPer == null)
+            try
             {
-                return NotFound();
-            }
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                var roleOrgPer = await RoleOrgPerManager.FindByUserId(SignUser.Id)
+                    .Include(r => r.Org)
+                    .Include(r => r.Per)
+                    .Include(r => r.Role)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (roleOrgPer == null)
+                {
+                    return NotFound();
+                }
 
-            return View(roleOrgPer);
+                return View(roleOrgPer);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -83,13 +134,30 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: RoleOrgPer/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            // 将Entity的数据封装到 SelectList中，制定要生成下拉框选项的value和text属性
-            ViewData["OrgId"] = new SelectList(_context.Organizations, nameof(Organization.Id), nameof(Organization.Name));
-            ViewData["PerId"] = new SelectList(_context.Permissions, nameof(Permission.Id), nameof(Permission.Name));
-            ViewData["RoleId"] = new SelectList(_context.Roles, nameof(Role.Id), nameof(Role.Name));
-            return View();
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                // 将Entity的数据封装到 SelectList中，制定要生成下拉框选项的value和text属性
+                // 查询到可以查询到的组织
+                ViewData["OrgId"] = new SelectList(await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.ORG_QUERY), nameof(Organization.Id), nameof(Organization.Name));
+                // 查询到可以查询到权限项 
+                ViewData["PerId"] = new SelectList(await PermissionManager.FindPerByUserId(SignUser.Id), nameof(Permission.Id), nameof(Permission.Name));
+                // 查询用户所在组织的角色
+                ViewData["RoleId"] = new SelectList(await RoleManager.FindRoleOfOrgByUserId(SignUser.Id), nameof(Role.Id), nameof(Role.Name));
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -104,16 +172,25 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,RoleId,OrgId,PerId")] RoleOrgPer roleOrgPer)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(roleOrgPer);
-                await _context.SaveChangesAsync();
+                // 1. 权限处理
+                if(!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(Index));
+                }
+                // 2. 业务处理
+                await RoleOrgPerManager.CreateByUserId(SignUser.Id,  roleOrgPer);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OrgId"] = new SelectList(_context.Organizations, nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
-            ViewData["PerId"] = new SelectList(_context.Permissions, nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
-            ViewData["RoleId"] = new SelectList(_context.Roles, nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);
-            return View(roleOrgPer);
+            catch(Exception e)
+            {
+                ViewData["OrgId"] = new SelectList(await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.ORG_QUERY), nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
+                ViewData["PerId"] = new SelectList(await PermissionManager.FindPerByUserId(SignUser.Id), nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
+                ViewData["RoleId"] = new SelectList(await RoleManager.FindRoleOfOrgByUserId(SignUser.Id), nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);
+                return View(roleOrgPer);
+            }
         }
 
         /// <summary>
@@ -124,20 +201,35 @@ namespace AuthorizationCenter.Controllers
         // GET: RoleOrgPer/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
-
-            var roleOrgPer = await _context.RoleOrgPers.FindAsync(id);
-            if (roleOrgPer == null)
+            try
             {
-                return NotFound();
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                var roleOrgPer = await RoleOrgPerManager.FindByUserId(SignUser.Id).Where(rop => rop.Id == id).SingleOrDefaultAsync();
+                if (roleOrgPer == null)
+                {
+                    return NotFound();
+                }
+                ViewData["OrgId"] = new SelectList(await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.ORG_QUERY), nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
+                ViewData["PerId"] = new SelectList(await PermissionManager.FindPerByUserId(SignUser.Id), nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
+                ViewData["RoleId"] = new SelectList(await RoleManager.FindRoleOfOrgByUserId(SignUser.Id), nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);
+                return View(roleOrgPer);
             }
-            ViewData["OrgId"] = new SelectList(_context.Organizations, nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
-            ViewData["PerId"] = new SelectList(_context.Permissions, nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
-            ViewData["RoleId"] = new SelectList(_context.Roles, nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);
-            return View(roleOrgPer);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -158,42 +250,24 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            
-            
 
-            if (ModelState.IsValid)
+            try
             {
-                // 1. 权限验证 具有授权权限
-
-                //if (await RoleOrgPerManager.HasPermission(SignUser.Id, "", "Authorization"))
-                //{
-                //    ModelState.AddModelError("All", "没有权限");
-                //    Logger.Warn($"[{nameof(Edit)}] 没有权限 进行角色权限编辑");
-                //    return View("Edit", id);
-                //}
-
-                try
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
                 {
-                    _context.Update(roleOrgPer);
-                    await _context.SaveChangesAsync();
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RoleOrgPerExists(roleOrgPer.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                // 2. 业务处理
+                await RoleOrgPerManager.UpdateByUserId(SignUser.Id, roleOrgPer);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OrgId"] = new SelectList(_context.Organizations, nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
-            ViewData["PerId"] = new SelectList(_context.Permissions, nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
-            ViewData["RoleId"] = new SelectList(_context.Roles, nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);
-            return View(roleOrgPer);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -204,22 +278,32 @@ namespace AuthorizationCenter.Controllers
         // GET: RoleOrgPer/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
+            // 0.参数检查
             if (id == null)
             {
                 return NotFound();
             }
-
-            var roleOrgPer = await _context.RoleOrgPers
-                .Include(r => r.Org)
-                .Include(r => r.Per)
-                .Include(r => r.Role)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (roleOrgPer == null)
+            try
             {
-                return NotFound();
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                var roleOrgPer = await RoleOrgPerManager.FindByUserId(SignUser.Id).Where(rop => rop.Id == id).SingleOrDefaultAsync();
+                if (roleOrgPer == null)
+                {
+                    return NotFound();
+                }
+                return View(roleOrgPer);
             }
-
-            return View(roleOrgPer);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -232,15 +316,23 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var roleOrgPer = await _context.RoleOrgPers.FindAsync(id);
-            _context.RoleOrgPers.Remove(roleOrgPer);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool RoleOrgPerExists(string id)
-        {
-            return _context.RoleOrgPers.Any(e => e.Id == id);
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
+                {
+                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                await RoleOrgPerManager.DeleteByUserId(SignUser.Id, rop => rop.Id == id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>

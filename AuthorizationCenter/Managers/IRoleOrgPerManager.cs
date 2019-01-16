@@ -25,7 +25,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="perName">权限名</param>
-        /// <param name="id"></param>
+        /// <param name="id">用户ID</param>
         /// <returns></returns>
         Task<bool> HasPermissionForUser(string userId, string perName, string id);
 
@@ -72,11 +72,11 @@ namespace AuthorizationCenter.Managers
         IQueryable<RoleOrgPer> FindByRoleId(string roleId);
 
         /// <summary>
-        /// 查询一个用户的权限
+        /// 查询用户(userId)的角色组织权限列表
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        IQueryable<RoleOrgPer> FindByUserId(string id);
+        IQueryable<RoleOrgPer> FindByUserId(string userId);
 
         /// <summary>
         /// 查询通过ID
@@ -91,5 +91,38 @@ namespace AuthorizationCenter.Managers
         /// <param name="id"></param>
         /// <returns></returns>
         IQueryable<RoleOrgPer> DeleteById(string id);
+
+        /// <summary>
+        /// 用户(userId)条件(predicate)删除角色权限
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate">条件</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate);
+
+        /// <summary>
+        /// 用户(userId)为角色授权(roleOrgPer)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="roleOrgPer">角色组织权限关系</param>
+        /// <returns></returns>
+        Task CreateByUserId(string userId, RoleOrgPer roleOrgPer);
+
+        /// <summary>
+        /// 用户(userId)按照条件(predicate)查询角色权限
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        IQueryable<RoleOrgPer> FindByUserId(string userId, Func<RoleOrgPer, bool> predicate);
+
+        /// <summary>
+        /// 用户(userId)更新角色授权(json)
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="roleOrgPer"></param>
+        /// <returns></returns>
+        Task UpdateByUserId(string userId, RoleOrgPer roleOrgPer);
+
     }
 }

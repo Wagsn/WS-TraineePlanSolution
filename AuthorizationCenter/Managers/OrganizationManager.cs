@@ -90,24 +90,37 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="organizationJson"></param>
         /// <returns></returns>
-        public async Task Create(OrganizationJson json)
+        public async Task Create(OrganizationJson organizationJson)
         {
-            var entity = Mapper.Map<Organization>(json);
-            entity.Id = Guid.NewGuid().ToString();
-            await OrganizationStore.Create(entity);
+            var org = Mapper.Map<Organization>(organizationJson);
+            org.Id = Guid.NewGuid().ToString();
+            await OrganizationStore.Create(org);
         }
 
         /// <summary>
-        /// 删除通过ID
+        /// 用户(userId)创建组织(organizationJson)
         /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organizationJson">组织</param>
+        /// <returns></returns>
+        public async Task CreateByUserId(string userId, OrganizationJson organizationJson)
+        {
+            var org = Mapper.Map<Organization>(organizationJson);
+            org.Id = Guid.NewGuid().ToString();
+            await OrganizationStore.CreateByUserId(userId, org);
+        }
+
+        /// <summary>
+        /// 用户(userId)删除组织(orgId)
+        /// </summary>
+        /// <param name="userId">用户ID</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public async Task DeleteById(string orgId)
+        public async Task DeleteByUserId(string userId, string orgId)
         {
-            // 1. 删除组织
-            await OrganizationStore.DeleteById(orgId);
+            await OrganizationStore.DeleteByUserId(userId, orgId);
         }
 
         /// <summary>
@@ -221,14 +234,15 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
-        /// 更新
+        /// 用户(userId)更新组织(organizationJson)
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organizationJson">组织</param>
         /// <returns></returns>
-        public async Task Update(OrganizationJson json)
+        public async Task UpdateByUserId(string userId, OrganizationJson organizationJson)
         {
-            var organization = Mapper.Map<Organization>(json);
-            await OrganizationStore.Update(organization);
+            var org = Mapper.Map<Organization>(organizationJson);
+            await OrganizationStore.UpdateByUserId(userId, org);
         }
     }
 }

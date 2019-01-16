@@ -79,7 +79,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserBaseJsons
-        public async Task<IActionResult> Index(int pageIndex =0, int pageSize =10)
+        public async Task<IActionResult> Index(string orgId = null, int pageIndex =0, int pageSize =10)
         {
             Logger.Trace($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})查询可见用户列表, 请求参数: pageIndex: {pageIndex}, pageSize: {pageSize}");
             ViewData[Constants.SIGNUSER] = SignUser;
@@ -210,8 +210,8 @@ namespace AuthorizationCenter.Controllers
             if (string.IsNullOrWhiteSpace(userJson.SignName) || string.IsNullOrWhiteSpace(userJson.PassWord))
             {
                 ModelState.AddModelError("All", "用户名或密码不能为空");
-                // 查询有权限添加用户的组织
-                return RedirectToAction(nameof(Create));
+                // 查询有权限添加用户的组织 -TODO: 测试这个东西有没问题
+                return RedirectToAction(nameof(Create), new { orgId });
             }
             try
             {
@@ -274,10 +274,10 @@ namespace AuthorizationCenter.Controllers
                 Logger.Trace($"[{nameof(Edit)}] 响应数据:\r\n{JsonUtil.ToJson(user)}");
                 if (user == null)
                 {
-                    Logger.Trace($"[{nameof(Edit)}] 进入编辑界面-用户不存在({id})");
+                    Logger.Trace($"[{nameof(Edit)}] 用户[{SignUser.SignName}]({SignUser.Id})进入编辑界面编辑的用户({id})不存在");
                     return NotFound();
                 }
-                return View(Mapper.Map<UserJson>(user));
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
             {

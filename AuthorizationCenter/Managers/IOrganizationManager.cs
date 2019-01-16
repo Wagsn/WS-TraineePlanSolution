@@ -60,18 +60,20 @@ namespace AuthorizationCenter.Managers
         Task<IEnumerable<Organization>> FindFromUserOrgByUserId(string userId);
 
         /// <summary>
-        /// 创建
+        /// 用户(userId)创建组织(organizationJson)
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organizationJson">组织</param>
         /// <returns></returns>
-        Task Create(TJson json);
+        Task CreateByUserId(string userId, OrganizationJson organizationJson);
 
         /// <summary>
-        /// 更新
+        /// 用户(userId)更新组织(organizationJson)
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="organizationJson">组织</param>
         /// <returns></returns>
-        Task Update(TJson json);
+        Task UpdateByUserId(string userId, OrganizationJson organizationJson);
 
         /// <summary>
         /// 存在
@@ -81,10 +83,11 @@ namespace AuthorizationCenter.Managers
         Task<bool> Exist(Func<TJson, bool> predicate);
 
         /// <summary>
-        /// 删除通过ID
+        /// 用户(userId)删除组织(orgId)
         /// </summary>
-        /// <param name="orgId"></param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task DeleteById(string orgId);
+        Task DeleteByUserId(string userId, string orgId);
     }
 }

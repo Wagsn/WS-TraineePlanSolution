@@ -45,18 +45,20 @@ namespace AuthorizationCenter.Controllers
         readonly ILogger Logger = LoggerManager.GetLogger<UserRolesController>();
 
         /// <summary>
-        /// 构造器
+        /// 
         /// </summary>
         /// <param name="userRoleManager"></param>
         /// <param name="userManager"></param>
         /// <param name="roleManager"></param>
-        public UserRolesController(IUserRoleManager userRoleManager, IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager)
+        /// <param name="roleOrgPerManager"></param>
+        public UserRolesController(IUserRoleManager userRoleManager, IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IRoleOrgPerManager roleOrgPerManager)
         {
-            UserRoleManager = userRoleManager;
-            UserManager = userManager;
-            RoleManager = roleManager;
+            UserRoleManager = userRoleManager ?? throw new ArgumentNullException(nameof(userRoleManager));
+            UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            RoleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
         }
-        
+
         /// <summary>
         /// [MVC] 角色绑定
         /// </summary>
@@ -67,7 +69,7 @@ namespace AuthorizationCenter.Controllers
             try
             {
                 // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLES))
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
                 {
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
@@ -89,18 +91,32 @@ namespace AuthorizationCenter.Controllers
         // GET: UserRoles/Details/5
         public async Task<IActionResult> Details(string id)
         {
+            
+            // 0. 参数检查
             if (id == null)
             {
                 return NotFound();
             }
-            
-            var userRole = await UserRoleManager.FindById(id).FirstOrDefaultAsync();
-            if (userRole == null)
+            try
             {
-                return NotFound();
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                var userRole = await UserRoleManager.FindById(id).FirstOrDefaultAsync();
+                if (userRole == null)
+                {
+                    return NotFound();
+                }
+                return View(userRole);
             }
-
-            return View(userRole);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -108,12 +124,25 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserRoles/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            // 查询 所有的用户角色
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name));
-            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName));
-            return View();
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理 查询 所有的用户角色
+                ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name));
+                ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName));
+                return View();
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -128,18 +157,28 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,RoleId")] UserRole userRole)
         {
-            if (ModelState.IsValid)
+            try
             {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
                 await UserRoleManager.Create(userRole);
                 return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }
             //ViewData["Roles"] = _context.Roles;
             //ViewData["Users"] = _context.UserBases;
 
             // 生成选择框数据
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
-            return View(userRole);
+            //ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+            //ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
+            //return View(userRole);
         }
 
         /// <summary>
@@ -154,15 +193,27 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            
-            var userRole = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
-            if (userRole == null)
+            try
             {
-                return NotFound();
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                var userRole = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
+                if (userRole == null)
+                {
+                    return NotFound();
+                }
+                ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+                ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
+                return View(userRole);
             }
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
-            return View(userRole);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -178,44 +229,38 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,UserId,RoleId")] UserRole userRole)
         {
+            // 0. 参数检查
             if (id != userRole.Id)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            try
             {
-                try
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
                 {
-                    // 重复判断 是否存在UserId和RoleId的关系
-                    if(await UserRoleManager.Exist(ur=> ur.RoleId==userRole.RoleId && ur.UserId == userRole.UserId))
-                    {
-                        ModelState.AddModelError("All", "角色已经被绑定在该用户上");
-                        ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
-                        ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
-                        return View(userRole);
-                    }
-                    else
-                    {
-                        await UserRoleManager.Update(userRole);
-                    }
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
-                catch (DbUpdateConcurrencyException)
+                // 2. 业务处理
+                // 重复判断 是否存在UserId和RoleId的关系
+                if (await UserRoleManager.Exist(ur => ur.RoleId == userRole.RoleId && ur.UserId == userRole.UserId))
                 {
-                    if (!await UserRoleManager.Exist(ur => ur.Id == userRole.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("All", "角色已经被绑定在该用户上");
+                    ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
+                    ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
+                    return View(userRole);
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                {
+                    await UserRoleManager.Update(userRole);
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
-            ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
-            return View(userRole);
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -230,13 +275,26 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
-            var urs = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
-            if (urs == null)
+            try
             {
-                return NotFound();
-            }
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                var urs = await UserRoleManager.FindById(id).SingleOrDefaultAsync();
+                if (urs == null)
+                {
+                    return NotFound();
+                }
 
-            return View(urs);
+                return View(urs);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>
@@ -249,8 +307,21 @@ namespace AuthorizationCenter.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await UserRoleManager.DeleteById(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                await UserRoleManager.DeleteById(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
         }
 
         /// <summary>

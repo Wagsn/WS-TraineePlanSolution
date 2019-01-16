@@ -148,24 +148,32 @@ namespace AuthorizationCenter.Controllers
         [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
         public async Task<IActionResult> Create(string id)
         {
-            Logger.Trace($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})在组织({id})下创建组织, 跳转到创建界面, 请求参数: 组织ID({id})");
+            Logger.Trace($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})在组织({id})下创建组织, 跳转到创建界面");
             try
             {
-                // 1. 权限检查
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_CREATE, id))
+                // 1. 权限检查 -创建组织的视图权限
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_CREATE))
                 {
-                    Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})操作组织({id})");
+                    Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
-                // 2. 业务处理
-                var organizations = await OrganizationManager.Find().ToListAsync();
-                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(organizations)}");
+                // 2. 业务处理 -查询有权限(ORG_CREATE)的组织
+                var org_create_PerOrgs = await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.ORG_CREATE);
+                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(org_create_PerOrgs)}");
+                // 如果id不为空，则只显示一个
                 if (id != null)
                 {
-                    organizations =organizations.Where(org => org.Id == id).ToList();
+                    // 1. 权限检查 -创建组织的视图权限
+                    if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_CREATE, id))
+                    {
+                        Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})操作组织({id})");
+                        ModelState.AddModelError("All", "权限不足");
+                        return RedirectToAction(nameof(Index));
+                    }
+                    org_create_PerOrgs = org_create_PerOrgs.Where(org => org.Id == id).ToList();
                 }
-                ViewData["OrgId"] = new SelectList(organizations, nameof(Organization.Id), nameof(Organization.Name), id);
+                ViewData["OrgId"] = new SelectList(org_create_PerOrgs, nameof(Organization.Id), nameof(Organization.Name), id);
                 return View();
             }
             catch (Exception e)
@@ -199,17 +207,16 @@ namespace AuthorizationCenter.Controllers
                 {
                     Logger.Warn($"[{nameof(Details)}] 权限不足 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.ORG_CREATE})操作组织({organization.ParentId})");
                     ModelState.AddModelError("All", "权限不足");
-                    return View(nameof(Index));
+                    return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
-                // 检查是否存在循环（允许有向无环图的产生，而不仅仅是树形结构）
-                await OrganizationManager.Create(organization);
+                // TODO：检查是否存在循环（允许有向无环图的产生，而不仅仅是树形结构）
+                await OrganizationManager.CreateByUserId(SignUser.Id, organization);
             }
             catch (Exception e)
             {
                 Logger.Error($"[{nameof(Create)}] 服务器发生错误：\r\n" + e);
             }
-            
             return RedirectToAction(nameof(Index));
         }
 
@@ -280,7 +287,7 @@ namespace AuthorizationCenter.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
-                await OrganizationManager.Update(organization);
+                await OrganizationManager.UpdateByUserId(SignUser.Id, organization);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
@@ -321,7 +328,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     return NotFound();
                 }
-                return View(organization);
+                return View(organization); // /Orgznization/Create
             }
             catch (Exception e)
             {
@@ -390,14 +397,14 @@ namespace AuthorizationCenter.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 // 2. 业务处理
-                await OrganizationManager.DeleteById(id);
-                return View(nameof(Index));
+                await OrganizationManager.DeleteByUserId(SignUser.Id, id);
+                return RedirectToAction(nameof(Index));
             }
             catch(Exception e)
             {
                 Logger.Error($"[{nameof(Edit)}] 服务器错误:\r\n{e}");
                 ModelState.AddModelError("All", "保存失败");
-                return RedirectToAction(nameof(Delete), id);
+                return RedirectToAction(nameof(Delete), new { id });
             }
         }
 

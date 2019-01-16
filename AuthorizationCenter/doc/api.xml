@@ -596,7 +596,7 @@
             <param name="roleOrgPerManager"></param>
             <param name="mapper"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserController.Index(System.Int32,System.Int32)">
+        <member name="M:AuthorizationCenter.Controllers.UserController.Index(System.String,System.Int32,System.Int32)">
             <summary>
             列表 -跳转到列表界面
             </summary>
@@ -691,13 +691,14 @@
             日志记录器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserRolesController.#ctor(AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson})">
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.#ctor(AuthorizationCenter.Managers.IUserRoleManager,AuthorizationCenter.Managers.IUserManager{AuthorizationCenter.Dto.Jsons.UserJson},AuthorizationCenter.Managers.IRoleManager{AuthorizationCenter.Dto.Jsons.RoleJson},AuthorizationCenter.Managers.IRoleOrgPerManager)">
             <summary>
-            构造器
+            
             </summary>
             <param name="userRoleManager"></param>
             <param name="userManager"></param>
             <param name="roleManager"></param>
+            <param name="roleOrgPerManager"></param>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index(System.Int32,System.Int32)">
             <summary>
@@ -1979,18 +1980,20 @@
             <param name="userId">用户ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Create(`0)">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.CreateByUserId(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            创建
+            用户(userId)创建组织(organizationJson)
             </summary>
-            <param name="json"></param>
+            <param name="userId">用户ID</param>
+            <param name="organizationJson">组织</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Update(`0)">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.UpdateByUserId(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            更新
+            用户(userId)更新组织(organizationJson)
             </summary>
-            <param name="json"></param>
+            <param name="userId">用户ID</param>
+            <param name="organizationJson">组织</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.Exist(System.Func{`0,System.Boolean})">
@@ -2000,11 +2003,12 @@
             <param name="predicate"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.DeleteById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.DeleteByUserId(System.String,System.String)">
             <summary>
-            删除通过ID
+            用户(userId)删除组织(orgId)
             </summary>
-            <param name="orgId"></param>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.IPermissionManager`1">
@@ -2502,13 +2506,22 @@
             <summary>
             创建
             </summary>
-            <param name="json"></param>
+            <param name="organizationJson"></param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.OrganizationManager.DeleteById(System.String)">
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.CreateByUserId(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            删除通过ID
+            用户(userId)创建组织(organizationJson)
             </summary>
+            <param name="userId">用户ID</param>
+            <param name="organizationJson">组织</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除组织(orgId)
+            </summary>
+            <param name="userId">用户ID</param>
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
@@ -2570,11 +2583,12 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
-        <member name="M:AuthorizationCenter.Managers.OrganizationManager.Update(AuthorizationCenter.Dto.Jsons.OrganizationJson)">
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.UpdateByUserId(System.String,AuthorizationCenter.Dto.Jsons.OrganizationJson)">
             <summary>
-            更新
+            用户(userId)更新组织(organizationJson)
             </summary>
-            <param name="json"></param>
+            <param name="userId">用户ID</param>
+            <param name="organizationJson">组织</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.PermissionManager">
@@ -3592,7 +3606,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.CreateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
             <summary>
-            [组织关系表] 用户(userId)创建组织(organization)
+            [组织扩展表] 用户(userId)创建组织(organization)
             添加一个组织会在组织扩展表中添加数据
             </summary>
             <param name="userId">用户ID</param>
@@ -3601,7 +3615,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.UpdateByUserId(System.String,AuthorizationCenter.Entitys.Organization)">
             <summary>
-            [组织关系表] 用户(userId)更新组织(organization)
+            [组织扩展表] 用户(userId)更新组织(organization)
             ID和ParentId不可修改
             TODO：可以更改组织架构（即修改ParentId）
             </summary>
@@ -3611,7 +3625,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteRelById(System.String,System.String,System.Boolean)">
             <summary>
-            [组织关系表] 删除关联
+            [组织扩展表] 删除关联
             </summary>
             <param name="sonId">子组织ID</param>
             <param name="parentId">父组织ID</param>
@@ -3620,14 +3634,14 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteRelById(System.String)">
             <summary>
-            [组织关系表] 删除与组织(orgId)有关的关联
+            [组织扩展表] 删除与组织(orgId)有关的关联
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.CreateRelById(System.String,System.String,System.Boolean)">
             <summary>
-            [组织关系表] 添加关联
+            [组织扩展表] 添加关联
             </summary>
             <param name="sonId">子组织ID</param>
             <param name="parentId">父组织ID</param>
@@ -3636,7 +3650,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteByUserId(System.String,System.String)">
             <summary>
-            [组织关系表] 用户(userId)删除组织(orgId)
+            [组织扩展表] 用户(userId)删除组织(orgId)
             删除关联表
             </summary>
             <param name="userId">用户ID</param>
@@ -4115,7 +4129,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String,System.String)">
             <summary>
-            删除通过用户ID
+            用户(userIds)删除用户(id)
             </summary>
             <param name="userId">用户ID</param>
             <param name="id">被删除用户ID</param>

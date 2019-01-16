@@ -66,10 +66,10 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PermissionJson>> FindByUserId(string userId)
+        public async Task<IEnumerable<PermissionJson>> FindPerByUserId(string userId)
         {
             // 查询有权组织
-            var perOegs = RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.PER_QUERY);
+            //var perOegs = RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.PER_QUERY);
             return await Find().ToListAsync();
         }
 

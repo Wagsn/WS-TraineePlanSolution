@@ -47,26 +47,13 @@ namespace AuthorizationCenter.Stores
             try
             {
                 Logger.Trace($"[{nameof(Create)}] 新建实体:\r\n{JsonUtil.ToJson(entity)}");
-                using(var trans = Context.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        Context.Set<TEntity>().Add(entity);
-                        //var res =await Context.AddAsync(entity);
-                        await Context.SaveChangesAsync();
-                        trans.Commit();
-                    }
-                    catch(Exception e)
-                    {
-                        //trans.Rollback();
-                        Logger.Error($"[{nameof(Create)}] 事务提交失败:\r\n" + e);
-                    }
-                }
+                Context.Set<TEntity>().Add(entity);
+                //var res =await Context.AddAsync(entity);
+                await Context.SaveChangesAsync();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Logger.Error($"[{nameof(Create)}] 新建实体:\r\n{JsonUtil.ToJson(entity)}\r\n失败：\r\n"+e);
-                throw e;
+                Logger.Error($"[{nameof(Create)}] 新建实体:\r\n{JsonUtil.ToJson(entity)}\r\n失败：\r\n" + e);
             }
             return entity;
         }

@@ -33,13 +33,13 @@ namespace AuthorizationCenter
             #region << 数据导入，TODO：数据转移到数据文件 >>
 
             // 初始用户
-            string rootUserId = Guid.NewGuid().ToString();
-            string xkjUserRootId = Guid.NewGuid().ToString();
+            string root_UserId = Guid.NewGuid().ToString();
+            string xkj_UserId = Guid.NewGuid().ToString();
             context.AddRange(new List<User>
             {
                 new User
                 {
-                    Id = rootUserId,
+                    Id = root_UserId,
                     SignName = "Wagsn",
                     PassWord = "123456"
                 },
@@ -51,26 +51,26 @@ namespace AuthorizationCenter
                 },
                 new User
                 {
-                    Id = xkjUserRootId,
+                    Id = xkj_UserId,
                     SignName = "xkjadmin",
                     PassWord = "123456"
                 }
             });
 
             // 初始角色
-            string roleRootId = Guid.NewGuid().ToString();
-            string xkjRoleRootId = Guid.NewGuid().ToString();
+            string root_RoleId = Guid.NewGuid().ToString();
+            string xkj_RoleId = Guid.NewGuid().ToString();
             context.AddRange(new List<Role>
             {
                 new Role
                 {
-                    Id = roleRootId,
+                    Id = root_RoleId,
                     Name = "SysRoleRoot",
                     Decription = "系统最高权限者"
                 },
                 new Role
                 {
-                    Id = xkjRoleRootId,
+                    Id = xkj_RoleId,
                     Name = "XKJRoot",
                     Decription = "新空间最高权限者"
                 },
@@ -107,205 +107,247 @@ namespace AuthorizationCenter
             });
 
             // 初始组织
-            string orgRootId = Guid.NewGuid().ToString();
-            string xkjOrgRootId = Guid.NewGuid().ToString(); 
+            string root_OrgId = Guid.NewGuid().ToString();
+            string xyh_OrgId = Guid.NewGuid().ToString();
+            string xkj_OrgId = Guid.NewGuid().ToString(); 
+            string xkj_km_OrgId = Guid.NewGuid().ToString();
             context.AddRange(new List<Organization>
             {
                 new Organization
                 {
-                    Id = orgRootId,
-                    Name = "OrgRoot",
-                    Description = "根组织",
+                    Id = root_OrgId,
+                    Name = "SysOrgRoot",
+                    Description = "系统默认根组织",
                     ParentId = null
                 },
                 new Organization
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    ParentId =orgRootId,
+                    Id = xyh_OrgId,
+                    ParentId =root_OrgId,
                     Name = "新耀行",
                     Description = "房产中介"
                 },
                 new Organization
                 {
-                    Id = xkjOrgRootId,
-                    ParentId = orgRootId,
+                    Id = xkj_OrgId,
+                    ParentId = root_OrgId,
                     Name = "新空间（重庆）科技有限公司",
                     Description = "致力于商业地产服务"
                 },
                 new Organization
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    ParentId = xkjOrgRootId,
+                    Id = xkj_km_OrgId,
+                    ParentId = xkj_OrgId,
                     Name = "新空间昆明分公司",
                     Description = "新空间昆明分公司"
                 }
             });
 
+            // 组织扩展
+            context.AddRange(new List<OrganizationRelation>
+            {
+                new OrganizationRelation
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ParentId = root_OrgId,
+                    SonId = xkj_OrgId,
+                    IsDirect = true
+                },
+                new OrganizationRelation
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ParentId = root_OrgId,
+                    SonId = xyh_OrgId,
+                    IsDirect = true
+                },
+                new OrganizationRelation
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ParentId = root_OrgId,
+                    SonId = xkj_km_OrgId,
+                    IsDirect = false
+                },
+                new OrganizationRelation
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ParentId = xkj_OrgId,
+                    SonId = xkj_km_OrgId,
+                    IsDirect =true
+                }
+            });
+
             // 初始权限
-            string perRootId = Guid.NewGuid().ToString();
-            string roleManageId = Guid.NewGuid().ToString();
-            string roleSaveId = Guid.NewGuid().ToString();
-            string roleCreateId = Guid.NewGuid().ToString();
-            string userManageId = Guid.NewGuid().ToString();
-            string userSaveId = Guid.NewGuid().ToString();
-            string orgManageId = Guid.NewGuid().ToString();
-            string orgSaveId = Guid.NewGuid().ToString();
-            string perManageId = Guid.NewGuid().ToString();
+            string root_PerId = Guid.NewGuid().ToString();
+            string role_manage_PerId = Guid.NewGuid().ToString();
+            string role_save_PerId = Guid.NewGuid().ToString();
+            string role_create_PerId = Guid.NewGuid().ToString();
+            string user_manage_PerId = Guid.NewGuid().ToString();
+            string user_save_PerId = Guid.NewGuid().ToString();
+            string org_manage_PerId = Guid.NewGuid().ToString();
+            string org_save_PerId = Guid.NewGuid().ToString();
+            string per_manage_PerId = Guid.NewGuid().ToString();
             context.AddRange(new List<Permission>
             {
                 new Permission
                 {
-                    Id = perRootId,
+                    Id = root_PerId,
                     Name = Constants.ROOT,
                     Description = "最高权限",
                     ParentId = null
                 },
                 new Permission
                 {
-                    Id = userManageId,
+                    Id = user_manage_PerId,
                     Name = Constants.USER_MANAGE,
                     Description = "用户管理",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 },
                 new Permission
                 {
-                    Id = userSaveId,
+                    Id = user_save_PerId,
                     Name = Constants.USER_SAVE,
                     Description = "用户保存",
-                    ParentId = userManageId
+                    ParentId = user_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USER_QUERY,
                     Description = "用户查询",
-                    ParentId = userManageId
+                    ParentId = user_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USER_DETAILS,
                     Description = "用户详情", // 用户的详细信息（不包括，用户ID，用户名等基础信息）
-                    ParentId = userManageId
+                    ParentId = user_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USER_UPDATE,
                     Description = "用户更新",
-                    ParentId = userSaveId
+                    ParentId = user_save_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USER_CREATE,
                     Description = "用户创建",
-                    ParentId = userSaveId
+                    ParentId = user_save_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USER_DELETE,
                     Description = "用户删除",
-                    ParentId = userManageId
+                    ParentId = user_manage_PerId
                 }, // Manage == Delete|Update|Create|Query > Delete > Save == Update|Create > Update > Create > Query
                 new Permission
                 {
-                    Id = roleManageId,
+                    Id = role_manage_PerId,
                     Name = Constants.ROLE_MANAGE,
                     Description = "角色管理",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 },
                 new Permission
                 {
-                    Id = roleSaveId,
+                    Id = role_save_PerId,
                     Name = Constants.ROLE_SAVE,
                     Description = "角色保存",
-                    ParentId = roleManageId
+                    ParentId = role_manage_PerId
                 },
                 new Permission
                 {
-                    Id = roleCreateId,
+                    Id = role_create_PerId,
                     Name = Constants.ROLE_CREATE,
                     Description = "角色添加",
-                    ParentId = roleSaveId
+                    ParentId = role_save_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ROLE_CREATE_VIEW,
                     Description = "角色角色添加界面",
-                    ParentId = roleCreateId
+                    ParentId = role_create_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ROLE_QUERY,
                     Description = "角色查询",
-                    ParentId = roleManageId
+                    ParentId = role_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.USERROLE_MANAGE,
                     Description = "角色绑定",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 },
                 new Permission
                 {
-                    Id = orgManageId,  // 功能模块
+                    Id = org_manage_PerId,  // 功能模块
                     Name = Constants.ORG_MANAGE,
                     Description = "组织管理",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 },
                 new Permission
                 {
-                    Id = orgSaveId,
+                    Id = org_save_PerId,
                     Name = Constants.ORG_SAVE,
                     Description = "组织保存",
-                    ParentId = orgManageId
+                    ParentId = org_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ORG_CREATE,
                     Description ="组织创建",
-                    ParentId = orgSaveId
+                    ParentId = org_save_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ORG_UPDATE,
                     Description ="组织更新",
-                    ParentId = orgSaveId
+                    ParentId = org_save_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.ORG_QUERY,
                     Description = "组织查询",
-                    ParentId = orgManageId
+                    ParentId = org_manage_PerId
+                },
+                new Permission
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = Constants.ORG_DELETE,
+                    Description = "组织删除",
+                    ParentId = org_manage_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.AUTH_MANAGE,
                     Description = "授权管理",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 },
                 new Permission
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = Constants.PER_QUERY,
                     Description = "权限查询",
-                    ParentId = perManageId
+                    ParentId = per_manage_PerId
                 },
                 new Permission
                 {
-                    Id = perManageId,
+                    Id = per_manage_PerId,
                     Name = Constants.PER_MANAGE,
                     Description = "权限管理",
-                    ParentId = perRootId
+                    ParentId = root_PerId
                 }
             });
 
@@ -315,14 +357,14 @@ namespace AuthorizationCenter
                 new UserRole
                 {
                     Id = Guid.NewGuid().ToString(),
-                    RoleId = roleRootId,
-                    UserId = rootUserId
+                    RoleId = root_RoleId,
+                    UserId = root_UserId
                 },
                 new UserRole
                 {
                     Id = Guid.NewGuid().ToString(),
-                    RoleId = xkjRoleRootId,
-                    UserId = xkjUserRootId
+                    RoleId = xkj_RoleId,
+                    UserId = xkj_UserId
                 }
             });
 
@@ -332,14 +374,14 @@ namespace AuthorizationCenter
                 new UserOrg
                 {
                     Id = Guid.NewGuid().ToString(),
-                    UserId = rootUserId,
-                    OrgId = orgRootId
+                    UserId = root_UserId,
+                    OrgId = root_OrgId
                 },
                 new UserOrg
                 {
                     Id = Guid.NewGuid().ToString(),
-                    UserId = xkjUserRootId,
-                    OrgId = xkjOrgRootId
+                    UserId = xkj_UserId,
+                    OrgId = xkj_OrgId
                 }
             });
 
@@ -349,14 +391,14 @@ namespace AuthorizationCenter
                 new RoleOrg
                 {
                     Id = Guid.NewGuid().ToString(),
-                    RoleId = roleRootId,
-                    OrgId = orgRootId
+                    RoleId = root_RoleId,
+                    OrgId = root_OrgId
                 },
                 new RoleOrg
                 {
                     Id = Guid.NewGuid().ToString(),
-                    RoleId = xkjRoleRootId,
-                    OrgId = xkjOrgRootId
+                    RoleId = xkj_RoleId,
+                    OrgId = xkj_OrgId
                 }
             });
 
@@ -366,27 +408,27 @@ namespace AuthorizationCenter
             {
                 new RoleOrgPer
                 {
-                    RoleId = roleRootId, // 角色
-                    OrgId = orgRootId,  // 数据范围
-                    PerId = perRootId  // 权限范围
+                    RoleId = root_RoleId, // 角色
+                    OrgId = root_OrgId,  // 数据范围
+                    PerId = root_PerId  // 权限范围
                 },
                 new RoleOrgPer
                 {
-                    RoleId = xkjRoleRootId,
-                    OrgId = xkjOrgRootId,
-                    PerId = userManageId
+                    RoleId = xkj_RoleId,
+                    OrgId = xkj_OrgId,
+                    PerId = user_manage_PerId
                 },
                 new RoleOrgPer
                 {
-                    RoleId = xkjRoleRootId,
-                    OrgId = xkjOrgRootId,
-                    PerId = orgManageId
+                    RoleId = xkj_RoleId,
+                    OrgId = xkj_OrgId,
+                    PerId = org_manage_PerId
                 },
                 new RoleOrgPer
                 {
-                    RoleId = xkjRoleRootId,
-                    OrgId = xkjOrgRootId,
-                    PerId = roleManageId
+                    RoleId = xkj_RoleId,
+                    OrgId = xkj_OrgId,
+                    PerId = role_manage_PerId
                 }
             });
 

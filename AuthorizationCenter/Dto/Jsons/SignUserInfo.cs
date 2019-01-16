@@ -18,7 +18,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// <summary>
         /// 用户名
         /// </summary>
-        public string SignName { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// 组织ID -用户登陆到哪个组织的
