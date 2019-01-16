@@ -22,7 +22,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<IQueryable<TodoItem>> DeleteById(string id)
+        public Task<IEnumerable<TodoItem>> DeleteById(string id)
         {
             return Delete(ti => ti.Id == id);
         }
@@ -32,7 +32,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Task<IQueryable<TodoItem>> DeleteByName(string name)
+        public Task<IEnumerable<TodoItem>> DeleteByName(string name)
         {
             return Delete(ti => ti.Name == name);
         }

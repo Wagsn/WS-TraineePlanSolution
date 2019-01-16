@@ -263,7 +263,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<IQueryable<Organization>> DeleteById(string id)
+        public Task<IEnumerable<Organization>> DeleteById(string id)
         {
             return Delete(org => org.Id == id);
         }
@@ -274,7 +274,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name">组织名</param>
         /// <returns></returns>
-        public Task<IQueryable<Organization>> DeleteByName(string name)
+        public Task<IEnumerable<Organization>> DeleteByName(string name)
         {
             return Delete(org => org.Name == name);
         }

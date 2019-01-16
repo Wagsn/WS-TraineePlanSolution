@@ -110,7 +110,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<IQueryable<PermissionJson>> DeleteById(string id)
+        public async Task<IEnumerable<PermissionJson>> DeleteById(string id)
         {
             return (await Store.Delete(ur => ur.Id == id)).Select(per =>Mapper.Map<PermissionJson>(per));
         }

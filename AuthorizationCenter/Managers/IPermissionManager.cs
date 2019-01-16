@@ -63,6 +63,6 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IQueryable<TJson>> DeleteById(string id);
+        Task<IEnumerable<TJson>> DeleteById(string id);
     }
 }

@@ -11,6 +11,7 @@ using AuthorizationCenter.Dto.Jsons;
 using Microsoft.AspNetCore.Http;
 using AuthorizationCenter.Define;
 using WS.Log;
+using WS.Text;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -40,6 +41,12 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         public ILogger Logger = LoggerManager.GetLogger<RoleOrgPerController>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roleOrgPerManager"></param>
+        /// <param name="permissionManager"></param>
+        /// <param name="roleManager"></param>
         public RoleOrgPerController(IRoleOrgPerManager roleOrgPerManager, IPermissionManager<PermissionJson> permissionManager, IRoleManager<RoleJson> roleManager)
         {
             RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
@@ -186,6 +193,7 @@ namespace AuthorizationCenter.Controllers
             }
             catch(Exception e)
             {
+                Logger.Error($"[{nameof(Create)}] 用户[{SignUser.SignName}]({SignUser.Id})删除角色权限:\r\n{JsonUtil.ToJson(roleOrgPer)}\r\n失败:\r\n{e}");
                 ViewData["OrgId"] = new SelectList(await RoleOrgPerManager.FindOrgByUserIdPerName(SignUser.Id, Constants.ORG_QUERY), nameof(Organization.Id), nameof(Organization.Name), roleOrgPer.OrgId);
                 ViewData["PerId"] = new SelectList(await PermissionManager.FindPerByUserId(SignUser.Id), nameof(Permission.Id), nameof(Permission.Name), roleOrgPer.PerId);
                 ViewData["RoleId"] = new SelectList(await RoleManager.FindRoleOfOrgByUserId(SignUser.Id), nameof(Role.Id), nameof(Role.Name), roleOrgPer.RoleId);

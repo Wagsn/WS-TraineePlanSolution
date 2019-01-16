@@ -23,7 +23,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<IQueryable<Permission>> DeleteById(string id)
+        public Task<IEnumerable<Permission>> DeleteById(string id)
         {
             return Delete(perm => perm.Id == id);
         }
@@ -33,7 +33,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Task<IQueryable<Permission>> DeleteByName(string name)
+        public Task<IEnumerable<Permission>> DeleteByName(string name)
         {
             return Delete(per => per.Name == name);
         }

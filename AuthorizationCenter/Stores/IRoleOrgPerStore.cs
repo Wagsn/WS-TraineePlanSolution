@@ -18,5 +18,7 @@ namespace AuthorizationCenter.Stores
         /// <param name="perName">权限名称</param>
         /// <returns></returns>
         Task<IEnumerable<Organization>> FindOrgByUserIdPerName(string userId, string perName);
+
+
     }
 }

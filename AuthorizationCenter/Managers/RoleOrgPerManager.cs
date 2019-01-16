@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WS.Log;
 
 namespace AuthorizationCenter.Managers
 {
@@ -30,6 +31,11 @@ namespace AuthorizationCenter.Managers
         /// 组织存储
         /// </summary>
         IOrganizationStore OrganizationStore { get; set; }
+
+        /// <summary>
+        /// 日志器
+        /// </summary>
+        readonly ILogger Logger = LoggerManager.GetLogger<RoleOrgPerManager>();
 
         /// <summary>
         /// 
@@ -61,6 +67,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate)
         {
+            Logger.Trace($"[{nameof(DeleteByUserId)}] 用户{userId}条件删除角色权限");
             await RoleOrgPerStore.Delete(predicate);
         }
 
@@ -243,6 +250,18 @@ namespace AuthorizationCenter.Managers
         public async Task UpdateByUserId(string userId, RoleOrgPer roleOrgPer)
         {
             await RoleOrgPerStore.Update(roleOrgPer);
+        }
+
+        /// <summary>
+        /// 用户(userId)通过条件(predicate)查询角色权限
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IQueryable<RoleOrgPer> FindByUserId(string userId, Func<RoleOrgPer, bool> predicate)
+        {
+            
+            return RoleOrgPerStore.Find(predicate);
         }
     }
 }

@@ -137,7 +137,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<RoleOrgPer>(b =>
             {
-                b.ToTable("role_organization_permission_relation");
+                b.ToTable("role_org_per_relation");
                 //b.Property(p => p.Id).ValueGeneratedOnAddOrUpdate();
             });
 
@@ -148,7 +148,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserPermissionExpansion>(b =>
             {
-                b.ToTable("user_role_organization_permission_expansion");
+                b.ToTable("user_role_org_per_expansion");
             });
             #endregion
         }

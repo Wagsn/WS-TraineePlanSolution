@@ -80,7 +80,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        Task<IQueryable<TEntity>> Delete(Func<TEntity, bool> predicate);
+        Task<IEnumerable<TEntity>> Delete(Func<TEntity, bool> predicate);
 
         /// <summary>
         /// 删除 -异步

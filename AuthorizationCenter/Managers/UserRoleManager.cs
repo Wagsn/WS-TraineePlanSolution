@@ -93,7 +93,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<IQueryable<UserRole>> DeleteById(string id)
+        public Task<IEnumerable<UserRole>> DeleteById(string id)
         {
             return Store.Delete(ur => ur.Id == id);
         }

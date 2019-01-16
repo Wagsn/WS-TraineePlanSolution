@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace AuthorizationCenter.Controllers
+﻿namespace AuthorizationCenter.Controllers
 {
     /// <summary>
     /// 用于检查服务连通性
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class CheckController: Controller // ControllerBase
+
+    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
+    [Microsoft.AspNetCore.Mvc.ApiController]
+    public class CheckController: Microsoft.AspNetCore.Mvc.Controller // ControllerBase
     {
         /// <summary>
         /// 检查
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public ActionResult<string> Get()
+        [Microsoft.AspNetCore.Mvc.HttpGet]
+        [Filters.NoSign]
+        public Microsoft.AspNetCore.Mvc.ActionResult<string> Get()
         {
             return "The website is working.";
         }
@@ -24,7 +24,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         [Filters.NoSign]
-        public ViewResult Check()
+        public Microsoft.AspNetCore.Mvc.ViewResult Check()
         {
             return View();
         }

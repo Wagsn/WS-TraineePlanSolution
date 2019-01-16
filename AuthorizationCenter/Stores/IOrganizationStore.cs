@@ -94,5 +94,13 @@ namespace AuthorizationCenter.Stores
         /// <param name="resourceId">资源ID</param>
         /// <returns></returns>
         Task<IEnumerable<Organization>> FindByUserIdSrcId<TResource>(string userId, string resourceId) where TResource : class;
+
+        ///// <summary>
+        ///// 用户(userId)查询包含权限(perName)的组织
+        ///// </summary>
+        ///// <param name="userId">用户ID</param>
+        ///// <param name="perName">权限名</param>
+        ///// <returns></returns>
+        //Task<IEnumerable<Organization>> FindPerOrgByUserIdPerName(string userId, string perName);
     }
 }

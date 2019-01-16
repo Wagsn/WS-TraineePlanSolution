@@ -57,7 +57,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IQueryable<UserRole>> DeleteById(string id);
+        Task<IEnumerable<UserRole>> DeleteById(string id);
 
     }
 }

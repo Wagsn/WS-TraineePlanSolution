@@ -1,6 +1,7 @@
 ﻿using AuthorizationCenter.Entitys;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Log;
@@ -96,7 +97,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id">用户ID</param>
         /// <returns></returns>
-        public Task<IQueryable<User>> DeleteById(string id)
+        public Task<IEnumerable<User>> DeleteById(string id)
         {
             // 打印日志
             Logger.Trace($"[{nameof(DeleteById)}] 条件删除用户({id})");
@@ -149,7 +150,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="name">用户名</param>
         /// <returns></returns>
-        public Task<IQueryable<User>> DeleteByName(string name)
+        public Task<IEnumerable<User>> DeleteByName(string name)
         {
             // 打印日志
             Logger.Trace($"[{nameof(DeleteByName)}] 条件删除用户({name})");

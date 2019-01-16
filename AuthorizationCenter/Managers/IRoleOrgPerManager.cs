@@ -112,7 +112,7 @@ namespace AuthorizationCenter.Managers
         /// 用户(userId)按照条件(predicate)查询角色权限
         /// </summary>
         /// <param name="userId"></param>
-        /// <param name="func"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
         IQueryable<RoleOrgPer> FindByUserId(string userId, Func<RoleOrgPer, bool> predicate);
 

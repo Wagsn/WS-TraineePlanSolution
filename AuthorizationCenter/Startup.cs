@@ -77,7 +77,7 @@ namespace AuthorizationCenter
 
             services.AddDbContext<ApplicationDbContext>(it =>
             {
-                it.UseMySql(configuration["Data:DefaultConnection:ConnectionString"] ?? "server=localhost;database=ws_internship2;user=admin;password=123456;");
+                it.UseMySql(configuration["Data:DefaultConnection:ConnectionString"] ?? "server=localhost;database=ws_traineeplan;user=admin;password=123456;");
                 //it.UseMySql("server=192.168.100.132;database=ws_internship;user=admin;password=123456;");
             });
         }

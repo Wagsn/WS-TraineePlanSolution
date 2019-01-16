@@ -29,13 +29,13 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="id">ID</param>
         /// <returns></returns>
-        Task<IQueryable<TEntity>> DeleteById(string id);
+        Task<IEnumerable<TEntity>> DeleteById(string id);
 
         /// <summary>
         /// 删除 -通过名称删除
         /// </summary>
         /// <param name="name">名称</param>
         /// <returns></returns>
-        Task<IQueryable<TEntity>> DeleteByName(string name);
+        Task<IEnumerable<TEntity>> DeleteByName(string name);
     }
 }

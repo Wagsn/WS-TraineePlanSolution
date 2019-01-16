@@ -29,15 +29,15 @@ namespace AuthorizationCenter.Entitys
         /// </summary>
         public User User { get; set; }
 
-        /// <summary>
-        /// 角色ID
-        /// </summary>
-        public string RoleId { get; set; }
+        ///// <summary>
+        ///// 角色ID
+        ///// </summary>
+        //public string RoleId { get; set; }
 
-        /// <summary>
-        /// 角色
-        /// </summary>
-        public Role Role { get; set; }
+        ///// <summary>
+        ///// 角色
+        ///// </summary>
+        //public Role Role { get; set; }
 
         /// <summary>
         /// 组织ID

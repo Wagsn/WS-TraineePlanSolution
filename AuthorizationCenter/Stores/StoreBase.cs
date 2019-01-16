@@ -1,6 +1,7 @@
 ﻿using AuthorizationCenter.Entitys;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WS.Log;
@@ -177,21 +178,20 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="predicate">条件表达式</param>
         /// <returns></returns>
-        public virtual async Task<IQueryable<TEntity>> Delete(Func<TEntity, bool> predicate)
+        public virtual async Task<IEnumerable<TEntity>> Delete(Func<TEntity, bool> predicate)
         {
-            var entitys =Find().Where(entity => predicate(entity));
-            Context.RemoveRange(entitys);
-
             try
             {
+                var entitys = await Find().Where(entity => predicate(entity)).AsNoTracking().ToListAsync();
+                Context.RemoveRange(entitys);
                 await Context.SaveChangesAsync();
+                return entitys;
             }
             catch(Exception e)
             {
-                Logger.Error($"[{nameof(Delete)}] 条件删除失败: \r\n" + e);
-                throw e;
+                Logger.Error($"[{nameof(Delete)}] {typeof(TEntity).Name}条件删除失败: \r\n" + e);
+                throw new Exception($"{typeof(TEntity).Name}条件删除失败", e);
             }
-            return entitys;
         }
         
         /// <summary>
@@ -201,18 +201,17 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public virtual async Task<TEntity> Delete(TEntity entity)
         {
-            var result =Context.Remove(entity).Entity;
-
             try
             {
+                var result =Context.Remove(entity).Entity;
                 await Context.SaveChangesAsync();
+                return result;
             }
             catch (Exception e)
             {
                 Logger.Error($"[{nameof(Delete)}] 实体删除失败: \r\n" + e);
                 throw e;
             }
-            return result;
         }
     }
 }
