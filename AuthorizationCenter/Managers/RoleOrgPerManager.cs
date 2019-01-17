@@ -68,7 +68,11 @@ namespace AuthorizationCenter.Managers
         public async Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate)
         {
             Logger.Trace($"[{nameof(DeleteByUserId)}] 用户{userId}条件删除角色权限");
-            await RoleOrgPerStore.Delete(predicate);
+            var roleOrgPers = await RoleOrgPerStore.Find(predicate).AsNoTracking().ToListAsync();
+            foreach(var rop in roleOrgPers)
+            {
+                await RoleOrgPerStore.DeleteByUserId(userId, rop.Id);
+            }
         }
 
         /// <summary>
@@ -103,6 +107,36 @@ namespace AuthorizationCenter.Managers
                           where ur.UserId == userId  
                           select ur.RoleId).Contains(rop.RoleId) // 1. 查询用户的角色
                    select rop; // 2. 查询角色组织权限关联
+        }
+
+        /// <summary>
+        /// 查询用户(userId)可见的角色组织权限列表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<RoleOrgPer>> FindForPerByUserId(string userId)
+        {
+            // 1. 查询用户的有权组织
+            // 2. 
+            return from rop in RoleOrgPerStore.Context.Set<RoleOrgPer>()
+                   where (from ur in RoleOrgPerStore.Context.Set<UserRole>()
+                          where ur.UserId == userId
+                          select ur.RoleId).Contains(rop.RoleId) // 1. 查询用户的角色
+                   select rop; // 2. 查询角色组织权限关联
+        }
+
+        /// <summary>
+        /// 用户(userId)查询可见的角色组织权限列表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<RoleOrgPer>> FindFromOrgByUserId(string userId)
+        {
+            // 查询用户包含权限的组织
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.AUTH_MANAGE)).Select(org => org.Id);
+            // 查询组织相关的角色权限关联
+            var roleOrgPers = await RoleOrgPerStore.Find(rop => perOrgIds.Contains(rop.OrgId)).Include(r => r.Org).Include(r => r.Per).Include(r => r.Role).AsNoTracking().ToListAsync();
+            return roleOrgPers;
         }
 
         /// <summary>
@@ -237,8 +271,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task CreateByUserId(string userId, RoleOrgPer roleOrgPer)
         {
-            
-            await RoleOrgPerStore.Create(roleOrgPer);
+            await RoleOrgPerStore.CreateByUserId(userId, roleOrgPer);
         }
 
         /// <summary>
@@ -249,7 +282,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task UpdateByUserId(string userId, RoleOrgPer roleOrgPer)
         {
-            await RoleOrgPerStore.Update(roleOrgPer);
+            await RoleOrgPerStore.UpdateByUserId(userId, roleOrgPer);
         }
 
         /// <summary>
@@ -260,8 +293,16 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<RoleOrgPer> FindByUserId(string userId, Func<RoleOrgPer, bool> predicate)
         {
-            
             return RoleOrgPerStore.Find(predicate);
+        }
+
+        /// <summary>
+        /// 重新扩展用户组织权限表
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReExpansion()
+        {
+            await RoleOrgPerStore.ReExpansion();
         }
     }
 }

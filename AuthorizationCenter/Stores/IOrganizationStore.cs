@@ -52,6 +52,13 @@ namespace AuthorizationCenter.Stores
         IQueryable<Organization> FindChildrenFromRelById(string orgId);
 
         /// <summary>
+        /// [组织关系表] 找到组织ID集合的所有子组织（包括自身）
+        /// </summary>
+        /// <param name="orgIds">组织ID集合</param>
+        /// <returns></returns>
+        IQueryable<Organization> FindChildrenFromRelById(List<string> orgIds);
+
+        /// <summary>
         /// 通过组织找到所有子组织（不包含自身）
         /// </summary>
         /// <param name="organization">组织</param>

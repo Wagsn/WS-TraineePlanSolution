@@ -148,7 +148,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserPermissionExpansion>(b =>
             {
-                b.ToTable("user_role_org_per_expansion");
+                b.ToTable("user_org_per_expansion");
             });
             #endregion
         }

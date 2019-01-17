@@ -56,7 +56,8 @@ namespace AuthorizationCenter.Controllers
 
 
         /// <summary>
-        /// 跳转到列表
+        /// 跳转到授权列表
+        /// 查看自己能看到的授权（获取有授权权限的组织，根据组织找关联）
         /// </summary>
         /// <returns></returns>
         // GET: RoleOrgPer
@@ -67,25 +68,10 @@ namespace AuthorizationCenter.Controllers
                 // 1. 权限验证
                 if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
                 {
-                    Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
-                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
-                }
-                // 2. 业务处理
-            }
-            catch (Exception e)
-            {
-                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
-                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
-            }
-            try
-            {
-                // 1. 权限验证
-                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
-                {
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
                 // 2. 业务处理 -查询用户(userId)的角色组织权限列表
-                var roleOrgPers = await RoleOrgPerManager.FindByUserId(SignUser.Id).Include(r => r.Org).Include(r => r.Per).Include(r => r.Role).ToListAsync();
+                var roleOrgPers = await RoleOrgPerManager.FindFromOrgByUserId(SignUser.Id);
                 // 分页（TODO）
                 return View(roleOrgPers);
             }
@@ -116,12 +102,8 @@ namespace AuthorizationCenter.Controllers
                 {
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
-                // 2. 业务处理
-                var roleOrgPer = await RoleOrgPerManager.FindByUserId(SignUser.Id)
-                    .Include(r => r.Org)
-                    .Include(r => r.Per)
-                    .Include(r => r.Role)
-                    .FirstOrDefaultAsync(m => m.Id == id);
+                // 2. 业务处理 -查询用户可以管理的
+                var roleOrgPer = (await RoleOrgPerManager.FindFromOrgByUserId(SignUser.Id)).FirstOrDefault(rop => rop.Id==id);
                 if (roleOrgPer == null)
                 {
                     return NotFound();
@@ -177,7 +159,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoleId,OrgId,PerId")] RoleOrgPer roleOrgPer)
+        public async Task<IActionResult> Create(/*[Bind("Id,RoleId,OrgId,PerId")]*/ RoleOrgPer roleOrgPer)
         {
             try
             {
@@ -223,7 +205,7 @@ namespace AuthorizationCenter.Controllers
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
                 // 2. 业务处理
-                var roleOrgPer = await RoleOrgPerManager.FindByUserId(SignUser.Id).Where(rop => rop.Id == id).SingleOrDefaultAsync();
+                var roleOrgPer = (await RoleOrgPerManager.FindFromOrgByUserId(SignUser.Id)).FirstOrDefault(rop => rop.Id == id);
                 if (roleOrgPer == null)
                 {
                     return NotFound();
@@ -251,7 +233,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,RoleId,OrgId,PerId")] RoleOrgPer roleOrgPer)
+        public async Task<IActionResult> Edit(string id, /*[Bind("Id,RoleId,OrgId,PerId")]*/ RoleOrgPer roleOrgPer)
         {
             // 0. 参数检查
             if (id != roleOrgPer.Id)
@@ -261,7 +243,7 @@ namespace AuthorizationCenter.Controllers
 
             try
             {
-                // 1. 权限验证
+                // 1. 权限验证 
                 if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.AUTH_MANAGE))
                 {
                     Logger.Warn($"[] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.AUTH_MANAGE})");
@@ -338,6 +320,25 @@ namespace AuthorizationCenter.Controllers
             }
             catch (Exception e)
             {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+            }
+        }
+
+        /// <summary>
+        /// 重新扩展用户组织权限表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> ReExpansion()
+        {
+            try
+            {
+                await RoleOrgPerManager.ReExpansion();
+                return RedirectToAction(nameof(Index));
+            }
+            catch(Exception e)
+            {
+
                 Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
                 return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
             }

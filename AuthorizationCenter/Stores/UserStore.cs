@@ -82,6 +82,35 @@ namespace AuthorizationCenter.Stores
                    select user;
         }
 
+
+        /// <summary>
+        /// 查询所有组织下的用户
+        /// </summary>
+        /// <param name="orgIds">组织ID集合</param>
+        /// <returns></returns>
+        public IQueryable<User> FindByOrgId(IEnumerable<string> orgIds)
+        {
+            return from user in Context.Users
+                   where (from uo in Context.UserOrgs
+                          where orgIds.Contains(uo.OrgId)
+                          select uo.UserId).Contains(user.Id)
+                   select user;
+        }
+
+        ///// <summary>
+        ///// 查询所有符合条件(predicate)的组织下的用户
+        ///// </summary>
+        ///// <param name="predicate">条件</param>
+        ///// <returns></returns>
+        //public IQueryable<User> FindByOrg(Func<Organization, bool> predicate)
+        //{
+        //    return from user in Context.Users
+        //           where (from uo in Context.UserOrgs
+        //                  where orgIds.Contains(uo.OrgId)
+        //                  select uo.UserId).Contains(user.Id)
+        //           select user;
+        //}
+
         /// <summary>
         /// 查询 -通过名称
         /// </summary>

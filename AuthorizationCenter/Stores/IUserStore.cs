@@ -21,6 +21,20 @@ namespace AuthorizationCenter.Stores
         IQueryable<User> FindByOrgId(string orgId);
 
         /// <summary>
+        /// 查询所有组织下的用户
+        /// </summary>
+        /// <param name="orgIds">组织ID集合</param>
+        /// <returns></returns>
+        IQueryable<User> FindByOrgId(IEnumerable<string> orgIds);
+
+        ///// <summary>
+        ///// 查询所有符合条件(predicate)的组织下的用户
+        ///// </summary>
+        ///// <param name="predicate">条件</param>
+        ///// <returns></returns>
+        //IQueryable<User> FindByOrg(Func<Organization, bool> predicate);
+
+        /// <summary>
         /// 用户在其组织下创建用户
         /// </summary>
         /// <param name="userId">用户ID</param>

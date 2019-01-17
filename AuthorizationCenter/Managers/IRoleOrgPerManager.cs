@@ -79,6 +79,13 @@ namespace AuthorizationCenter.Managers
         IQueryable<RoleOrgPer> FindByUserId(string userId);
 
         /// <summary>
+        /// 用户(userId)查询可见的角色组织权限列表
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<RoleOrgPer>> FindFromOrgByUserId(string userId);
+
+        /// <summary>
         /// 查询通过ID
         /// </summary>
         /// <param name="id"></param>
@@ -124,5 +131,10 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         Task UpdateByUserId(string userId, RoleOrgPer roleOrgPer);
 
+        /// <summary>
+        /// 重新扩展用户组织权限表
+        /// </summary>
+        /// <returns></returns>
+        Task ReExpansion();
     }
 }

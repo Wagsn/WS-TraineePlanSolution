@@ -280,7 +280,8 @@
         </member>
         <member name="M:AuthorizationCenter.Controllers.RoleOrgPerController.Index(System.Int32,System.Int32)">
             <summary>
-            跳转到列表
+            跳转到授权列表
+            查看自己能看到的授权（获取有授权权限的组织，根据组织找关联）
             </summary>
             <returns></returns>
         </member>
@@ -331,6 +332,12 @@
             [MVC] 添加 角色组织权限关联
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.RoleOrgPerController.ReExpansion">
+            <summary>
+            重新扩展用户组织权限表
+            </summary>
             <returns></returns>
         </member>
         <member name="P:AuthorizationCenter.Controllers.RoleOrgPerController.SignUser">
@@ -2200,6 +2207,13 @@
             <param name="userId">用户ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.FindFromOrgByUserId(System.String)">
+            <summary>
+            用户(userId)查询可见的角色组织权限列表
+            </summary>
+            <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.FindById(System.String)">
             <summary>
             查询通过ID
@@ -2244,6 +2258,12 @@
             </summary>
             <param name="userId"></param>
             <param name="roleOrgPer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.IRoleOrgPerManager.ReExpansion">
+            <summary>
+            重新扩展用户组织权限表
+            </summary>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.ITodoItemManager">
@@ -2902,6 +2922,20 @@
             <param name="userId">用户ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.FindForPerByUserId(System.String)">
+            <summary>
+            查询用户(userId)可见的角色组织权限列表
+            </summary>
+            <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.FindFromOrgByUserId(System.String)">
+            <summary>
+            用户(userId)查询可见的角色组织权限列表
+            </summary>
+            <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.HasPermission(System.String,System.String,System.String)">
             <summary>
             是否有权限 用户在某个组织下是否具有某项权限
@@ -2986,6 +3020,12 @@
             </summary>
             <param name="userId"></param>
             <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.RoleOrgPerManager.ReExpansion">
+            <summary>
+            重新扩展用户组织权限表
+            </summary>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Managers.UserManager">
@@ -3398,6 +3438,13 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenFromRelById(System.Collections.Generic.List{System.String})">
+            <summary>
+            [组织关系表] 找到组织ID集合的所有子组织（包括自身）
+            </summary>
+            <param name="orgIds">组织ID集合</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildren(AuthorizationCenter.Entitys.Organization)">
             <summary>
             通过组织找到所有子组织（不包含自身）
@@ -3452,12 +3499,68 @@
             角色组织权限关联存储接口
             </summary>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.UpdateByUserId(System.String,AuthorizationCenter.Entitys.RoleOrgPer)">
+            <summary>
+            用户(userId)更新角色组织权限(roleOrgPer)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="roleOrgPer">角色组织权限</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.FindOrgByUserIdPerName(System.String,System.String)">
             <summary>
             查询用户有权根组织ID集合
             </summary>
             <param name="userId">用户ID</param>
             <param name="perName">权限名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.FindOrgFromURAndROPByUserIdPerName(System.String,System.String)">
+            <summary>
+            查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
+            如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
+            有权组织列表获取，通过用户ID和权限名称获取组织列表(U.ID-[UR]->R.ID, P.N-[P]->P.ID-[P]->P.ID)-[ROP]->O.ID-[O]->O.ID
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.FindOrgFromUOPByUserIdPerName(System.String,System.String)">
+            <summary>
+            查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
+            如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
+            有权组织列表获取，通过用户ID和权限名称获取组织列表(U.ID,(P.N-[P]->P.ID-[P]->P.ID))-[UOP]->O.ID-[OR]->O.ID
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.CreateByUserId(System.String,AuthorizationCenter.Entitys.RoleOrgPer)">
+            <summary>
+            用户(userId)创建角色组织权限(roleOrgPer)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="roleOrgPer">角色组织权限</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色组织权限(ropId)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="ropId">角色组织权限ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.ReExpansion">
+            <summary>
+            用户组织权限扩展
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.GenUserPermissionExpansion">
+            <summary>
+            生成用户权限扩展表
+            </summary>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.IRoleOrgStore">
@@ -3613,6 +3716,13 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IUserStore.FindByOrgId(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            查询所有组织下的用户
+            </summary>
+            <param name="orgIds">组织ID集合</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IUserStore.CreateForOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
             <summary>
             用户在其组织下创建用户
@@ -3747,6 +3857,13 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildrenFromRelById(System.Collections.Generic.List{System.String})">
+            <summary>
+            [组织关系表] 找到组织ID集合的所有子组织（包括自身）
+            </summary>
+            <param name="orgIds">组织ID集合</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.FindChildren(AuthorizationCenter.Entitys.Organization)">
             <summary>
             通过组织找到所有子组织（不包含自身）
@@ -3848,6 +3965,24 @@
         <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.FindOrgByUserIdPerName(System.String,System.String)">
             <summary>
             查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.FindOrgFromURAndROPByUserIdPerName(System.String,System.String)">
+            <summary>
+            查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
+            如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
+            有权组织列表获取，通过用户ID和权限名称获取组织列表(U.ID-[UR]->R.ID, P.N-[P]->P.ID-[P]->P.ID)-[ROP]->O.ID-[O]->O.ID
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="perName">权限名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.FindOrgFromUOPByUserIdPerName(System.String,System.String)">
+            <summary>
+            查询用户拥有某项权限（用户可能拥有其父级权限）的所有组织
             如果用户拥有的权限是在该操作权限之上 ROOT > USER_MANAGE > USER_QUERY
             有权组织列表获取，通过用户ID和权限名称获取组织列表(U.ID-[UR]->R.ID, P.N-[P]->P.ID-[P]->P.ID)-[ROP]->O.ID-[O]->O.ID
             </summary>
@@ -3860,6 +3995,56 @@
             查询所有上级权限（包含自身）
             </summary>
             <param name="perId">权限ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.UpdateByUserId(System.String,AuthorizationCenter.Entitys.RoleOrgPer)">
+            <summary>
+            用户(userId)更新角色组织权限(roleOrgPer)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="roleOrgPer">角色组织权限</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.CreateByUserId(System.String,AuthorizationCenter.Entitys.RoleOrgPer)">
+            <summary>
+            用户(userId)创建角色组织权限(roleOrgPer)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="roleOrgPer">角色组织权限</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.DeleteByUserId(System.String,System.String)">
+            <summary>
+            用户(userId)删除角色组织权限(ropId)
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="ropId">角色组织权限ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.ReExpansion">
+            <summary>
+            用户组织权限扩展
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.GenUserPermissionExpansion">
+            <summary>
+            生成用户权限扩展表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.GenUserPermissionExpansion(AuthorizationCenter.Entitys.RoleOrgPer)">
+            <summary>
+            根据角色组织权限(roleOrgPer)生成用户组织权限
+            </summary>
+            <param name="roleOrgPer">角色组织权限</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.GenUserPermissionExpansion(AuthorizationCenter.Entitys.UserRole)">
+            <summary>
+            根据用户角色(userRole)生成用户组织权限
+            </summary>
+            <param name="userRole">用户角色</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.RoleOrgStore">
@@ -4147,6 +4332,13 @@
             在用户组织表中查询组织绑定的所有用户
             </summary>
             <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.FindByOrgId(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            查询所有组织下的用户
+            </summary>
+            <param name="orgIds">组织ID集合</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.FindByName(System.String)">

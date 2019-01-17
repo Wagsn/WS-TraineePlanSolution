@@ -376,6 +376,21 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// [组织关系表] 找到组织ID集合的所有子组织（包括自身）
+        /// </summary>
+        /// <param name="orgIds">组织ID集合</param>
+        /// <returns></returns>
+        public IQueryable<Organization> FindChildrenFromRelById(List<string> orgIds)
+        {
+            return from org in Context.Set<Organization>()
+                   where (from orgRel in Context.Set<OrganizationRelation>()
+                          where orgIds.Contains(orgRel.ParentId)
+                          select orgRel.SonId).Contains(org.Id)  // 所有子组织
+                          || orgIds.Contains(org.Id)  // 组织自身
+                   select org;
+        }
+
+        /// <summary>
         /// 通过组织找到所有子组织（不包含自身）
         /// </summary>
         /// <param name="organization">组织</param>

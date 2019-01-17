@@ -170,7 +170,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task ById([Required] ResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
         {
-            response.Extension = await UserStore.Find(ub => ub.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
+            response.Extension = await UserStore.Find(user => user.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> Find(Func<UserJson, bool> predicate)
         {
-            return UserStore.Find(ub => predicate(Mapper.Map<UserJson>(ub))).Select(ub => Mapper.Map<UserJson>(ub));
+            return UserStore.Find((User ub) => predicate(Mapper.Map<UserJson>(ub))).Select(ub => Mapper.Map<UserJson>(ub));
         }
 
         /// <summary>
@@ -210,14 +210,16 @@ namespace AuthorizationCenter.Managers
         public async Task<IEnumerable<UserJson>> FindByUserId(string userId)
         {
             // 1. 查询有权组织
-            var perOrgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY);
+            //var perOrgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY);
+            var perOrgIds = (await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY)).Select(org => org.Id);
             // 2. 查询用户集合
-            var result = new List<User>();
-            foreach(var org in perOrgs)
-            {
-                result.AddRange(await UserStore.FindByOrgId(org.Id).ToListAsync());
-            }
-            return result.Select(user => Mapper.Map<UserJson>(user));
+            var users = await UserStore.FindByOrgId(perOrgIds).ToListAsync();
+            //var result = new List<User>();
+            //foreach(var orgId in perOrgIds)
+            //{
+            //    result.AddRange(await UserStore.FindByOrgId(orgId).ToListAsync());
+            //}
+            return users.Select(user => Mapper.Map<UserJson>(user));
         }
 
         /// <summary>
