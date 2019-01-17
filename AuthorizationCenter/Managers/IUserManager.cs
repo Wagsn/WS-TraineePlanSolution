@@ -83,7 +83,15 @@ namespace AuthorizationCenter.Managers
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
         Task<IEnumerable<TJson>> FindByUserId(string userId);
-        
+
+        /// <summary>
+        /// 用户(userId)查询组织(orgId)下的所有用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task<IEnumerable<UserJson>> FindByUserIdOrgId(string userId, string orgId);
+
         /// <summary>
         /// 通过Name查询 -异步查询 -只取第一个 -没有返回空
         /// </summary>

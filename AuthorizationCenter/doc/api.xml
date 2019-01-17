@@ -88,10 +88,11 @@
             <param name="organizationManager"></param>
             <param name="roleOrgPerManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index(System.Int32,System.Int32)">
+        <member name="M:AuthorizationCenter.Controllers.OrganizationController.Index(System.String,System.Int32,System.Int32)">
             <summary>
             [MVC] 组织管理-组织列表
             只能查看ORG_QUERY的组织森林
+            如果orgId存在，查看该组织下的组织，不存在则查看该用户可见的组织
             </summary>
             <returns></returns>
         </member>
@@ -1047,7 +1048,7 @@
         </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.ParentId">
             <summary>
-            父组织ID
+            父组织ID TODO:删除PanrentId
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Dto.Jsons.OrganizationJson.Parent">
@@ -1902,7 +1903,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.IOrganizationManager`1.FindByUserIdOrgId(System.String,System.String)">
             <summary>
-            通过用户ID和组织ID查询
+            用户(userId)查询以组织(orgId)为根的所有组织
             </summary>
             <param name="userId">用户ID</param>
             <param name="orgId">组织ID</param>
@@ -2328,6 +2329,14 @@
             <param name="userId">用户ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindByUserIdOrgId(System.String,System.String)">
+            <summary>
+            用户(userId)查询组织(orgId)下的所有用户
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Managers.IUserManager`1.FindByName(System.String)">
             <summary>
             通过Name查询 -异步查询 -只取第一个 -没有返回空
@@ -2557,6 +2566,7 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.OrganizationManager.FindByUserIdOrgId(System.String,System.String)">
             <summary>
+            用户(userId)查询以组织(orgId)为根的所有组织
             通过用户ID和组织ID查询 -代码编写中
             U.ID->R.ID|P.ID->O.ID
             </summary>
@@ -2983,7 +2993,7 @@
             用户管理实现
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Managers.UserManager.Store">
+        <member name="P:AuthorizationCenter.Managers.UserManager.UserStore">
             <summary>
             用户存储
             </summary>
@@ -3100,9 +3110,17 @@
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.FindByUserId(System.String)">
             <summary>
-            通过用户ID查询有权查看的用户列表
+            用户(userId)查询他有权查看的用户列表
             </summary>
             <param name="userId">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Managers.UserManager.FindByUserIdOrgId(System.String,System.String)">
+            <summary>
+            用户(userId)查询组织(orgId)下的所有用户
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Managers.UserManager.FindByName(System.String)">
@@ -3368,7 +3386,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenById(System.String)">
             <summary>
-            通过组织ID找到所有子组织（包括间接子组织，包括自身）
+            查询组织ID(orgId)下的所有子组织（包括自身）
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>
@@ -4126,7 +4144,7 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.FindByOrgId(System.String)">
             <summary>
-            通过组织ID查询
+            在用户组织表中查询组织绑定的所有用户
             </summary>
             <param name="orgId">组织ID</param>
             <returns></returns>

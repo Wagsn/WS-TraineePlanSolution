@@ -35,6 +35,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// <summary>
         /// 权限名称
         /// </summary>
+        [Required(ErrorMessage = "权限名称不能为空")]
         [StringLength(15, MinimumLength = 2)]
         [RegularExpression(Constants.VISIBLE_REG, ErrorMessage = Constants.VISIBLE_ERR)]
         public string Name { get; set; }

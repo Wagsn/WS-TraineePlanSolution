@@ -38,7 +38,7 @@ namespace AuthorizationCenter.Stores
         Task DeleteByUserId(string userId, string orgId);
 
         /// <summary>
-        /// 通过组织ID找到所有子组织（包括间接子组织，包括自身）
+        /// 查询组织ID(orgId)下的所有子组织（包括自身）
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>

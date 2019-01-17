@@ -74,7 +74,7 @@ namespace AuthorizationCenter.Stores
                 try
                 {
                     // 1. 查询数据库中组织信息
-                    var dbOrg = await Context.Set<Organization>().FindAsync(organization.Id);
+                    var dbOrg = await Context.Set<Organization>().Where(org => org.Id == organization.Id).AsNoTracking().SingleOrDefaultAsync();
                     if(dbOrg == null)
                     {
                         throw new ArgumentException("找不到编辑的组织");

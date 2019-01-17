@@ -9,7 +9,7 @@
 <p>
     <a asp-action="Create">新增组织</a>
 </p>
-<table class="table">
+<table class="table" border="1">
     <thead>
         <tr>
             <th>
@@ -41,6 +41,7 @@
                 <td>
                     <a asp-action="Index" asp-controller="User" asp-route-orgId="@item.Id" title="User List">用户列表</a> |
                     <a asp-action="Create" asp-controller="User" asp-route-orgId="@item.Id" title="Add User">添加用户</a> |
+                    <a asp-action="Index" asp-controller="Organization" asp-route-orgId="@item.Id" title="Organization List">组织列表</a> |
                     <a asp-action="Create" asp-controller="Organization" asp-route-id="@item.Id" title="Add Organization">添加组织</a> |
                     <a asp-route-id="@item.Id" title="Move Organization">移动组织(TODO)</a> |
                     <a asp-action="Edit" asp-route-id="@item.Id" title="Edit Organization">编辑组织</a> |

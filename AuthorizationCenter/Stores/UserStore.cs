@@ -69,7 +69,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 通过组织ID查询
+        /// 在用户组织表中查询组织绑定的所有用户
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>

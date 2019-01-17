@@ -24,7 +24,7 @@ namespace AuthorizationCenter.Dto.Jsons
         public string Id { get; set; }
 
         /// <summary>
-        /// 父组织ID
+        /// 父组织ID TODO:删除PanrentId
         /// </summary>
         //[ForeignKey("ParentId")]
         [StringLength(36, MinimumLength = 36)]
@@ -47,6 +47,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// <summary>
         /// 组织名称
         /// </summary>
+        [Required(ErrorMessage = "组织名不能为空")] // 在添加和修改时为必填字段
         [StringLength(15, MinimumLength = 2)]
         [RegularExpression(Constants.VISIBLE_REG, ErrorMessage = Constants.VISIBLE_ERR)]
         public string Name { get; set; }

@@ -24,6 +24,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 用户签名
         /// </summary>
+        [Required(ErrorMessage ="用户名不能为空")]
         [MaxLength(15)]
         [RegularExpression(Constants.SIGNNAME_REG, ErrorMessage = Constants.SIGNNAME_ERR)]
         public string SignName { get; set; }

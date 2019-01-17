@@ -219,6 +219,7 @@ namespace AuthorizationCenter.Managers
         }
 
         /// <summary>
+        /// 用户(userId)查询以组织(orgId)为根的所有组织
         /// 通过用户ID和组织ID查询 -代码编写中
         /// U.ID->R.ID|P.ID->O.ID
         /// </summary>
@@ -227,10 +228,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId)
         {
-            // 1. 查询有权组织集合
-            var orgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.ORG_QUERY);
-            // 2. 查询组织ID所在组织
-            throw new NotImplementedException("未实现");
+            return (await OrganizationStore.FindChildrenById(orgId)).Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
         /// <summary>

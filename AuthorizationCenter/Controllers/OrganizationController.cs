@@ -51,22 +51,50 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// [MVC] 组织管理-组织列表
         /// 只能查看ORG_QUERY的组织森林
+        /// 如果orgId存在，查看该组织下的组织，不存在则查看该用户可见的组织
         /// </summary>
         /// <returns></returns>
         // GET: Organization
-        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
+        public async Task<IActionResult> Index(string orgId, int pageIndex = 0, int pageSize = 10)
         {
             try
             {
-                // 1. 权限验证 ROOT_ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Exist(O.ID)
-                // 2. 业务处理 -查询有权组织 森林列表
-                var orgnazitions = await OrganizationManager.FindPerOrgsByUserId(SignUser.Id);
+                // 0. 参数检查
+                if (orgId == null)
+                {
+                    // 1. 权限验证 ROOT_ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Exist(O.ID)
+                    if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_QUERY))
+                    {
+                        Logger.Warn($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限查询组织");
+                        return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    }
+                    // 2. 业务处理 -查询有权组织 森林列表
+                    var orgnazitions = await OrganizationManager.FindPerOrgsByUserId(SignUser.Id);
 
-                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(orgnazitions)}");
+                    Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(orgnazitions)}");
 
-                ViewData["list"] = JsonUtil.ToJson(orgnazitions);
+                    ViewData["list"] = JsonUtil.ToJson(orgnazitions);
 
-                return View(orgnazitions);
+                    return View(orgnazitions);
+                }
+                else
+                {
+                    // 1. 权限验证 ROOT_ORG_QUERY U.ID-[UR]->R.ID|P.ID-[ROP]->Exist(O.ID)
+                    if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.ORG_QUERY, orgId))
+                    {
+                        Logger.Warn($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限查询组织({orgId})");
+                        return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    }
+                    // 2. 业务处理
+                    var orgnazitions = (await OrganizationManager.FindByUserIdOrgId(SignUser.Id, orgId)).ToList();
+                    orgnazitions.ForEach(org => org.Children = null);
+
+                    Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(orgnazitions)}");
+
+                    ViewData["list"] = JsonUtil.ToJson(orgnazitions);
+
+                    return View(orgnazitions);
+                }
             }
             catch (Exception e)
             {
@@ -269,7 +297,7 @@ namespace AuthorizationCenter.Controllers
         // POST: Organization/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,ParentId,Name,Description")] OrganizationJson organization)
+        public async Task<IActionResult> Edit(string id, /*[Bind("Id,ParentId,Name,Description")]*/ OrganizationJson organization)
         {
             Logger.Trace($"[{nameof(Edit)}] 请求参数: id: {id}\r\n{JsonUtil.ToJson(organization)}");
             // 0. 参数检查
@@ -277,6 +305,11 @@ namespace AuthorizationCenter.Controllers
             {
                 return NotFound();
             }
+            //if (organization.Name == null)
+            //{
+            //    ModelState.AddModelError("Name", "组织名不能为空");
+            //    return View(organization);
+            //}
             try
             {
                 // 1. 权限检查

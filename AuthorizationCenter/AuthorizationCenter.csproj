@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyVersion>1.0.0.1149</AssemblyVersion>
-    <FileVersion>1.0.0.1149</FileVersion>
-    <Version>1.0.1.1149</Version>
+    <AssemblyVersion>1.0.2.0116</AssemblyVersion>
+    <FileVersion>1.0.0.0116</FileVersion>
+    <Version>1.0.2.0116</Version>
     <Description>中心</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>

@@ -79,25 +79,44 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserBaseJsons
-        public async Task<IActionResult> Index(string orgId = null, int pageIndex =0, int pageSize =10)
+        public async Task<IActionResult> Index(string orgId, int pageIndex =0, int pageSize =10)
         {
-            Logger.Trace($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})查询可见用户列表, 请求参数: pageIndex: {pageIndex}, pageSize: {pageSize}");
+            Logger.Trace($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})查询组织({orgId??"可见"})下的用户列表, 请求参数: pageIndex: {pageIndex}, pageSize: {pageSize}");
             ViewData[Constants.SIGNUSER] = SignUser;
             try
             {
-                // 1. 权限验证 -在自己组织有没权限
-                if(!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USER_QUERY))
+                if (orgId == null)
                 {
-                    Logger.Warn($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.USER_QUERY})");
-                    ModelState.AddModelError("All", "没有权限");
-                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    // 1. 权限验证 -该用户是否存在该权限
+                    if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USER_QUERY))
+                    {
+                        Logger.Warn($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})没有权限({Constants.USER_QUERY})");
+                        ModelState.AddModelError("All", "没有权限");
+                        return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    }
+                    // 2. 业务处理
+                    var users = await UserManager.FindByUserId(SignUser.Id);
+                    // 分页查询用户列表 
+                    var data = users.Page(pageIndex, pageSize).ToList();
+                    Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
+                    return View(data);
                 }
-                // 2. 业务处理
-                var users = await UserManager.FindByUserId(SignUser.Id);
-                // 分页查询用户列表 
-                var data = users.Page(pageIndex, pageSize).ToList();
-                Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
-                return View(data);
+                else
+                {
+                    // 1. 权限验证 -该用户在组织(orgId)下是否存在该权限
+                    if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USER_QUERY, orgId))
+                    {
+                        Logger.Warn($"[{nameof(Index)}] 用户[{SignUser.SignName}]({SignUser.Id})在组织({orgId})下没有权限({Constants.USER_QUERY})");
+                        ModelState.AddModelError("All", "没有权限");
+                        return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                    }
+                    // 2. 业务处理
+                    var users = await UserManager.FindByUserIdOrgId(SignUser.Id, orgId);
+                    // 分页查询用户列表 
+                    var data = users.Page(pageIndex, pageSize).ToList();
+                    Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
+                    return View(data);
+                }
             }
             catch(Exception e)
             {

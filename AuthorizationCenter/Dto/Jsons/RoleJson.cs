@@ -21,6 +21,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// 角色名称
         /// </summary>
         //[MaxLength(15)]
+        [Required(ErrorMessage = "角色名称不能为空")]
         [StringLength(15, MinimumLength = 2)]
         [RegularExpression(Constants.VISIBLE_REG, ErrorMessage = Constants.VISIBLE_ERR)]
         public string Name { get; set; }

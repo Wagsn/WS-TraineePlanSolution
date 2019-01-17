@@ -23,7 +23,7 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 用户存储
         /// </summary>
-        public IUserStore Store { get; set; }
+        public IUserStore UserStore { get; set; }
 
         /// <summary>
         /// 
@@ -60,7 +60,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="mapper"></param>
         public UserManager(IUserStore store, IUserOrgStore userOrgStore, IRoleOrgPerStore roleOrgPerStore, IOrganizationStore organizationStore, IMapper mapper)
         {
-            Store = store ?? throw new ArgumentNullException(nameof(store));
+            UserStore = store ?? throw new ArgumentNullException(nameof(store));
             UserOrgStore = userOrgStore ?? throw new ArgumentNullException(nameof(userOrgStore));
             RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
             OrganizationStore = organizationStore ?? throw new ArgumentNullException(nameof(organizationStore));
@@ -82,7 +82,7 @@ namespace AuthorizationCenter.Managers
             // 存储
             try
             {
-                var dbub = await Store.Create(ub);
+                var dbub = await UserStore.Create(ub);
                 response.Extension = Mapper.Map<UserJson>(dbub);
             }
             catch (Exception e)
@@ -102,7 +102,7 @@ namespace AuthorizationCenter.Managers
             var user = Mapper.Map<User>(json);
             user.Id = Guid.NewGuid().ToString();
             // 存储
-            var dbUser = await Store.Create(user);
+            var dbUser = await UserStore.Create(user);
             return Mapper.Map<UserJson>(dbUser);
         }
 
@@ -115,7 +115,7 @@ namespace AuthorizationCenter.Managers
         public async Task<UserJson> CreateForOrgByUserId(string userId, UserJson json)
         {
             json.Id = Guid.NewGuid().ToString();
-            await Store.CreateForOrgByUserId(userId, Mapper.Map<User>(json));
+            await UserStore.CreateForOrgByUserId(userId, Mapper.Map<User>(json));
             return json;
         }
 
@@ -130,7 +130,7 @@ namespace AuthorizationCenter.Managers
         {
             json.Id = Guid.NewGuid().ToString();
             // 1. 创建用户
-            await Store.Create(Mapper.Map<User>(json));
+            await UserStore.Create(Mapper.Map<User>(json));
             // 2. 创建用户组织关联
             await UserOrgStore.Create(new UserOrg
             {
@@ -148,7 +148,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="request"></param>
         public async Task List([Required] PagingResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
         {
-            response.Extension = await Store.Find().Select(ub => Mapper.Map<UserJson>(ub)).ToListAsync();
+            response.Extension = await UserStore.Find().Select(ub => Mapper.Map<UserJson>(ub)).ToListAsync();
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task ById([Required] ResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
         {
-            response.Extension = await Store.Find(ub => ub.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
+            response.Extension = await UserStore.Find(ub => ub.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> Find()
         {
-            return Store.Find().Select(user => Mapper.Map<UserJson>(user));
+            return UserStore.Find().Select(user => Mapper.Map<UserJson>(user));
         }
         
         /// <summary>
@@ -189,7 +189,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> Find(Func<UserJson, bool> predicate)
         {
-            return Store.Find(ub => predicate(Mapper.Map<UserJson>(ub))).Select(ub => Mapper.Map<UserJson>(ub));
+            return UserStore.Find(ub => predicate(Mapper.Map<UserJson>(ub))).Select(ub => Mapper.Map<UserJson>(ub));
         }
 
         /// <summary>
@@ -199,11 +199,11 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> FindById(string id)
         {
-            return Store.FindById(id).Select(ub => Mapper.Map<UserJson>(ub));
+            return UserStore.FindById(id).Select(ub => Mapper.Map<UserJson>(ub));
         }
 
         /// <summary>
-        /// 通过用户ID查询有权查看的用户列表
+        /// 用户(userId)查询他有权查看的用户列表
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
@@ -215,9 +215,30 @@ namespace AuthorizationCenter.Managers
             var result = new List<User>();
             foreach(var org in perOrgs)
             {
-                result.AddRange(await Store.FindByOrgId(org.Id).ToListAsync());
+                result.AddRange(await UserStore.FindByOrgId(org.Id).ToListAsync());
             }
             return result.Select(user => Mapper.Map<UserJson>(user));
+        }
+
+        /// <summary>
+        /// 用户(userId)查询组织(orgId)下的所有用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<UserJson>> FindByUserIdOrgId(string userId, string orgId)
+        {
+            // 1. 查询有权组织
+            var perOrgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY);
+            // 1. 查询所有组织
+            var orgs = await OrganizationStore.FindChildrenById(orgId);
+            // 2. 查询用户集合
+            var users = new List<User>();
+            foreach(var org in orgs)
+            {
+                users.AddRange(await UserStore.FindByOrgId(org.Id).AsNoTracking().ToListAsync());
+            }
+            return users.Select(user => Mapper.Map<UserJson>(user));
         }
 
         /// <summary>
@@ -227,7 +248,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserJson> FindByName(string name)
         {
-            return Store.FindByName(name).AsNoTracking().Select(ub => Mapper.Map<UserJson>(ub));
+            return UserStore.FindByName(name).AsNoTracking().Select(ub => Mapper.Map<UserJson>(ub));
         }
 
         /// <summary>
@@ -237,7 +258,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task<UserJson> Update(UserJson json)
         {
-            return Mapper.Map<UserJson>(await Store.Update(Mapper.Map<User>(json)));
+            return Mapper.Map<UserJson>(await UserStore.Update(Mapper.Map<User>(json)));
         }
 
         /// <summary>
@@ -247,7 +268,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> ExistById(string id)
         {
-            return Store.Exist(ub => ub.Id == id);
+            return UserStore.Exist(ub => ub.Id == id);
         }
 
         /// <summary>
@@ -257,7 +278,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> Exist(Func<UserJson, bool> predicate)
         {
-            return Store.Exist(ub=>predicate(Mapper.Map<UserJson>(ub)));
+            return UserStore.Exist(ub=>predicate(Mapper.Map<UserJson>(ub)));
         }
 
         /// <summary>
@@ -267,7 +288,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> ExistByName(string name)
         {
-            return Store.Exist(ub => ub.SignName == name);
+            return UserStore.Exist(ub => ub.SignName == name);
         }
 
         /// <summary>
@@ -277,7 +298,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task Delete(UserJson json)
         {
-            await Store.DeleteById(json.Id);
+            await UserStore.DeleteById(json.Id);
         }
 
         /// <summary>
@@ -287,7 +308,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task DeleteById(string id)
         {
-            await Store.DeleteById(id);
+            await UserStore.DeleteById(id);
         }
 
         /// <summary>
@@ -299,7 +320,7 @@ namespace AuthorizationCenter.Managers
         public async Task DeleteByUserId(string userId, string id)
         {
             // 删除该用户的所有关联
-            await Store.DeleteByUserId(userId, id);
+            await UserStore.DeleteByUserId(userId, id);
         }
     }
 }

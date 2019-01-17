@@ -31,7 +31,7 @@ namespace AuthorizationCenter.Managers
         IQueryable<TJson> FindById(string orgId);
 
         /// <summary>
-        /// 通过用户ID和组织ID查询
+        /// 用户(userId)查询以组织(orgId)为根的所有组织
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">组织ID</param>

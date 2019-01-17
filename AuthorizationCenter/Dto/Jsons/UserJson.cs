@@ -24,6 +24,7 @@ namespace AuthorizationCenter.Dto.Jsons
         /// 用户签名
         /// </summary>
         [MaxLength(15)]
+        [Required(ErrorMessage = "用户名不能为空")]
         [RegularExpression(Constants.SIGNNAME_REG, ErrorMessage = Constants.SIGNNAME_ERR)]
         public string SignName { get; set; }
 

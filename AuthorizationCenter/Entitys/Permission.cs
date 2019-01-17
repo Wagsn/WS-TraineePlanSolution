@@ -35,6 +35,7 @@ namespace AuthorizationCenter.Entitys
         /// <summary>
         /// 权限名称
         /// </summary>
+        [Required(ErrorMessage ="权限名称不能为空")]
         [StringLength(63, MinimumLength =2)]
         public string Name { get; set; }
 
