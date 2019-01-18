@@ -155,7 +155,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,RoleId")] UserRole userRole)
+        public async Task<IActionResult> Create(/*[Bind("Id,UserId,RoleId")]*/ UserRole userRole)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace AuthorizationCenter.Controllers
                 {
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
-                await UserRoleManager.Create(userRole);
+                await UserRoleManager.Create(SignUser.Id, userRole);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception e)
@@ -227,7 +227,7 @@ namespace AuthorizationCenter.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,UserId,RoleId")] UserRole userRole)
+        public async Task<IActionResult> Edit(string id, /*[Bind("Id,UserId,RoleId")]*/ UserRole userRole)
         {
             // 0. 参数检查
             if (id != userRole.Id)
@@ -314,7 +314,8 @@ namespace AuthorizationCenter.Controllers
                 {
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
-                await UserRoleManager.DeleteById(id);
+                // await UserRoleManager.DeleteById(id);
+                await UserRoleManager.DeleteById(SignUser.Id, id);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception e)

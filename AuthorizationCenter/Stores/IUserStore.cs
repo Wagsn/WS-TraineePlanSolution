@@ -50,5 +50,13 @@ namespace AuthorizationCenter.Stores
         /// <param name="id">被删除用户ID</param>
         /// <returns></returns>
         Task DeleteByUserId(string userId, string id);
+
+        /// <summary>
+        /// 删除通过用户ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="ids">被删除用户ID</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, IEnumerable<string> ids);
     }
 }

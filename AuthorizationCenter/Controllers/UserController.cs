@@ -33,7 +33,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 组织管理
         /// </summary>
-        IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
+        IOrganizationManager OrganizationManager { get; set; }
 
         /// <summary>
         /// 用户角色关联管理
@@ -64,7 +64,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="userRoleManager"></param>
         /// <param name="roleOrgPerManager"></param>
         /// <param name="mapper"></param>
-        public UserController(IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IOrganizationManager<OrganizationJson> organizationManager, IUserRoleManager userRoleManager, IRoleOrgPerManager roleOrgPerManager, IMapper mapper)
+        public UserController(IUserManager<UserJson> userManager, IRoleManager<RoleJson> roleManager, IOrganizationManager organizationManager, IUserRoleManager userRoleManager, IRoleOrgPerManager roleOrgPerManager, IMapper mapper)
         {
             UserManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             RoleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
@@ -97,8 +97,10 @@ namespace AuthorizationCenter.Controllers
                     // 2. 业务处理
                     var users = await UserManager.FindByUserId(SignUser.Id);
                     // 分页查询用户列表 
-                    var data = users.Page(pageIndex, pageSize).ToList();
+                    var pageBody = users.Page(pageIndex, pageSize);
+                    var data = pageBody.Data;
                     Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
+                    ViewData["PageBody"] = pageBody;
                     return View(data);
                 }
                 else
@@ -113,8 +115,10 @@ namespace AuthorizationCenter.Controllers
                     // 2. 业务处理
                     var users = await UserManager.FindByUserIdOrgId(SignUser.Id, orgId);
                     // 分页查询用户列表 
-                    var data = users.Page(pageIndex, pageSize).ToList();
+                    var pageBody = users.Page(pageIndex, pageSize);
+                    var data = pageBody.Data;
                     Logger.Trace($"[{nameof(Index)}] 响应数据:\r\n{JsonUtil.ToJson(data)}");
+                    ViewData["PageBody"] = pageBody;
                     return View(data);
                 }
             }
@@ -355,9 +359,9 @@ namespace AuthorizationCenter.Controllers
         /// <param name="errMsg">错误信息</param>
         /// <returns></returns>
         // GET: UserBaseJsons/Delete/5
-        public async Task<IActionResult> Delete(string id, string errMsg = null)
+        public async Task<IActionResult> Delete(string id, string errMsg)
         {
-            Logger.Trace($"[{nameof(Delete)}] 删除用户({id})");
+            Logger.Trace($"[{nameof(Delete)}] 删除用户({id})失败{errMsg}");
             // 0. 检查参数
             if (id == null)
             {

@@ -3,16 +3,18 @@
 @{
     ViewData["Title"] = "Index";
     Console.WriteLine("Sign Name: "+ ((UserJson)ViewData["SignUser"]).SignName??"");
+    var PageBody = ViewBag.PageBody as AuthorizationCenter.Define.PageBody<UserJson>;
+    var SignUser = ViewData["SignUser"] as UserJson;
 }
 
 <h2>用户管理</h2>
 
 <p>
-    当前用户登陆用户为【<span id="sign-name">@(((UserJson)ViewData["SignUser"]).SignName ??"游客")</span>】
+    当前用户登陆用户为【<a id="sign-name" asp-action="Details" asp-route-id="@SignUser?.Id" title="User Details">@(SignUser?.SignName ??"游客")</a>】
 </p>
 
 <p>
-    <a asp-action="Create">Create New User</a>
+    <a asp-action="Create" title="Create New User">新建用户</a>
 </p>
 @{
     var users = Model;
@@ -22,11 +24,11 @@
     <thead>
         <tr>
             <th>
-                SignName
+                用户名
                 @*@Html.DisplayNameFor(models => models.Extension[0].SignName)*@
             </th>
             <th>
-                PassWord
+                密码
                 @*@Html.DisplayNameFor(model => model.PassWord)*@
             </th>
             <th></th>
@@ -43,9 +45,9 @@
                     @Html.DisplayFor(modelItem => item.PassWord)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" title="Edit User">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" title="User Details">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" title="Delete User">Delete</a>
                 </td>
             </tr>
         }
@@ -53,8 +55,20 @@
 </table>
 @* 分页跳转 *@
 <form asp-action="Index">
-    <input id="pageIndex" name="pageIndex" type="number" min="0" value="0" placeholder="分页索引(0-base)"/>
-    <input id="pageSize" name="pageSize" type="number" min="1" value="1" placeholder="每页尺寸"/>
-    <input type="submit" value="跳转"/>
+    <input id="pageIndex" name="pageIndex" type="number" min="0" value="@PageBody.PageIndex" placeholder="分页索引(0-base)" />
+    <input id="pageSize" name="pageSize" type="number" min="1" value="@PageBody.PageSize" placeholder="每页尺寸" />
+    <input type="submit" value="跳转" />
     @*<input type="submit" value="下一页" />*@
+    <span>
+        <a href="/User/Index?pageIndex=0&pageSize=@PageBody.PageSize" title="Head Page">首页</a>
+        @if (PageBody.PageIndex != 0)
+        {
+            <a href="/User/Index?pageIndex=@(PageBody.PageIndex-1)&pageSize=@PageBody.PageSize" title="Previous Page">上一页</a>
+        }
+        @if (PageBody.PageIndex != PageBody.PageCount - 1)
+        {
+            <a href="/User/Index?pageIndex=@(PageBody.PageIndex+1)&pageSize=@PageBody.PageSize" title="Next Page">下一页</a>
+        }
+        <a href="/User/Index?pageIndex=@(PageBody.PageCount-1)&pageSize=@PageBody.PageSize" title="Tail Page">尾页</a>
+    </span>
 </form>

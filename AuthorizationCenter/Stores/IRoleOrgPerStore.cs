@@ -51,13 +51,23 @@ namespace AuthorizationCenter.Stores
 
         #endregion
 
+        ///// <summary>
+        ///// 用户(userId)创建角色组织权限(roleOrgPer)
+        ///// </summary>
+        ///// <param name="userId">用户ID</param>
+        ///// <param name="roleOrgPer">角色组织权限</param>
+        ///// <returns></returns>
+        //Task CreateByUserId(string userId, RoleOrgPer roleOrgPer);
+
         /// <summary>
-        /// 用户(userId)创建角色组织权限(roleOrgPer)
+        /// 用户(userId)创建角色(rId)组织(oId)权限(pId)关联
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="roleOrgPer">角色组织权限</param>
+        /// <param name="rId"></param>
+        /// <param name="oId"></param>
+        /// <param name="pId"></param>
         /// <returns></returns>
-        Task CreateByUserId(string userId, RoleOrgPer roleOrgPer);
+        Task CreateByUserId(string userId, string rId, string oId, string pId);
 
         /// <summary>
         /// 用户(userId)删除角色组织权限(ropId)
@@ -81,10 +91,26 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         Task ReExpansion();
 
-        /// <summary>
-        /// 生成用户权限扩展表
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion();
+        ///// <summary>
+        ///// 生成用户权限扩展表
+        ///// </summary>
+        ///// <returns></returns>
+        //Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion();
+
+        ///// <summary>
+        ///// 根据角色组织权限(roleOrgPer)生成用户组织权限
+        ///// </summary>
+        ///// <param name="rId"></param>
+        ///// <param name="oId"></param>
+        ///// <param name="pId"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(string rId, string oId, string pId);
+
+        ///// <summary>
+        ///// 根据用户角色(userRole)生成用户组织权限
+        ///// </summary>
+        ///// <param name="userRole">用户角色</param>
+        ///// <returns></returns>
+        //Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(UserRole userRole);
     }
 }

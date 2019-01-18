@@ -49,18 +49,41 @@ namespace AuthorizationCenter.Define
         /// <param name="pageIndex">分页索引，从0开始</param>
         /// <param name="pageSize">每页数量{0,}</param>
         /// <returns></returns>
-        public static IEnumerable<E> Page<E>(this IEnumerable<E> data, int pageIndex, int pageSize)
+        public static PageBody<E> Page<E>(this IEnumerable<E> data, int pageIndex, int pageSize)
         {
-            //// 总数
-            //int count = data.Count();
-            //// 判断索引有效
-            //int pIndex = pageIndex;
-            //int pSize = pageSize > 50 ? 10 : pageSize;
-            //if (pageSize <= 0) pSize = 10;
-            //int pageNum = (int)Math.Ceiling((double)count / pSize);
+            //if (pageSize < 1 || pageIndex < 0)
+            //{
+            //    throw new ArgumentOutOfRangeException("参数范围错误");
+            //}
+            // 总数
+            int count = data.Count();
+            int pCount = 0;
+            //int pSize = 0;
+            //int pIndex = 0;
+            if (pageSize > 0)
+            {
+                pCount = (int)Math.Ceiling((double)count / pageSize);
+            }
             //pIndex = (pageIndex % pageNum + pageNum) % pageNum;
             // 获取数据
-            return data.Skip(pageIndex * pageSize).Take(pageSize);
+            return new PageBody<E>
+            {
+                Data = data.Skip(pageIndex * pageSize).Take(pageSize).ToList(),
+                Total = count,
+                PageIndex = pageIndex,
+                PageCount = pCount,
+                PageSize = pageSize
+            };
+            ////// 总数
+            ////int count = data.Count();
+            ////// 判断索引有效
+            ////int pIndex = pageIndex;
+            ////int pSize = pageSize > 50 ? 10 : pageSize;
+            ////if (pageSize <= 0) pSize = 10;
+            ////int pageNum = (int)Math.Ceiling((double)count / pSize);
+            ////pIndex = (pageIndex % pageNum + pageNum) % pageNum;
+            //// 获取数据
+            //return data.Skip(pageIndex * pageSize).Take(pageSize);
         }
 
         /// <summary>
@@ -70,9 +93,19 @@ namespace AuthorizationCenter.Define
         /// <returns></returns>
         public static string Encrypt(string src)
         {
-            return null;
+            throw new NotImplementedException();
         }
-        
+
+        /// <summary>
+        /// 解密
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static string Decrypt(string src)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// 输入集合是当前集合的子集
         /// </summary>

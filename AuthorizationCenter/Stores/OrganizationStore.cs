@@ -242,10 +242,40 @@ namespace AuthorizationCenter.Stores
             {
                 try
                 {
-                    // 1. 删除关系表 -删除条件: 以其为子组织以其为父组织
-                    await DeleteRelById(orgId);
-                    // 2. 删除组织
-                    await Delete(org => org.Id == orgId);
+                    // 1. 查询所有组织
+                    var orgIds = (await FindChildrenFromOrgRelById(orgId).AsNoTracking().ToListAsync()).Select(o => o.Id);
+                    // 2. 删除所有用户
+                    // 2.1 查询所有用户ID
+                    var userIds = await (from uo in Context.Set<UserOrg>()
+                                         where orgIds.Contains(uo.OrgId)
+                                         select uo.UserId).AsNoTracking().ToListAsync();
+                    // 2.2 删除所有用户组织关联
+                    var userOrgs = await (from uo in Context.Set<UserOrg>()
+                                          where userIds.Contains(uo.UserId)
+                                          select uo).AsNoTracking().ToListAsync();
+                    Context.RemoveRange(userOrgs);
+                    // 2.3 删除所有用户角色关联
+                    //var userRoles
+                    // 2.4 删除所有用户本身
+                    var users = await (from u in Context.Set<User>()
+                                       where userIds.Contains(u.Id)
+                                       select u).AsNoTracking().ToListAsync();
+                    Context.RemoveRange(users);
+                    
+                    // 3. 删除所有角色
+                    // 3.1 查询所有角色ID
+                    // 3.2 删除所有角色组织关联
+                    // 3.3 删除所有用户角色关联
+                    // 3.4 删除所有角色本身
+                    
+                    // 4. 删除所有角色组织权限关联
+
+                    // 5. 删除所有组织
+                    // 5.1. 删除组织关系表 -删除条件: 以其为子组织以其为父组织
+                    // await DeleteRelById(orgId);
+                    // 5.2 删除所有组织本身
+
+                    //await Delete(org => org.Id == orgId);
                     trans.Commit();
                 }
                 catch(Exception e)
@@ -343,6 +373,16 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task<List<Organization>> FindChildrenById(string orgId)
         {
+            return await FindChildrenFromOrgRelById(orgId).Include(org => org.Parent).AsNoTracking().ToListAsync();
+        }
+
+        /// <summary>
+        /// 通过组织ID找到所有子组织（包含自身）
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        public async Task<List<Organization>> FindChildrenFromOrgById(string orgId)
+        {
             List<Organization> result = new List<Organization>();
             //if(orgId == null)
             //{
@@ -355,7 +395,7 @@ namespace AuthorizationCenter.Stores
             // 遍历其直接子组织
             foreach (var o in orgs)
             {
-                result.AddRange(await FindChildrenById(o.Id));
+                result.AddRange(await FindChildrenFromOrgById(o.Id));
             }
             return result;
         }
@@ -365,7 +405,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public IQueryable<Organization> FindChildrenFromRelById(string orgId)
+        public IQueryable<Organization> FindChildrenFromOrgRelById(string orgId)
         {
             return from org in Context.Set<Organization>()
                    where (from orgRel in Context.Set<OrganizationRelation>()
@@ -380,7 +420,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="orgIds">组织ID集合</param>
         /// <returns></returns>
-        public IQueryable<Organization> FindChildrenFromRelById(List<string> orgIds)
+        public IQueryable<Organization> FindChildrenFromOrgRelById(List<string> orgIds)
         {
             return from org in Context.Set<Organization>()
                    where (from orgRel in Context.Set<OrganizationRelation>()

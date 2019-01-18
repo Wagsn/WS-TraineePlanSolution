@@ -14,21 +14,20 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 组织管理
     /// </summary>
-    /// <typeparam name="TJson">Dto数据分离，映射模型</typeparam>
-    public interface IOrganizationManager<TJson> where TJson : OrganizationJson
+    public interface IOrganizationManager
     {
         /// <summary>
         /// 查询
         /// </summary>
         /// <returns></returns>
-        IQueryable<TJson> Find();
+        IQueryable<OrganizationJson> Find();
 
         /// <summary>
-        /// 查询通过ID
+        /// 查询组织(orgId)
         /// </summary>
-        /// <param name="orgId"></param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        IQueryable<TJson> FindById(string orgId);
+        IQueryable<OrganizationJson> FindById(string orgId);
 
         /// <summary>
         /// 用户(userId)查询以组织(orgId)为根的所有组织
@@ -36,28 +35,21 @@ namespace AuthorizationCenter.Managers
         /// <param name="userId">用户ID</param>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<IEnumerable<TJson>> FindByUserIdOrgId(string userId, string orgId);
-
-        /// <summary>
-        /// 通过组织ID查询所有子节点，返回组织树
-        /// </summary>
-        /// <param name="orgId"></param>
-        /// <returns></returns>
-        Organization FindTreeById(string orgId);
+        Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId);
 
         /// <summary>
         /// 查询通过用户ID -先找角色-再找组织
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        Task<IEnumerable<TJson>> FindPerOrgsByUserId(string userId);
+        Task<IEnumerable<OrganizationJson>> FindPerOrgsByUserId(string userId);
 
         /// <summary>
         /// 查询用户(userId)所在组织
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        Task<IEnumerable<Organization>> FindFromUserOrgByUserId(string userId);
+        Task<IEnumerable<Organization>> FindFromUOByUserId(string userId);
 
         /// <summary>
         /// 用户(userId)创建组织(organizationJson)
@@ -80,7 +72,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        Task<bool> Exist(Func<TJson, bool> predicate);
+        Task<bool> Exist(Func<OrganizationJson, bool> predicate);
 
         /// <summary>
         /// 用户(userId)删除组织(orgId)

@@ -15,14 +15,21 @@ namespace AuthorizationCenter.Stores
     {
 
         private readonly ITransaction _transaction;
+
+        /// <summary>
+        /// 用户角色存储
+        /// </summary>
+        IUserRoleStore UserRoleStore { get; set; }
+
         /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
         /// <param name="transaction"></param>
-        public UserStore(ApplicationDbContext context, ITransaction transaction):base(context)
+        public UserStore(ApplicationDbContext context, ITransaction transaction, IUserRoleStore userRoleStore):base(context)
         {
             _transaction = transaction;
+            UserRoleStore = userRoleStore;
         }
 
         /// <summary>
@@ -137,26 +144,31 @@ namespace AuthorizationCenter.Stores
         /// 用户(userIds)删除用户(id)
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="id">被删除用户ID</param>
+        /// <param name="uId">被删除用户ID</param>
         /// <returns></returns>
-        public async Task DeleteByUserId(string userId, string id)
+        public async Task DeleteByUserId(string userId, string uId)
         {
             using(var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    var userroles = from ur in Context.Set<UserRole>()
-                                    where ur.UserId == id
-                                    select ur;
-                    Context.AttachRange(userroles);
-                    Context.RemoveRange(userroles);
+                    // 1. 删除用户角色关联（附带删除用户用户组织权限关联）
+                    var userroles = await(from ur in Context.Set<UserRole>()
+                                    where ur.UserId == uId
+                                    select ur).AsNoTracking().ToListAsync();
+                    foreach(var userRole in userroles)
+                    {
+                        await UserRoleStore.DeleteByUserId(userId, userRole.UserId, userRole.RoleId);
+                    }
+                    // 2. 删除用户组织关联
                     var userorgs = from uo in Context.Set<UserOrg>()
-                                   where uo.UserId == id
+                                   where uo.UserId == uId
                                    select uo;
                     Context.AttachRange(userorgs);
                     Context.RemoveRange(userorgs);
+                    // 2. 删除自身
                     var users = from user in Context.Set<User>()
-                                where user.Id == id
+                                where user.Id == uId
                                 select user;
                     Context.AttachRange(users);
                     Context.RemoveRange(users);
@@ -172,6 +184,20 @@ namespace AuthorizationCenter.Stores
             }
             
 
+        }
+
+        /// <summary>
+        /// 删除通过用户ID
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="uIds">被删除用户ID</param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, IEnumerable<string> uIds)
+        {
+            foreach(var uId in uIds)
+            {
+                await DeleteByUserId(userId, uId);
+            }
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace AuthorizationCenter.Stores
     /// <summary>
     /// 角色组织权限关联存储实现
     /// </summary>
-    public class RoleOrgPerStore: StoreBase<RoleOrgPer>, IRoleOrgPerStore
+    public class RoleOrgPerStore : StoreBase<RoleOrgPer>, IRoleOrgPerStore
     {
         /// <summary>
         /// 组织存储 -NOTE：小心循环调用
@@ -24,7 +24,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="context"></param>
         /// <param name="organizationStore"></param>
-        public RoleOrgPerStore(ApplicationDbContext context, IOrganizationStore organizationStore):base(context)
+        public RoleOrgPerStore(ApplicationDbContext context, IOrganizationStore organizationStore) : base(context)
         {
             OrganizationStore = organizationStore;
         }
@@ -68,7 +68,7 @@ namespace AuthorizationCenter.Stores
                                 && (roleIds).Contains(rop.RoleId) // 通过权限和角色查询组织
                                 select rop.OrgId).AsNoTracking().ToListAsync();
             // 4. 扩展成组织列表
-            var orgList = await OrganizationStore.FindChildrenFromRelById(orgIds).AsNoTracking().ToListAsync();
+            var orgList = await OrganizationStore.FindChildrenFromOrgRelById(orgIds).AsNoTracking().ToListAsync();
             Logger.Trace($"[{nameof(FindOrgByUserIdPerName)}] 用户({userId})拥有权限({perName})的组织有:\r\n{JsonUtil.ToJson(orgList)}");
             return orgList;
         }
@@ -96,7 +96,7 @@ namespace AuthorizationCenter.Stores
                                     && (perIds).Contains(uop.PermissionId)  // 如果用户的权限是该权限的父权限，则表示用户用户该权限
                                 select uop.OrganizationId).AsNoTracking().ToListAsync();
             // 3. 扩展成组织列表
-            var orgList = await OrganizationStore.FindChildrenFromRelById(orgIds).AsNoTracking().ToListAsync();
+            var orgList = await OrganizationStore.FindChildrenFromOrgRelById(orgIds).Include(org => org.Parent).AsNoTracking().ToListAsync();
             Logger.Trace($"[{nameof(FindOrgByUserIdPerName)}] 用户({userId})拥有权限({perName})的组织有:\r\n{JsonUtil.ToJson(orgList)}");
             return orgList;
         }
@@ -122,7 +122,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 用户(userId)更新角色组织权限(roleOrgPer)
+        /// 用户(userId)更新角色组织权限(roleOrgPer) -不可用
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="roleOrgPer">角色组织权限</param>
@@ -137,15 +137,15 @@ namespace AuthorizationCenter.Stores
                     var oldRoleOrgPer = await Context.Set<RoleOrgPer>().Where(rop => rop.Id == roleOrgPer.Id).SingleOrDefaultAsync();
                     // 2. 查询并删除旧的用户组织权限
                     var oldUserOrgPers = await (from uop in Context.Set<UserPermissionExpansion>()
-                                             where uop.OrganizationId == oldRoleOrgPer.OrgId && uop.PermissionId == oldRoleOrgPer.PerId
-                                                && (from ur in Context.Set<UserRole>()
-                                                    where ur.RoleId == oldRoleOrgPer.RoleId
-                                                    select ur.UserId).Contains(uop.UserId)
-                                             select uop).AsNoTracking().ToListAsync();
+                                                where uop.OrganizationId == oldRoleOrgPer.OrgId && uop.PermissionId == oldRoleOrgPer.PerId
+                                                   && (from ur in Context.Set<UserRole>()
+                                                       where ur.RoleId == oldRoleOrgPer.RoleId
+                                                       select ur.UserId).Contains(uop.UserId)
+                                                select uop).AsNoTracking().ToListAsync();
                     Context.AttachRange(oldUserOrgPers);
                     Context.RemoveRange(oldUserOrgPers);
                     // 3. 生成并添加新的用户组织权限
-                    var newUserOrgPers = await GenUserPermissionExpansion(roleOrgPer);
+                    var newUserOrgPers = await GenUserPermissionExpansion(roleOrgPer.RoleId, roleOrgPer.OrgId, roleOrgPer.PerId);
                     Context.AddRange(newUserOrgPers);
                     // 4. 更新角色组织权限
                     Context.Attach(roleOrgPer);
@@ -153,7 +153,7 @@ namespace AuthorizationCenter.Stores
                     await Context.SaveChangesAsync();
                     trans.Commit();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Logger.Error($"[{nameof(UpdateByUserId)}] 用户({userId})更新角色组织权限:\r\n{JsonUtil.ToJson(roleOrgPer)}\r\n失败:\r\n{e}");
                     trans.Rollback();
@@ -162,35 +162,124 @@ namespace AuthorizationCenter.Stores
             }
         }
 
+        ///// <summary>
+        ///// 用户(userId)创建角色组织权限(roleOrgPer)
+        ///// </summary>
+        ///// <param name="userId">用户ID</param>
+        ///// <param name="roleOrgPer">角色组织权限</param>
+        ///// <returns></returns>
+        //public async Task CreateByUserId(string userId, RoleOrgPer roleOrgPer)
+        //{
+        //    using (var trans = await Context.Database.BeginTransactionAsync())
+        //    {
+        //        try
+        //        {
+        //            // 1. 查询旧的用户组织权限关联
+                    
+        //            var oldUserOrgPers = await (from uop in Context.Set<UserPermissionExpansion>()
+        //                                        where uop.OrganizationId==roleOrgPer.OrgId&&uop.PermissionId==roleOrgPer.PerId
+        //                                        select uop).AsNoTracking().ToListAsync();
+        //            // 2. 生成的用户组织权限关联
+        //            var genUserOrgPers = await GenUserPermissionExpansion(roleOrgPer.RoleId, roleOrgPer.OrgId, roleOrgPer.PerId);
+        //            // 3. 得到需要添加的用户组织权限关联
+        //            var newUops = new List<UserPermissionExpansion>();
+        //            foreach(var newUop in newUops)
+        //            {
+        //                bool flag = true;
+        //                foreach(var oldUop in oldUserOrgPers)
+        //                {
+        //                    if(oldUop.OrganizationId == newUop.OrganizationId && oldUop.PermissionId == newUop.PermissionId && oldUop.UserId == newUop.UserId)
+        //                    {
+        //                        flag = false;
+        //                    }
+        //                }
+        //                if (flag)
+        //                {
+        //                    newUops.Add(newUop);
+        //                }
+        //            }
+        //            // 4. 添加需要的用户组织权限关联
+        //            Context.AddRange(newUops);
+        //            // 5. 添加角色组织权限
+        //            if (roleOrgPer.Id == null)
+        //            {
+        //                roleOrgPer.Id = Guid.NewGuid().ToString();
+        //            }
+        //            Context.Add(roleOrgPer);
+
+        //            await Context.SaveChangesAsync();
+        //            trans.Commit();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error($"[{nameof(CreateByUserId)}] 用户({userId})创建角色组织权限:\r\n{JsonUtil.ToJson(roleOrgPer)}\r\n失败:\r\n{e}");
+        //            trans.Rollback();
+        //            throw new Exception($"用户({userId})创建角色组织权限失败", e);
+        //        }
+        //    }
+        //}
+
         /// <summary>
         /// 用户(userId)创建角色组织权限(roleOrgPer)
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="roleOrgPer">角色组织权限</param>
+        /// <param name="rId"></param>
+        /// <param name="oId"></param>
+        /// <param name="pId"></param>
         /// <returns></returns>
-        public async Task CreateByUserId(string userId, RoleOrgPer roleOrgPer)
+        public async Task CreateByUserId(string userId, string rId, string oId, string pId)
         {
-            using(var trans = await Context.Database.BeginTransactionAsync())
+            using (var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    // 1. 添加角色组织权限关联
-                    Context.Add(roleOrgPer);
-                    // 2. 添加用户组织权限关联
-                    var userOrgPers = await GenUserPermissionExpansion(roleOrgPer);
-                    Context.AddRange(userOrgPers);
+                    // 1. 查询旧的用户组织权限关联
+
+                    var oldUserOrgPers = await (from uop in Context.Set<UserPermissionExpansion>()
+                                                where uop.OrganizationId == oId && uop.PermissionId == pId
+                                                select uop).AsNoTracking().ToListAsync();
+                    // 2. 生成的用户组织权限关联
+                    var genUserOrgPers = await GenUserPermissionExpansion(rId, oId, pId);
+                    // 3. 得到需要添加的用户组织权限关联
+                    var newUops = new List<UserPermissionExpansion>();
+                    foreach (var newUop in genUserOrgPers)
+                    {
+                        bool flag = true;
+                        foreach (var oldUop in oldUserOrgPers)
+                        {
+                            if (oldUop.OrganizationId == newUop.OrganizationId && oldUop.PermissionId == newUop.PermissionId && oldUop.UserId == newUop.UserId)
+                            {
+                                flag = false;
+                            }
+                        }
+                        if (flag)
+                        {
+                            newUops.Add(newUop);
+                        }
+                    }
+                    // 4. 添加需要的用户组织权限关联
+                    Context.AddRange(newUops);
+                    // 5. 添加角色组织权限
+                    Context.Add(new RoleOrgPer
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        RoleId =rId,
+                        OrgId =oId,
+                        PerId =pId
+                    });
+
                     await Context.SaveChangesAsync();
                     trans.Commit();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    Logger.Error($"[{nameof(CreateByUserId)}] 用户({userId})创建角色组织权限:\r\n{JsonUtil.ToJson(roleOrgPer)}\r\n失败:\r\n{e}");
+                    Logger.Error($"[{nameof(CreateByUserId)}] 用户({userId})创建角色({rId})组织({oId})权限({pId})关联失败:\r\n{e}");
                     trans.Rollback();
                     throw new Exception($"用户({userId})创建角色组织权限失败", e);
                 }
             }
         }
-
+        
         /// <summary>
         /// 用户(userId)删除角色组织权限(ropId)
         /// </summary>
@@ -205,7 +294,7 @@ namespace AuthorizationCenter.Stores
                 {
                     // 1. 查询角色组织权限关联
                     var roleOrgPer = await Context.Set<RoleOrgPer>().Where(rop => rop.Id == ropId).AsNoTracking().SingleOrDefaultAsync();
-                    if(roleOrgPer == null)
+                    if (roleOrgPer == null)
                     {
                         Logger.Warn($"[{nameof(CreateByUserId)}] 用户({userId})删除角色组织权限({ropId})不存在");
                         return;
@@ -240,7 +329,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task ReExpansion()
         {
-            using(var trans =await Context.Database.BeginTransactionAsync())
+            using (var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
                 {
@@ -257,7 +346,7 @@ namespace AuthorizationCenter.Stores
                     await Context.SaveChangesAsync();
                     trans.Commit();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("服务器错误:\r\n" + e);
                     trans.Rollback();
@@ -282,7 +371,7 @@ namespace AuthorizationCenter.Stores
             {
                 foreach (var rop in roleOrgPers)
                 {
-                    if (userRole.RoleId == rop.RoleId)
+                    if (userRole.RoleId == rop.RoleId && !userOrgPers.Any(uop => uop.UserId==userRole.UserId&&uop.OrganizationId==rop.OrgId&&uop.PermissionId==rop.PerId))
                     {
                         userOrgPers.Add(new UserPermissionExpansion
                         {
@@ -298,51 +387,93 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 根据角色组织权限(roleOrgPer)生成用户组织权限
+        /// 根据角色组织权限生成用户组织权限
         /// </summary>
-        /// <param name="roleOrgPer">角色组织权限</param>
+        /// <param name="rId"></param>
+        /// <param name="oId"></param>
+        /// <param name="pId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(RoleOrgPer roleOrgPer)
+        public async Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(string rId, string oId, string pId)
         {
             // 1. 找到所有用户角色关系
-            var userRoles = await Context.Set<UserRole>().Where(ur=> ur.RoleId==roleOrgPer.RoleId).AsNoTracking().ToListAsync();
+            var userRoles = await Context.Set<UserRole>().Where(ur => ur.RoleId == rId).AsNoTracking().ToListAsync();
             // 2. 生成用户组织权限数据
             var userOrgPers = new List<UserPermissionExpansion>();
-            foreach(var ur in userRoles)
+            foreach (var ur in userRoles)
             {
                 userOrgPers.Add(new UserPermissionExpansion
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = ur.UserId,
-                    OrganizationId = roleOrgPer.OrgId,
-                    PermissionId = roleOrgPer.PerId
+                    OrganizationId = oId,
+                    PermissionId = pId
                 });
             }
             return userOrgPers;
         }
 
-        /// <summary>
-        /// 根据用户角色(userRole)生成用户组织权限
-        /// </summary>
-        /// <param name="userRole">用户角色</param>
-        /// <returns></returns>
-        public async Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(UserRole userRole)
+        ///// <summary>
+        ///// 根据用户角色(userRole)生成用户组织权限
+        ///// </summary>
+        ///// <param name="userRole">用户角色</param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<UserPermissionExpansion>> GenUserPermissionExpansion(UserRole userRole)
+        //{
+        //    // 1. 找到所有角色组织权限
+        //    var roleOrgPers = await Context.Set<RoleOrgPer>().Where(rop => rop.RoleId == userRole.RoleId).AsNoTracking().ToListAsync();
+        //    // 2. 生成用户组织权限数据
+        //    var userOrgPers = new List<UserPermissionExpansion>();
+        //    foreach (var rop in roleOrgPers)
+        //    {
+        //        userOrgPers.Add(new UserPermissionExpansion
+        //        {
+        //            Id = Guid.NewGuid().ToString(),
+        //            UserId = userRole.UserId,
+        //            OrganizationId = rop.OrgId,
+        //            PermissionId = rop.PerId
+        //        });
+        //    }
+        //    return userOrgPers;
+        //}
+
+        ///// <summary>
+        ///// 根据用户角色(userRole)查询用户组织权限
+        ///// </summary>
+        ///// <param name="userRole">用户角色</param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<UserPermissionExpansion>> FindUserPermissionExpansion(UserRole userRole)
+        //{
+        //    // 1. 找到所有角色组织权限
+        //    var roleOrgPers = await Context.Set<RoleOrgPer>().Where(rop => rop.RoleId == userRole.RoleId).AsNoTracking().ToListAsync();
+        //    // 2. 生成用户组织权限数据
+        //    var userOrgPers = new List<UserPermissionExpansion>();
+        //    foreach (var rop in roleOrgPers)
+        //    {
+        //        userOrgPers.Add(new UserPermissionExpansion
+        //        {
+        //            Id = Guid.NewGuid().ToString(),
+        //            UserId = userRole.UserId,
+        //            OrganizationId = rop.OrgId,
+        //            PermissionId = rop.PerId
+        //        });
+        //    }
+        //    var res = from uop in Context.Set<UserPermissionExpansion>()
+        //              where userOrgPers.Any(a => a.OrganizationId==uop.OrganizationId && a.PermissionId ==uop.PermissionId&&a.UserId==uop.UserId)
+        //              select uop;
+        //    return await res.AsNoTracking().ToListAsync();
+        //}
+
+        class Comparer : IEqualityComparer<UserPermissionExpansion>
         {
-            // 1. 找到所有角色组织权限
-            var roleOrgPers = await Context.Set<RoleOrgPer>().Where(rop => rop.RoleId == userRole.RoleId).AsNoTracking().ToListAsync();
-            // 2. 生成用户组织权限数据
-            var userOrgPers = new List<UserPermissionExpansion>();
-            foreach (var rop in roleOrgPers)
+            public bool Equals(UserPermissionExpansion x, UserPermissionExpansion y)
             {
-                userOrgPers.Add(new UserPermissionExpansion
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    UserId = userRole.UserId,
-                    OrganizationId = rop.OrgId,
-                    PermissionId = rop.PerId
-                });
+                throw new NotImplementedException();
             }
-            return userOrgPers;
+
+            public int GetHashCode(UserPermissionExpansion obj)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

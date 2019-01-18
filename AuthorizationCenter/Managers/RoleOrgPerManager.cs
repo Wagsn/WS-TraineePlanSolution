@@ -256,7 +256,7 @@ namespace AuthorizationCenter.Managers
             foreach(var orgId in rootOrgIds)
             {
                 // 递归
-                perOrgIds.AddRange((await OrganizationStore.FindChildrenById(orgId)).Select(org => org.Id));
+                perOrgIds.AddRange((await OrganizationStore.FindChildrenFromOrgById(orgId)).Select(org => org.Id));
             }
             perOrgIds.AddRange(rootOrgIds);
             // 4. 判断传入的组织ID列表是有权限组织ID列表的子集
@@ -271,7 +271,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task CreateByUserId(string userId, RoleOrgPer roleOrgPer)
         {
-            await RoleOrgPerStore.CreateByUserId(userId, roleOrgPer);
+            await RoleOrgPerStore.CreateByUserId(userId, roleOrgPer.RoleId, roleOrgPer.OrgId, roleOrgPer.PerId);
         }
 
         /// <summary>

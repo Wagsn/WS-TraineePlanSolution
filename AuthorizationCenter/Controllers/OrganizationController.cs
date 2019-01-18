@@ -25,7 +25,7 @@ namespace AuthorizationCenter.Controllers
         /// <summary>
         /// 管理
         /// </summary>
-        IOrganizationManager<OrganizationJson> OrganizationManager { get; set; }
+        IOrganizationManager OrganizationManager { get; set; }
 
         /// <summary>
         /// 角色组织权限管理
@@ -42,7 +42,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <param name="organizationManager"></param>
         /// <param name="roleOrgPerManager"></param>
-        public OrganizationController(IOrganizationManager<OrganizationJson> organizationManager, IRoleOrgPerManager roleOrgPerManager)
+        public OrganizationController(IOrganizationManager organizationManager, IRoleOrgPerManager roleOrgPerManager)
         {
             OrganizationManager = organizationManager ?? throw new ArgumentNullException(nameof(organizationManager));
             RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));

@@ -233,7 +233,7 @@ namespace AuthorizationCenter.Managers
             // 1. 查询有权组织
             var perOrgs = await RoleOrgPerStore.FindOrgByUserIdPerName(userId, Constants.USER_QUERY);
             // 1. 查询所有组织
-            var orgs = await OrganizationStore.FindChildrenById(orgId);
+            var orgs = await OrganizationStore.FindChildrenFromOrgById(orgId);
             // 2. 查询用户集合
             var users = new List<User>();
             foreach(var org in orgs)

@@ -16,7 +16,7 @@ namespace AuthorizationCenter.Managers
     /// <summary>
     /// 组织管理
     /// </summary>
-    public class OrganizationManager : IOrganizationManager<OrganizationJson>
+    public class OrganizationManager : IOrganizationManager
     {
         /// <summary>
         /// 组织存储
@@ -139,60 +139,40 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<OrganizationJson> Find()
         {
-            return OrganizationStore.Find()
-                .Include(org => org.Parent)
-                .Select(org => Mapper.Map<OrganizationJson>(org));
+            return OrganizationStore.Find().Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
         /// <summary>
         /// 查询通过ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public IQueryable<OrganizationJson> FindById(string id)
+        public IQueryable<OrganizationJson> FindById(string orgId)
         {
-            return OrganizationStore.Find(org => org.Id == id)
-                .Include(org => org.Parent)
-                .Include(org => org.Children)
-                .Select(org => Mapper.Map<OrganizationJson>(org));
+            return OrganizationStore.Find(org => org.Id == orgId).Include(org => org.Parent).Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
-        /// <summary>
-        /// 递归查询所有节点，构成一棵树返回
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public Organization FindTreeById(string id)
-        {
-            var org = OrganizationStore.Find(o => o.Id == id).Include(o => o.Children).SingleOrDefault();
-            for (int i = 0; i < org.Children.Count; i++)
-            {
-                org.Children[i] = FindTreeById(org.Children[i].Id);
-            }
-            return org;
-        }
-
-        /// <summary>
-        /// 将组织树扩展成组织列表
-        /// </summary>
-        /// <param name="organization">组织树节点</param>
-        /// <returns></returns>
-        public static List<Organization> TreeToList(Organization organization)
-        {
-            List<Organization> result = new List<Organization>
-            {
-                organization
-            };
-            if (organization == null|| organization.Children == null)
-            {
-                return result;
-            }
-            foreach (var org in organization.Children)
-            {
-                result.AddRange(TreeToList(org));
-            }
-            return result;
-        }
+        ///// <summary>
+        ///// 将组织树扩展成组织列表
+        ///// </summary>
+        ///// <param name="organization">组织树节点</param>
+        ///// <returns></returns>
+        //public static List<Organization> TreeToList(Organization organization)
+        //{
+        //    List<Organization> result = new List<Organization>
+        //    {
+        //        organization
+        //    };
+        //    if (organization == null|| organization.Children == null)
+        //    {
+        //        return result;
+        //    }
+        //    foreach (var org in organization.Children)
+        //    {
+        //        result.AddRange(TreeToList(org));
+        //    }
+        //    return result;
+        //}
 
         /// <summary>
         /// 查询用户(userId)具有组织查询的组织
@@ -213,7 +193,7 @@ namespace AuthorizationCenter.Managers
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <returns></returns>
-        public async Task<IEnumerable<Organization>> FindFromUserOrgByUserId(string userId)
+        public async Task<IEnumerable<Organization>> FindFromUOByUserId(string userId)
         {
             return await OrganizationStore.FindByUserId(userId).ToListAsync();
         }
@@ -229,6 +209,7 @@ namespace AuthorizationCenter.Managers
         public async Task<IEnumerable<OrganizationJson>> FindByUserIdOrgId(string userId, string orgId)
         {
             return (await OrganizationStore.FindChildrenById(orgId)).Select(org => Mapper.Map<OrganizationJson>(org));
+            //return (await OrganizationStore.FindChildrenFromOrgRelById(orgId)).Select(org => Mapper.Map<OrganizationJson>(org));
         }
 
         /// <summary>

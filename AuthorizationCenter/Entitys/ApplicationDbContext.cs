@@ -116,7 +116,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<UserOrg>(b =>
             {
-                b.ToTable("user_organization_relation");
+                b.ToTable("user_org_relation");
             });
 
             builder.Entity<Permission>(b =>
@@ -132,7 +132,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<OrganizationRelation>(b =>
             {
-                b.ToTable("organization_relation");
+                b.ToTable("org_relation");
             });
 
             builder.Entity<RoleOrgPer>(b =>
@@ -143,7 +143,7 @@ namespace AuthorizationCenter.Entitys
 
             builder.Entity<RoleOrg>(b =>
             {
-                b.ToTable("role_organization_relation");
+                b.ToTable("role_org_relation");
             });
 
             builder.Entity<UserPermissionExpansion>(b =>

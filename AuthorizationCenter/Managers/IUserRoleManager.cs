@@ -37,6 +37,14 @@ namespace AuthorizationCenter.Managers
         /// <param name="userRole"></param>
         /// <returns></returns>
         Task<UserRole> Create(UserRole userRole);
+        
+        /// <summary>
+        /// 创建用户角色关联
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="userRole">用户角色</param>
+        /// <returns></returns>
+        Task Create(string userId, UserRole userRole);
 
         /// <summary>
         /// 更新用户角色
@@ -58,6 +66,14 @@ namespace AuthorizationCenter.Managers
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<UserRole>> DeleteById(string id);
+
+        /// <summary>
+        /// 通过ID删除
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="id">用户角色ID</param>
+        /// <returns></returns>
+        Task DeleteById(string userId, string id);
 
     }
 }

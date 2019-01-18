@@ -37,26 +37,34 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         Task DeleteByUserId(string userId, string orgId);
 
+
         /// <summary>
-        /// 查询组织ID(orgId)下的所有子组织（包括自身）
+        /// 通过组织ID找到所有子组织（包含自身）
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
         Task<List<Organization>> FindChildrenById(string orgId);
 
         /// <summary>
+        /// 查询组织ID(orgId)下的所有子组织（包括自身）
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task<List<Organization>> FindChildrenFromOrgById(string orgId);
+
+        /// <summary>
         /// 通过组织ID找到所有子组织（包括间接子组织，包括自身）
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        IQueryable<Organization> FindChildrenFromRelById(string orgId);
+        IQueryable<Organization> FindChildrenFromOrgRelById(string orgId);
 
         /// <summary>
         /// [组织关系表] 找到组织ID集合的所有子组织（包括自身）
         /// </summary>
         /// <param name="orgIds">组织ID集合</param>
         /// <returns></returns>
-        IQueryable<Organization> FindChildrenFromRelById(List<string> orgIds);
+        IQueryable<Organization> FindChildrenFromOrgRelById(List<string> orgIds);
 
         /// <summary>
         /// 通过组织找到所有子组织（不包含自身）

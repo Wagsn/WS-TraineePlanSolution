@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WS.Log;
 
 namespace AuthorizationCenter.Managers
 {
@@ -16,15 +17,25 @@ namespace AuthorizationCenter.Managers
         /// <summary>
         /// 存储
         /// </summary>
-        protected IUserRoleStore Store { get; set; }
+        protected IUserRoleStore UserRoleStore { get; set; }
+
+        IRoleOrgPerStore RoleOrgPerStore { get; set; }
+
+        IUserPermissionExpansionStore UserPermissionExpansionStore { get; set; }
+
+        readonly ILogger Logger = LoggerManager.GetLogger<UserRoleManager>();
 
         /// <summary>
-        /// 构造器
+        /// 
         /// </summary>
-        /// <param name="store"></param>
-        public UserRoleManager(IUserRoleStore store)
+        /// <param name="userRoleStore"></param>
+        /// <param name="roleOrgPerStore"></param>
+        /// <param name="userPermissionExpansionStore"></param>
+        public UserRoleManager(IUserRoleStore userRoleStore, IRoleOrgPerStore roleOrgPerStore, IUserPermissionExpansionStore userPermissionExpansionStore)
         {
-            Store = store;
+            UserRoleStore = userRoleStore ?? throw new ArgumentNullException(nameof(userRoleStore));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            UserPermissionExpansionStore = userPermissionExpansionStore ?? throw new ArgumentNullException(nameof(userPermissionExpansionStore));
         }
 
         /// <summary>
@@ -33,7 +44,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public IQueryable<UserRole> Find()
         {
-            return Store.Find().Include(ur => ur.User).Include(ur => ur.Role);
+            return UserRoleStore.Find().Include(ur => ur.User).Include(ur => ur.Role);
         }
 
         /// <summary>
@@ -65,7 +76,18 @@ namespace AuthorizationCenter.Managers
         {
             // 前端没有传Id上来
             userRole.Id = Guid.NewGuid().ToString();
-            return Store.Create(userRole);
+            return UserRoleStore.Create(userRole);
+        }
+
+        /// <summary>
+        /// 创建用户角色关联
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="userRole">用户角色</param>
+        /// <returns></returns>
+        public async Task Create(string userId, UserRole userRole)
+        {
+            await UserRoleStore.CreateByUserId(userId, userRole.UserId, userRole.RoleId);
         }
 
         /// <summary>
@@ -75,7 +97,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<UserRole> Update(UserRole userRole)
         {
-            return Store.Update(userRole);
+            return UserRoleStore.Update(userRole);
         }
 
         /// <summary>
@@ -85,7 +107,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<bool> Exist(Func<UserRole, bool> predicate)
         {
-            return Store.Find().AnyAsync(ur => predicate(ur));
+            return UserRoleStore.Find().AnyAsync(ur => predicate(ur));
         }
 
         /// <summary>
@@ -95,7 +117,19 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public Task<IEnumerable<UserRole>> DeleteById(string id)
         {
-            return Store.Delete(ur => ur.Id == id);
+            return UserRoleStore.Delete(ur => ur.Id == id);
+        }
+
+        /// <summary>
+        /// 通过ID删除
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="urId">用户角色ID</param>
+        /// <returns></returns>
+        public async Task DeleteById(string userId, string urId)
+        {
+            // 删除用户角色关联
+            await UserRoleStore.DeleteByUserId(userId, urId);
         }
     }
 }
