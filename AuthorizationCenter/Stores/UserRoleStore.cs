@@ -221,23 +221,30 @@ namespace AuthorizationCenter.Stores
                             PermissionId = rop.PerId
                         });
                     }
-                    // 2. 查询除该用户的其它用户组织权限关联
-                    var oldUserOrgPers = await (from uop in Context.Set<UserPermissionExpansion>()
-                                                where uop.UserId != uId
-                                                select uop).AsNoTracking().ToListAsync();
+                    // 2. 查询该用户的由其它角色产生的用户组织权限关联
+                    // U==U01&&R!=R01
+                    var oldUserRoles = await (from ur in Context.Set<UserRole>()
+                                              where ur.UserId == uId && ur.RoleId != rId
+                                              select ur).AsNoTracking().ToListAsync();
+
+                    var oldUserOrgPers = new List<UserPermissionExpansion>();
+                    foreach(var oldUserRole in oldUserRoles)
+                    {
+                        oldUserOrgPers.AddRange(await GenUserPermissionExpansion(oldUserRole));
+                    }
                     // 3. 获取需要删除的用户组织权限
                     var subUserOrgPers = new List<UserPermissionExpansion>();
                     foreach (var newUop in genUserOrgPers)
                     {
-                        bool uopExistInOther = false;
+                        bool flag = true;
                         foreach (var oldUop in oldUserOrgPers)
                         {
                             if ((oldUop.OrganizationId == newUop.OrganizationId && oldUop.PermissionId == newUop.PermissionId && oldUop.UserId == newUop.UserId))
                             {
-                                uopExistInOther = true;
+                                flag = false;
                             }
                         }
-                        if (!uopExistInOther)
+                        if (flag)
                         {
                             subUserOrgPers.Add(newUop);
                         }
