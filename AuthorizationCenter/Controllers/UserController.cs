@@ -164,6 +164,7 @@ namespace AuthorizationCenter.Controllers
                     // 再查询用户绑定的角色列表
                     ViewData[Constants.ROLES] = await RoleManager.FindByUserId(id);
                     ViewData[Constants.USERROLES] = await UserRoleManager.FindByUserId(id).ToListAsync();
+                    ViewData["Organization"] = (await OrganizationManager.FindFromUOByUserId(SignUser.Id)).SingleOrDefault();
                     return View(user);
                 }
             }
@@ -278,7 +279,7 @@ namespace AuthorizationCenter.Controllers
         // GET: UserBaseJsons/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            Logger.Trace($"[{nameof(Edit)}] 请求参数: 用户ID({id})");
+            Logger.Trace($"[{nameof(Edit)}] 用户[{SignUser.SignName}]({SignUser.Id})编辑用户({id}) 跳转到编辑界面");
             if (id == null)
             {
                 return NotFound();
@@ -300,7 +301,7 @@ namespace AuthorizationCenter.Controllers
                     Logger.Trace($"[{nameof(Edit)}] 用户[{SignUser.SignName}]({SignUser.Id})进入编辑界面编辑的用户({id})不存在");
                     return NotFound();
                 }
-                return RedirectToAction(nameof(Index));
+                return View(user);
             }
             catch (Exception e)
             {

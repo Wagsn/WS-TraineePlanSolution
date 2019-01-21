@@ -6,6 +6,11 @@
     //var roles = new List<RoleJson>(); // ViewBag.Roles;
     var roles = ViewBag.Roles as IEnumerable<RoleJson>;
     var userRoles = ViewBag.UserRoles as IEnumerable<UserRole>;
+    var org = ViewBag.Organization as Organization ?? new Organization
+    {
+        Name = "自由组织",
+        Description = "自由组织"
+    };
 }
 
 <h2>Details</h2>
@@ -15,7 +20,7 @@
 }
 <div>
     <h4>UserBaseJson</h4>
-    <p>TODO 所属组织<span>游民</span> </p>
+    <p>所属组织为【<a id="sign-name" asp-action="Details" asp-controller="Organization" asp-route-id="@org?.Id" title="User Details">@(org?.Name)</a>】</p>
     <hr />
     <p>用户详细信息</p>
     <dl class="dl-horizontal">
