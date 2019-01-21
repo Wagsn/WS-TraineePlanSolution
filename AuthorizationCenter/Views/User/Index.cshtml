@@ -2,15 +2,18 @@
 @* 分页查询 *@
 @{
     ViewData["Title"] = "Index";
-    Console.WriteLine("Sign Name: "+ ((UserJson)ViewData["SignUser"]).SignName??"");
+    Console.WriteLine("Sign Name: " + ((UserJson)ViewData["SignUser"]).SignName ?? "");
     var PageBody = ViewBag.PageBody as AuthorizationCenter.Define.PageBody<UserJson>;
     var SignUser = ViewData["SignUser"] as UserJson;
 }
 
 <h2>用户管理</h2>
-
+@if (ViewBag.ErrMsg != null)
+{
+    <div class="err-msg" style="color:red">@ViewBag.ErrMsg?.ToString()</div>
+}
 <p>
-    当前用户登陆用户为【<a id="sign-name" asp-action="Details" asp-route-id="@SignUser?.Id" title="User Details">@(SignUser?.SignName ??"游客")</a>】
+    当前用户登陆用户为【<a id="sign-name" asp-action="Details" asp-route-id="@SignUser?.Id" title="User Details">@(SignUser?.SignName ?? "游客")</a>】
 </p>
 
 <p>
@@ -20,7 +23,7 @@
     var users = Model;
     // 判断是否登陆
 }
-<table class="table" >
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -31,7 +34,9 @@
                 密码
                 @*@Html.DisplayNameFor(model => model.PassWord)*@
             </th>
-            <th></th>
+            <th>
+                可用操作
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -45,9 +50,10 @@
                     @Html.DisplayFor(modelItem => item.PassWord)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" title="Edit User">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" title="User Details">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" title="Delete User">Delete</a>
+                    <a asp-action="MultCreate" asp-controller="UserRoles" asp-route-userId="@item.Id" title="Bind Role">绑定角色</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id" title="Edit User">编辑用户</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" title="User Details">用户详情</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" title="Delete User">删除用户</a>
                 </td>
             </tr>
         }

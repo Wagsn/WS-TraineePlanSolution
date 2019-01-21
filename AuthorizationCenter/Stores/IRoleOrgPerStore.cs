@@ -77,6 +77,15 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         Task DeleteByUserId(string userId, string ropId);
 
+        /// <summary>
+        /// 用户(userId)删除角色组织权限(ropId)
+        /// 当删除角色时要删除用户角色关联和角色组织关联和角色权限关联（当用户角色关联删除完后角色生成的用户权限也被删除完了）
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate);
+
         ///// <summary>
         ///// 用户(userId)删除角色组织权限(ropId)
         ///// </summary>

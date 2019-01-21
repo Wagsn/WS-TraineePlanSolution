@@ -1,4 +1,5 @@
 ﻿using AuthorizationCenter.Entitys;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,34 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public class RoleStore : StoreBase<Role>, IRoleStore
     {
+
         /// <summary>
-        /// 构造器
+        /// 用户角色存储
+        /// </summary>
+        IUserRoleStore UserRoleStore { get; set; }
+
+        /// <summary>
+        /// 角色组织权限存储
+        /// </summary>
+        IRoleOrgPerStore RoleOrgPerStore { get; set; }
+
+
+        IRoleOrgStore RoleOrgStore { get; set; }
+
+        /// <summary>
+        /// 
         /// </summary>
         /// <param name="context"></param>
-        public RoleStore(ApplicationDbContext context):base(context){ }
+        /// <param name="userRoleStore"></param>
+        /// <param name="roleOrgPerStore"></param>
+        /// <param name="roleOrgStore"></param>
+        public RoleStore(ApplicationDbContext context, IUserRoleStore userRoleStore, IRoleOrgPerStore roleOrgPerStore, IRoleOrgStore roleOrgStore):base(context)
+        {
+            UserRoleStore = userRoleStore ?? throw new ArgumentNullException(nameof(userRoleStore));
+            RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
+            RoleOrgStore = roleOrgStore ?? throw new ArgumentNullException(nameof(roleOrgStore));
+        }
+
 
         /// <summary>
         /// 通过ID删除
@@ -32,50 +56,66 @@ namespace AuthorizationCenter.Stores
         /// 用户(userId)删除角色(id)
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="id">被删除角色ID</param>
+        /// <param name="rId">被删除角色ID</param>
         /// <returns></returns>
-        public async Task DeleteByUserId(string userId, string id)
+        public async Task DeleteByUserId(string userId, string rId)
         {
             using(var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    // 1. 删除关联实体
-                    // 1.1 删除角色组织实体
-                    var roleOrgs = from ro in Context.Set<RoleOrg>()
-                                   where ro.RoleId == id
-                                   select ro;
-                    Context.AttachRange(roleOrgs);
-                    Context.RemoveRange(roleOrgs);
-                    // 1.2 删除角色权限实体
-                    var roleOrgPers = from rop in Context.Set<RoleOrgPer>()
-                                      where rop.RoleId == id
-                                      select rop;
-                    Context.AttachRange(roleOrgPers);
-                    Context.RemoveRange(roleOrgPers);
-                    // 1.3 删除用户角色实体
-                    var userRoles = from ur in Context.Set<UserRole>()
-                                    where ur.RoleId == id
-                                    select ur;
-                    Context.AttachRange(userRoles);
-                    Context.RemoveRange(userRoles);
-                    // 2. 删除角色实体
-                    var roles = from role in Context.Set<Role>()
-                                where role.Id == id
-                                select role;
-                    Context.AttachRange(roles);
-                    Context.RemoveRange(roles);
-                    await Context.SaveChangesAsync();
+                    // 删除所有用户角色关联
+                    await UserRoleStore.DeleteByUserId(userId, ur => ur.RoleId == rId);
+                    // 删除所有角色组织权限关联
+                    await RoleOrgPerStore.Delete(rop => rop.RoleId == rId);
+                    // 删除所有角色组织关联
+                    await RoleOrgStore.Delete(ro => ro.RoleId == rId);
+                    // 删除角色本身
+                    await DeleteById(rId);
                     trans.Commit();
                 }
                 catch(Exception e)
                 {
-                    Logger.Error($"[{nameof(DeleteByUserId)}] 删除角色失败:\r\n{e}");
+                    Logger.Error($"[{nameof(DeleteByUserId)}] 用户({userId})删除角色({rId})失败:\r\n{e}");
                     trans.Rollback();
-                    throw new Exception("删除角色失败", e);  // 因为删除失败，避免上层代码继续执行，将异常抛出
+                    throw new Exception($"用户({userId})删除角色({rId})失败", e);  // 因为删除失败，避免上层代码继续执行，将异常抛出
                 }
             }
+        }
 
+        /// <summary>
+        /// 用户(userId)条件(predicate)删除角色
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, Func<Role, bool> predicate)
+        {
+            var roles = await Find(predicate).AsNoTracking().ToListAsync();
+            foreach(var role in roles)
+            {
+                await DeleteByUserId(userId, role.Id);
+            }
+        }
+
+        /// <summary>
+        /// 用户(userId)条件(predicate)删除角色
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task DeleteByUserIdOrgId(string userId, Func<Organization, bool> predicate)
+        {
+            var roleIds = await (from ro in Context.Set<RoleOrg>()
+                                 where (from o in Context.Set<Organization>()
+                                        where predicate(o)
+                                        select o.Id).Contains(ro.OrgId)
+                                 select ro.RoleId).AsNoTracking().ToListAsync();
+            //await DeleteByUserId(userId, role => roleIds.Contains(role.Id));
+            foreach(var roleId in roleIds)
+            {
+                await DeleteByUserId(userId, roleId);
+            }
         }
 
         /// <summary>
@@ -140,10 +180,10 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public IEnumerable<Role> FindByOrgId(string orgId)
+        public IQueryable<Role> FindByOrgId(string orgId)
         {
-            return from r in Context.Roles
-                   where (from ro in Context.RoleOrgs
+            return from r in Context.Set<Role>()
+                   where (from ro in Context.Set<RoleOrg>()
                           where ro.OrgId == orgId
                           select ro.RoleId).Contains(r.Id)
                    select r;

@@ -47,16 +47,24 @@ namespace AuthorizationCenter.Stores
         /// 删除通过用户ID
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="id">被删除用户ID</param>
+        /// <param name="uId">被删除用户ID</param>
         /// <returns></returns>
-        Task DeleteByUserId(string userId, string id);
+        Task DeleteByUserId(string userId, string uId);
 
         /// <summary>
         /// 删除通过用户ID
         /// </summary>
         /// <param name="userId">用户ID</param>
-        /// <param name="ids">被删除用户ID</param>
+        /// <param name="uIds">被删除用户ID</param>
         /// <returns></returns>
-        Task DeleteByUserId(string userId, IEnumerable<string> ids);
+        Task DeleteByUserId(string userId, IEnumerable<string> uIds);
+
+        /// <summary>
+        /// 删除符合条件的组织的所有用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate">条件表达式</param>
+        /// <returns></returns>
+        Task DeleteByUserIdOrgId(string userId, Func<Organization, bool> predicate);
     }
 }

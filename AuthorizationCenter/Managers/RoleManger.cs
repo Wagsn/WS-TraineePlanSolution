@@ -171,7 +171,34 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task DeleteByUserId(string userId, string id)
         {
-            await RoleStore.DeleteByUserId(userId, id);
+            using(var trans = await RoleStore.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 查询所有用户角色关联
+                    var userRoles = await UserRoleStore.Find(ur => ur.RoleId == id).AsNoTracking().ToListAsync();
+                    // 删除所有用户角色关联
+                    foreach (var ur in userRoles)
+                    {
+                        await UserRoleStore.DeleteByUserId(userId, ur.Id);
+                    }
+                    // 删除所有用户组织权限关联
+                    var roleOrgPers = await RoleOrgPerStore.Delete(rop => rop.RoleId == id);
+
+                    // 删除所有角色组织关联
+                    await RoleOrgStore.Delete(ro => ro.RoleId == id);
+                    // 删除角色本身
+                    await RoleStore.DeleteById(id);
+                    trans.Commit();
+                }
+                catch(Exception e)
+                {
+                    Logger.Error($"[{nameof(DeleteByUserId)}] 用户({userId})删除角色({id})失败");
+                    trans.Rollback();
+                    throw new Exception("角色删除失败", e);
+                }
+            }
+            
         }
 
         /// <summary>

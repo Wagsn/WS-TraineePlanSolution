@@ -44,5 +44,13 @@ namespace AuthorizationCenter.Stores
         /// <param name="rId"></param>
         /// <returns></returns>
         Task DeleteByUserId(string userId, string uId, string rId);
+
+        /// <summary>
+        /// 用户条件删除用户角色关联
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, Func<UserRole, bool> predicate);
     }
 }

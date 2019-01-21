@@ -9,7 +9,10 @@
 }
 
 <h2>Details</h2>
-
+@if (ViewBag.ErrMsg != null)
+{
+    <div class="err-msg" style="color:red">@ViewBag.ErrMsg?.ToString()</div>
+}
 <div>
     <h4>UserBaseJson</h4>
     <p>TODO 所属组织<span>游民</span> </p>

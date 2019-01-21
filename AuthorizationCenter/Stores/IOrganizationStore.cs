@@ -37,13 +37,27 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         Task DeleteByUserId(string userId, string orgId);
 
+        /// <summary>
+        /// [组织扩展表] 删除与组织(orgId)有关的关联
+        /// </summary>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task DeleteRelById(string orgId);
+
+        /// <summary>
+        /// 删除递归删除组织，先删叶子组织
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="orgId">组织ID</param>
+        /// <returns></returns>
+        Task DeleteRecursionByUserId(string userId, string orgId);
 
         /// <summary>
         /// 通过组织ID找到所有子组织（包含自身）
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        Task<List<Organization>> FindChildrenById(string orgId);
+        Task<IEnumerable<Organization>> FindChildrenById(string orgId);
 
         /// <summary>
         /// 查询组织ID(orgId)下的所有子组织（包括自身）

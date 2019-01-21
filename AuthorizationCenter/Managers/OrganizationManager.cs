@@ -24,14 +24,14 @@ namespace AuthorizationCenter.Managers
         public IOrganizationStore OrganizationStore { get; set; }
 
         /// <summary>
-        /// 用户组织存储
+        /// 用户存储
         /// </summary>
-        public IUserOrgStore UserOrgStore { get; set; }
+        public IUserStore UserStore { get; set; }
 
         /// <summary>
-        /// 角色组织存储
+        /// 角色存储
         /// </summary>
-        public IRoleOrgStore RoleOrgStore { get; set; }
+        public IRoleStore RoleStore { get; set; }
 
         /// <summary>
         /// 角色组织权限存储
@@ -52,15 +52,15 @@ namespace AuthorizationCenter.Managers
         /// 构造器
         /// </summary>
         /// <param name="store"></param>
-        /// <param name="userOrgStore"></param>
-        /// <param name="roleOrgStore"></param>
+        /// <param name="userStore"></param>
+        /// <param name="roleStore"></param>
         /// <param name="roleOrgPerStore"></param>
         /// <param name="mapper"></param>
-        public OrganizationManager(IOrganizationStore store, IUserOrgStore userOrgStore, IRoleOrgStore roleOrgStore, IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
+        public OrganizationManager(IOrganizationStore store, IUserStore userStore ,IRoleStore roleStore , IRoleOrgPerStore roleOrgPerStore, IMapper mapper)
         {
             OrganizationStore = store ?? throw new ArgumentNullException(nameof(store));
-            UserOrgStore = userOrgStore ?? throw new ArgumentNullException(nameof(userOrgStore));
-            RoleOrgStore = roleOrgStore ?? throw new ArgumentNullException(nameof(roleOrgStore));
+            UserStore = userStore ?? throw new ArgumentNullException(nameof(userStore));
+            RoleStore = roleStore ?? throw new ArgumentNullException(nameof(roleStore));
             RoleOrgPerStore = roleOrgPerStore ?? throw new ArgumentNullException(nameof(roleOrgPerStore));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
@@ -120,7 +120,29 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task DeleteByUserId(string userId, string orgId)
         {
-            await OrganizationStore.DeleteByUserId(userId, orgId);
+            using(var trans = await OrganizationStore.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 查询所有组织ID
+                    var orgIds = await OrganizationStore.FindChildrenFromOrgRelById(orgId).Select(org => org.Id).AsNoTracking().ToListAsync();
+                    // 删除组织下的所有用户
+                    await UserStore.DeleteByUserIdOrgId(userId, org => orgIds.Contains(org.Id));
+                    // 删除组织下的所有角色
+                    await RoleStore.DeleteByUserIdOrgId(userId, org => orgIds.Contains(org.Id));
+                    // 删除组织下的所有角色组织权限
+                    await RoleOrgPerStore.DeleteByUserId(userId, rop => orgIds.Contains(rop.OrgId));
+                    // 递归删除组织（先删子组织，再删父组织）
+                    await OrganizationStore.DeleteRecursionByUserId(userId, orgId);
+                    trans.Commit();
+                }
+                catch(Exception e)
+                {
+                    Logger.Error($"用户({userId})删除组织({orgId})失败:\r\n{e}");
+                    trans.Rollback();
+                    throw new Exception($"用户({userId})删除组织({orgId})失败", e);
+                }
+            }
         }
 
         /// <summary>

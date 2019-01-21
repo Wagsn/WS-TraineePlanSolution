@@ -13,23 +13,26 @@ namespace AuthorizationCenter.Stores
     /// </summary>
     public class UserStore : StoreBase<User>, IUserStore
     {
-
-        private readonly ITransaction _transaction;
-
         /// <summary>
         /// 用户角色存储
         /// </summary>
         IUserRoleStore UserRoleStore { get; set; }
 
         /// <summary>
+        /// 用户组织关联存储
+        /// </summary>
+        IUserOrgStore UserOrgStore { get; set; }
+
+        /// <summary>
         /// 构造器
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="transaction"></param>
-        public UserStore(ApplicationDbContext context, ITransaction transaction, IUserRoleStore userRoleStore):base(context)
+        /// <param name="userRoleStore"></param>
+        /// <param name="userOrgStore"></param>
+        public UserStore(ApplicationDbContext context, IUserRoleStore userRoleStore, IUserOrgStore userOrgStore) :base(context)
         {
-            _transaction = transaction;
             UserRoleStore = userRoleStore;
+            UserOrgStore = userOrgStore;
         }
 
         /// <summary>
@@ -44,7 +47,7 @@ namespace AuthorizationCenter.Stores
             {
                 try
                 {
-                    var orgId = await Context.UserOrgs.Where(uo => uo.UserId == userId).Select(uo => uo.OrgId).AsNoTracking().SingleAsync();
+                    var orgId = await Context.Set<UserOrg>().Where(uo => uo.UserId == userId).Select(uo => uo.OrgId).AsNoTracking().SingleAsync();
                     Context.Add(user);
                     Context.Add(new UserOrg
                     {
@@ -82,8 +85,8 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<User> FindByOrgId(string orgId)
         {
-            return from user in Context.Users
-                   where (from uo in Context.UserOrgs
+            return from user in Context.Set<User>()
+                   where (from uo in Context.Set<UserOrg>()
                           where uo.OrgId == orgId
                           select uo.UserId).Contains(user.Id)
                    select user;
@@ -97,8 +100,8 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<User> FindByOrgId(IEnumerable<string> orgIds)
         {
-            return from user in Context.Users
-                   where (from uo in Context.UserOrgs
+            return from user in Context.Set<User>()
+                   where (from uo in Context.Set<UserOrg>()
                           where orgIds.Contains(uo.OrgId)
                           select uo.UserId).Contains(user.Id)
                    select user;
@@ -141,7 +144,7 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
-        /// 用户(userIds)删除用户(id)
+        /// 用户(userIds)删除用户(uId)
         /// </summary>
         /// <param name="userId">用户ID</param>
         /// <param name="uId">被删除用户ID</param>
@@ -153,10 +156,10 @@ namespace AuthorizationCenter.Stores
                 try
                 {
                     // 1. 删除用户角色关联（附带删除用户用户组织权限关联）
-                    var userroles = await(from ur in Context.Set<UserRole>()
-                                    where ur.UserId == uId
-                                    select ur).AsNoTracking().ToListAsync();
-                    foreach(var userRole in userroles)
+                    var userRoles = await (from ur in Context.Set<UserRole>()
+                                           where ur.UserId == uId
+                                           select ur).AsNoTracking().ToListAsync();
+                    foreach (var userRole in userRoles)
                     {
                         await UserRoleStore.DeleteByUserId(userId, userRole.UserId, userRole.RoleId);
                     }
@@ -177,13 +180,27 @@ namespace AuthorizationCenter.Stores
                 }
                 catch (Exception e)
                 {
-                    Logger.Error($"[{nameof(DeleteByUserId)}] 删除用户失败:\r\n{e}");
+                    Logger.Error($"[{nameof(DeleteByUserId)}] 用户({userId})删除用户({uId})失败:\r\n{e}");
                     trans.Rollback();
-                    throw new Exception("删除用户失败", e);
+                    throw new Exception($"用户({userId})删除用户({uId})失败", e);
                 }
             }
-            
+        }
 
+        /// <summary>
+        /// 删除符合条件的组织的所有用户
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task DeleteByUserIdOrgId(string userId, Func<Organization, bool> predicate)
+        {
+            var userIds = await (from uo in Context.Set<UserOrg>()
+                                where (from o in Context.Set<Organization>()
+                                       where predicate(o)
+                                       select o.Id).Contains(uo.OrgId)
+                                select uo.UserId).AsNoTracking().ToListAsync();
+            await DeleteByUserId(userId, userIds);
         }
 
         /// <summary>

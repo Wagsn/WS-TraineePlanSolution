@@ -667,7 +667,7 @@
             <param name="roleManager"></param>
             <param name="roleOrgPerManager"></param>
         </member>
-        <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index(System.Int32,System.Int32)">
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.Index(System.Int32,System.Int32,System.String)">
             <summary>
             [MVC] 角色绑定
             </summary>
@@ -691,6 +691,21 @@
             新增
             </summary>
             <param name="userRole"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.MultCreate(System.String)">
+            <summary>
+            批量为用户添加角色
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Controllers.UserRolesController.MultCreate(AuthorizationCenter.Dto.Jsons.UserJson,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            用户批量绑定角色
+            </summary>
+            <param name="user"></param>
+            <param name="roleIds"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Controllers.UserRolesController.Edit(System.String)">
@@ -2485,14 +2500,14 @@
             组织存储
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Managers.OrganizationManager.UserOrgStore">
+        <member name="P:AuthorizationCenter.Managers.OrganizationManager.UserStore">
             <summary>
-            用户组织存储
+            用户存储
             </summary>
         </member>
-        <member name="P:AuthorizationCenter.Managers.OrganizationManager.RoleOrgStore">
+        <member name="P:AuthorizationCenter.Managers.OrganizationManager.RoleStore">
             <summary>
-            角色组织存储
+            角色存储
             </summary>
         </member>
         <member name="P:AuthorizationCenter.Managers.OrganizationManager.RoleOrgPerStore">
@@ -2510,13 +2525,13 @@
             日志记录器
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Managers.OrganizationManager.#ctor(AuthorizationCenter.Stores.IOrganizationStore,AuthorizationCenter.Stores.IUserOrgStore,AuthorizationCenter.Stores.IRoleOrgStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AutoMapper.IMapper)">
+        <member name="M:AuthorizationCenter.Managers.OrganizationManager.#ctor(AuthorizationCenter.Stores.IOrganizationStore,AuthorizationCenter.Stores.IUserStore,AuthorizationCenter.Stores.IRoleStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AutoMapper.IMapper)">
             <summary>
             构造器
             </summary>
             <param name="store"></param>
-            <param name="userOrgStore"></param>
-            <param name="roleOrgStore"></param>
+            <param name="userStore"></param>
+            <param name="roleStore"></param>
             <param name="roleOrgPerStore"></param>
             <param name="mapper"></param>
         </member>
@@ -3443,6 +3458,21 @@
             <param name="orgId">组织ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.DeleteRelById(System.String)">
+            <summary>
+            [组织扩展表] 删除与组织(orgId)有关的关联
+            </summary>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IOrganizationStore.DeleteRecursionByUserId(System.String,System.String)">
+            <summary>
+            删除递归删除组织，先删叶子组织
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IOrganizationStore.FindChildrenById(System.String)">
             <summary>
             通过组织ID找到所有子组织（包含自身）
@@ -3579,6 +3609,15 @@
             <param name="ropId">角色组织权限ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.RoleOrgPer,System.Boolean})">
+            <summary>
+            用户(userId)删除角色组织权限(ropId)
+            当删除角色时要删除用户角色关联和角色组织关联和角色权限关联（当用户角色关联删除完后角色生成的用户权限也被删除完了）
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.IRoleOrgPerStore.ReExpansion">
             <summary>
             用户组织权限扩展
@@ -3615,6 +3654,22 @@
             </summary>
             <param name="userId">用户ID</param>
             <param name="id">被删除角色ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.Role,System.Boolean})">
+            <summary>
+            用户(userId)条件(predicate)删除角色
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="predicate">条件表达式</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IRoleStore.DeleteByUserIdOrgId(System.String,System.Func{AuthorizationCenter.Entitys.Organization,System.Boolean})">
+            <summary>
+            用户(userId)删除符合条件(predicate)的组织下的所有角色
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="predicate">条件表达式</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.IStore`1">
@@ -3773,6 +3828,14 @@
             <param name="rId"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.IUserRoleStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.UserRole,System.Boolean})">
+            <summary>
+            用户条件删除用户角色关联
+            </summary>
+            <param name="userId"></param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.IUserStore">
             <summary>
             用户存储
@@ -3805,7 +3868,7 @@
             删除通过用户ID
             </summary>
             <param name="userId">用户ID</param>
-            <param name="id">被删除用户ID</param>
+            <param name="uId">被删除用户ID</param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.IUserStore.DeleteByUserId(System.String,System.Collections.Generic.IEnumerable{System.String})">
@@ -3813,7 +3876,15 @@
             删除通过用户ID
             </summary>
             <param name="userId">用户ID</param>
-            <param name="ids">被删除用户ID</param>
+            <param name="uIds">被删除用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.IUserStore.DeleteByUserIdOrgId(System.String,System.Func{AuthorizationCenter.Entitys.Organization,System.Boolean})">
+            <summary>
+            删除符合条件的组织的所有用户
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="predicate">条件表达式</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Stores.OrganizationStore">
@@ -3878,6 +3949,14 @@
             </summary>
             <param name="userId">用户ID</param>
             <param name="orgId">组织ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteRecursionByUserId(System.String,System.String)">
+            <summary>
+            删除递归删除组织，先删叶子组织
+            </summary>
+            <param name="userId"></param>
+            <param name="orgId"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.OrganizationStore.DeleteById(System.String)">
@@ -4108,6 +4187,15 @@
             <param name="ropId">角色组织权限ID</param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.RoleOrgPer,System.Boolean})">
+            <summary>
+            用户(userId)删除角色组织权限(ropId)
+            当删除角色时要删除用户角色关联和角色组织关联和角色权限关联（当用户角色关联删除完后角色生成的用户权限也被删除完了）
+            </summary>
+            <param name="userId">用户ID</param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.RoleOrgPerStore.ReExpansion">
             <summary>
             用户组织权限扩展
@@ -4153,11 +4241,24 @@
             角色存储
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Stores.RoleStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext)">
+        <member name="P:AuthorizationCenter.Stores.RoleStore.UserRoleStore">
             <summary>
-            构造器
+            用户角色存储
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Stores.RoleStore.RoleOrgPerStore">
+            <summary>
+            角色组织权限存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Stores.IUserRoleStore,AuthorizationCenter.Stores.IRoleOrgPerStore,AuthorizationCenter.Stores.IRoleOrgStore)">
+            <summary>
+            
             </summary>
             <param name="context"></param>
+            <param name="userRoleStore"></param>
+            <param name="roleOrgPerStore"></param>
+            <param name="roleOrgStore"></param>
         </member>
         <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteById(System.String)">
             <summary>
@@ -4171,7 +4272,23 @@
             用户(userId)删除角色(id)
             </summary>
             <param name="userId">用户ID</param>
-            <param name="id">被删除角色ID</param>
+            <param name="rId">被删除角色ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.Role,System.Boolean})">
+            <summary>
+            用户(userId)条件(predicate)删除角色
+            </summary>
+            <param name="userId"></param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteByUserIdOrgId(System.String,System.Func{AuthorizationCenter.Entitys.Organization,System.Boolean})">
+            <summary>
+            用户(userId)条件(predicate)删除角色
+            </summary>
+            <param name="userId"></param>
+            <param name="predicate"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.RoleStore.DeleteByName(System.String)">
@@ -4443,6 +4560,14 @@
             <param name="rId"></param>
             <returns></returns>
         </member>
+        <member name="M:AuthorizationCenter.Stores.UserRoleStore.DeleteByUserId(System.String,System.Func{AuthorizationCenter.Entitys.UserRole,System.Boolean})">
+            <summary>
+            用户条件删除用户角色关联
+            </summary>
+            <param name="userId"></param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
         <member name="M:AuthorizationCenter.Stores.UserRoleStore.GenUserPermissionExpansion(AuthorizationCenter.Entitys.UserRole)">
             <summary>
             根据用户角色(userRole)生成用户组织权限
@@ -4467,12 +4592,18 @@
             用户角色存储
             </summary>
         </member>
-        <member name="M:AuthorizationCenter.Stores.UserStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Stores.ITransaction,AuthorizationCenter.Stores.IUserRoleStore)">
+        <member name="P:AuthorizationCenter.Stores.UserStore.UserOrgStore">
+            <summary>
+            用户组织关联存储
+            </summary>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.#ctor(AuthorizationCenter.Entitys.ApplicationDbContext,AuthorizationCenter.Stores.IUserRoleStore,AuthorizationCenter.Stores.IUserOrgStore)">
             <summary>
             构造器
             </summary>
             <param name="context"></param>
-            <param name="transaction"></param>
+            <param name="userRoleStore"></param>
+            <param name="userOrgStore"></param>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.CreateForOrgByUserId(System.String,AuthorizationCenter.Entitys.User)">
             <summary>
@@ -4519,10 +4650,18 @@
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String,System.String)">
             <summary>
-            用户(userIds)删除用户(id)
+            用户(userIds)删除用户(uId)
             </summary>
             <param name="userId">用户ID</param>
             <param name="uId">被删除用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserIdOrgId(System.String,System.Func{AuthorizationCenter.Entitys.Organization,System.Boolean})">
+            <summary>
+            删除符合条件的组织的所有用户
+            </summary>
+            <param name="userId"></param>
+            <param name="predicate"></param>
             <returns></returns>
         </member>
         <member name="M:AuthorizationCenter.Stores.UserStore.DeleteByUserId(System.String,System.Collections.Generic.IEnumerable{System.String})">

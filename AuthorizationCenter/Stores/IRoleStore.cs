@@ -23,7 +23,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        IEnumerable<Role> FindByOrgId(string orgId);
+        IQueryable<Role> FindByOrgId(string orgId);
 
         /// <summary>
         /// 用户(userId)删除角色(id)
@@ -32,5 +32,21 @@ namespace AuthorizationCenter.Stores
         /// <param name="id">被删除角色ID</param>
         /// <returns></returns>
         Task DeleteByUserId(string userId, string id);
+
+        /// <summary>
+        /// 用户(userId)条件(predicate)删除角色
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate">条件表达式</param>
+        /// <returns></returns>
+        Task DeleteByUserId(string userId, Func<Role, bool> predicate);
+
+        /// <summary>
+        /// 用户(userId)删除符合条件(predicate)的组织下的所有角色
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate">条件表达式</param>
+        /// <returns></returns>
+        Task DeleteByUserIdOrgId(string userId, Func<Organization, bool> predicate);
     }
 }

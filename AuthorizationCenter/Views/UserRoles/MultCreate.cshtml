@@ -1,20 +1,22 @@
-﻿@model UserRole
+﻿@model UserJson
 
 @{
-    ViewData["Title"] = "Create";
-    var Roles = new List<RoleJson>();
+    ViewData["Title"] = "MultCreate";
+    var temp = new List<RoleJson>();
     for (int i = 10; i < 15; i++)
     {
-        Roles.Add(new RoleJson
+        temp.Add(new RoleJson
         {
             Id = Guid.NewGuid().ToString(),
-            Name = (i + 1).ToString(),
+            Name = "temp_"+(i + 1).ToString(),
             Decription = (i + 1).ToString()
         });
     }
+    var Roles = ViewBag.Roles as IEnumerable<RoleJson> ?? temp;
+
 }
 
-<h2>Create</h2>
+<h2>MultCreate</h2>
 @if (ViewBag.ErrMsg != null)
 {
     <div class="err-msg" style="color:red">@ViewBag.ErrMsg?.ToString()</div>
@@ -22,18 +24,17 @@
 <h4>UserRole</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div>
+        @* class="col-md-4" *@
+        <form asp-action="MultCreate">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Id" type="hidden" />
             <div class="form-group">
-                <label asp-for="User.SignName" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <label asp-for="SignName" class="control-label"></label>
+                <input asp-for="SignName" class="form-control" disabled />
             </div>
             <div class="form-group">
-                <label asp-for="Role.Name" class="control-label"></label>
-                <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
-            </div>
-            @*<div class="form-group">
+                <p>登陆用户所有可见角色</p>
                 <table class="table">
                     <thead>
                         <tr>
@@ -43,7 +44,9 @@
                             <th>
                                 角色描述
                             </th>
-                            <th></th>
+                            <th>
+                                可用操作
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,7 +54,6 @@
                         {
                             <tr>
                                 <td>
-                                    @Html.CheckBox("CheckItems", new { id=item.Id, name =item.Name, value = item.Id })
                                     <input id="@item.Id" value="@item.Id" name="roleIds" class="checkblogCatalog" type="checkbox" />
                                     @Html.DisplayFor(modelItem => item.Name)
                                 </td>
@@ -67,7 +69,7 @@
                         }
                     </tbody>
                 </table>
-            </div>*@
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>

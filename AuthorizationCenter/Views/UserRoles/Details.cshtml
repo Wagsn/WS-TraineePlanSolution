@@ -5,7 +5,10 @@
 }
 
 <h2>Details</h2>
-
+@if (ViewBag.ErrMsg != null)
+{
+    <div class="err-msg" style="color:red">@ViewBag.ErrMsg?.ToString()</div>
+}
 <div>
     <h4>UserRole</h4>
     <hr />

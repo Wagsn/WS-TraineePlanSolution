@@ -288,6 +288,37 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// 删除递归删除组织，先删叶子组织
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public async Task DeleteRecursionByUserId(string userId, string orgId)
+        {
+            var org = await FindById(orgId).Include(o => o.Children).AsNoTracking().SingleOrDefaultAsync();
+            if (org == null)
+            {
+                return;
+            }
+            foreach(var o in org.Children)
+            {
+                await DeleteRecursionByUserId(userId, o.Id);
+            }
+            try
+            {
+                // 删除组织相关的组织关系
+                await DeleteRelById(orgId);
+                // 删除组织本身
+                await DeleteById(orgId);
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(DeleteRecursionByUserId)}] 用户({userId})递归删除组织({orgId})失败:\r\n{e}");
+                throw new Exception($"用户({userId})递归删除组织({orgId})失败", e);
+            }
+        }
+
+        /// <summary>
         /// 删除通过ID 
         /// 单元操作
         /// </summary>
@@ -316,7 +347,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public IQueryable<Organization> FindById(string id)
         {
-            return Find(org => org.Id == id).Include(org => org.Children);
+            return Find(org => org.Id == id);
         }
 
         /// <summary>
@@ -371,7 +402,7 @@ namespace AuthorizationCenter.Stores
         /// </summary>
         /// <param name="orgId">组织ID</param>
         /// <returns></returns>
-        public async Task<List<Organization>> FindChildrenById(string orgId)
+        public async Task<IEnumerable<Organization>> FindChildrenById(string orgId)
         {
             return await FindChildrenFromOrgRelById(orgId).Include(org => org.Parent).AsNoTracking().ToListAsync();
         }

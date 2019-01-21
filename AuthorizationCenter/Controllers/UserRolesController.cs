@@ -11,6 +11,7 @@ using AuthorizationCenter.Dto.Jsons;
 using WS.Log;
 using AuthorizationCenter.Define;
 using Microsoft.AspNetCore.Http;
+using WS.Text;
 
 namespace AuthorizationCenter.Controllers
 {
@@ -64,7 +65,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: UserRoles
-        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10)
+        public async Task<IActionResult> Index(int pageIndex = 0, int pageSize = 10, string errMsg = null)
         {
             try
             {
@@ -74,6 +75,7 @@ namespace AuthorizationCenter.Controllers
                     return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
                 }
                 // 2. 业务处理
+                ViewData["ErrMsg"] = errMsg;
                 return View(await UserRoleManager.Find().ToListAsync());
             }
             catch (Exception e)
@@ -159,6 +161,7 @@ namespace AuthorizationCenter.Controllers
         {
             try
             {
+                Logger.Trace($"[] 用户添加用户角色: 用户角色;\r\n{JsonUtil.ToJson(userRole)}");
                 // 1. 权限验证
                 if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
                 {
@@ -179,6 +182,76 @@ namespace AuthorizationCenter.Controllers
             //ViewData["RoleId"] = new SelectList(RoleManager.Find(), nameof(Role.Id), nameof(Role.Name), userRole.RoleId);
             //ViewData["UserId"] = new SelectList(UserManager.Find(), nameof(Entitys.User.Id), nameof(Entitys.User.SignName), userRole.UserId);
             //return View(userRole);
+        }
+
+        /// <summary>
+        /// 批量为用户添加角色
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> MultCreate(string userId)
+        {
+            try
+            {
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                // 2. 业务处理
+                ViewData["Roles"] = await RoleManager.FindRoleOfOrgByUserId(SignUser.Id);
+                var user = await UserManager.FindById(userId).AsNoTracking().SingleOrDefaultAsync();
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
+            }
+            catch(Exception e)
+            {
+                Logger.Error($"[{nameof(MultCreate)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(Index), new { errMsg = e.Message });
+            }
+        }
+
+        /// <summary>
+        /// 用户批量绑定角色
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="roleIds"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MultCreate(UserJson user, IEnumerable<string> roleIds)
+        {
+            if (user == null || roleIds == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                Logger.Trace($"[{nameof(MultCreate)}] 用户添加用户角色: 用户:\r\n{JsonUtil.ToJson(user)}, 角色ID;\r\n{JsonUtil.ToJson(roleIds)}");
+                // 1. 权限验证
+                if (!await RoleOrgPerManager.HasPermission(SignUser.Id, Constants.USERROLE_MANAGE))
+                {
+                    return RedirectToAction(nameof(HomeController.Index), HomeController.Name);
+                }
+                //await UserRoleManager.Create(SignUser.Id, userRole);
+                foreach(var rId in roleIds)
+                {
+                    await UserRoleManager.Create(SignUser.Id, new UserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = rId
+                    });
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[{nameof(Index)}] 服务器错误:\r\n{e}");
+                return RedirectToAction(nameof(Index), new { errMsg = e.Message });
+            }
         }
 
         /// <summary>

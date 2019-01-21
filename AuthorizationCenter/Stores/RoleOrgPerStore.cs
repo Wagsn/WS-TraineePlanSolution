@@ -229,6 +229,11 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task CreateByUserId(string userId, string rId, string oId, string pId)
         {
+            if(await Exist(rop=> rop.RoleId==rId && rop.OrgId == oId && rop.PerId == pId))
+            {
+                Logger.Warn($"[{nameof(CreateByUserId)}] 用户({userId})添加角色({rId})组织({oId})权限({pId})关联重复，该关联已经存在");
+                return;
+            }
             using (var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
@@ -352,6 +357,22 @@ namespace AuthorizationCenter.Stores
         }
 
         /// <summary>
+        /// 用户(userId)删除角色组织权限(ropId)
+        /// 当删除角色时要删除用户角色关联和角色组织关联和角色权限关联（当用户角色关联删除完后角色生成的用户权限也被删除完了）
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, Func<RoleOrgPer, bool> predicate)
+        {
+            var ropIds = await Find(predicate).Select(rop => rop.Id).AsNoTracking().ToListAsync();
+            foreach(var ropId in ropIds)
+            {
+                await DeleteByUserId(userId, ropId);
+            }
+        }
+
+        /// <summary>
         /// 用户组织权限扩展
         /// </summary>
         /// <returns></returns>
@@ -411,7 +432,16 @@ namespace AuthorizationCenter.Stores
                     }
                 }
             }
-            return userOrgPers;
+            // 去重
+            var result = new List<UserPermissionExpansion>();
+            foreach(var userOrgPer in userOrgPers)
+            {
+                if(!result.Any(uop => uop.UserId == userOrgPer.UserId && uop.OrganizationId == userOrgPer.OrganizationId && uop.PermissionId == userOrgPer.PermissionId))
+                {
+                    result.Add(userOrgPer);
+                }
+            }
+            return result;
         }
 
         /// <summary>

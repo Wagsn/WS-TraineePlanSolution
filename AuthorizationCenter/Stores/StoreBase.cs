@@ -160,6 +160,7 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public virtual Task<bool> Exist(Func<TEntity, bool> predicate)
         {
+            // The LINQ expression 'Any()' could not be translated and will be evaluated locally.
             return Context.Set<TEntity>().AsNoTracking().AnyAsync(entity => predicate(entity));
         }
 
@@ -189,8 +190,8 @@ namespace AuthorizationCenter.Stores
             }
             catch(Exception e)
             {
-                Logger.Error($"[{nameof(Delete)}] {typeof(TEntity).Name}条件删除失败: \r\n" + e);
-                throw new Exception($"{typeof(TEntity).Name}条件删除失败", e);
+                Logger.Error($"[{nameof(Delete)}] 条件删除({typeof(TEntity).Name})失败: \r\n" + e);
+                throw new Exception($"条件删除({typeof(TEntity).Name})失败", e);
             }
         }
         

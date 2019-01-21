@@ -458,7 +458,7 @@ namespace AuthorizationCenter
                             Id = Guid.NewGuid().ToString(),
                             UserId = xkj_UserId,
                             OrganizationId = xkj_OrgId,
-                            PermissionId = per_manage_PerId
+                            PermissionId = role_manage_PerId
                         }
                     });
                     context.SaveChanges();

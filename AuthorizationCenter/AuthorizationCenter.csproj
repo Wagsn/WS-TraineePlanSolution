@@ -16,6 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Update="Views\UserRoles\MultCreate.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="wwwroot\js\site.js">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

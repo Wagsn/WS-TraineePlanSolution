@@ -47,6 +47,12 @@ namespace AuthorizationCenter.Stores
         /// <returns></returns>
         public async Task CreateByUserId(string userId, string uId, string rId)
         {
+            // 0. 参数检查
+            if(await Exist(ur => ur.UserId == uId && ur.RoleId == rId))
+            {
+                Logger.Warn($"[{nameof(CreateByUserId)}] 用户({userId})添加用户({uId})角色({rId})关联重复，该关联已经被添加。");
+                return;
+            }
             using (var trans = await Context.Database.BeginTransactionAsync())
             {
                 try
@@ -190,7 +196,7 @@ namespace AuthorizationCenter.Stores
                 Logger.Warn($"[{nameof(DeleteByUserId)}] 用户({userId})删除的用户角色关联({urId})不存在");
                 return;
             }
-            await DeleteByUserId(userId, userRole?.UserId, userRole.RoleId);
+            await DeleteByUserId(userId, userRole.UserId, userRole.RoleId);
         }
 
         /// <summary>
@@ -272,6 +278,21 @@ namespace AuthorizationCenter.Stores
                     Logger.Error($"用户({userId})删除用户({uId})角色{rId}关联失败:\r\n{e}");
                     throw new Exception($"用户({userId})删除用户({uId})角色({rId})关联失败", e);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 用户条件删除用户角色关联
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public async Task DeleteByUserId(string userId, Func<UserRole, bool> predicate)
+        {
+            var userRoles = await Find(predicate).AsNoTracking().ToListAsync();
+            foreach(var ur in userRoles)
+            {
+                await DeleteByUserId(userId, ur.Id);
             }
         }
 
