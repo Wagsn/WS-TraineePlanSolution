@@ -117,7 +117,7 @@ namespace AuthorizationCenter.Define
         {
             foreach (var item in collection)
             {
-                if (!theCollection.Contains(item))
+                if (!theCollection.Contains(item)) // theCollection.Any(entity => item.Equals(entity))
                 {
                     return false;
                 }
