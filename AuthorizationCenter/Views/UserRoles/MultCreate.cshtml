@@ -13,7 +13,27 @@
         });
     }
     var Roles = ViewBag.Roles as IEnumerable<RoleJson> ?? temp;
-
+    var RoleCheckBoxs = new List<CheckBox<RoleJson>>
+    {
+        new CheckBox<RoleJson>
+        {
+            Data = new RoleJson
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "R01"
+            },
+            IsChecked =true
+        },
+        new CheckBox<RoleJson>
+        {
+            Data = new RoleJson
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "R02"
+            },
+            IsChecked =false
+        }
+    };
 }
 
 <h2>MultCreate</h2>
@@ -64,6 +84,43 @@
                                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group">
+                <p>登陆用户所有可见角色(刷新模式)</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                角色名称
+                            </th>
+                            <th>
+                                角色描述
+                            </th>
+                            <th>
+                                可用操作
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in RoleCheckBoxs)
+                        {
+                            <tr>
+                                <td>
+                                    <input id="@item.Data.Id" value="@item.IsChecked" name="roleIds" class="checkblogCatalog" type="checkbox" />
+                                    @Html.DisplayFor(modelItem => item.Data.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Data.Decription)
+                                </td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Data.Id">Edit</a> |
+                                    <a asp-action="Details" asp-route-id="@item.Data.Id">Details</a> |
+                                    <a asp-action="Delete" asp-route-id="@item.Data.Id">Delete</a>
                                 </td>
                             </tr>
                         }

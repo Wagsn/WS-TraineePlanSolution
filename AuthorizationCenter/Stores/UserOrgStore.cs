@@ -18,5 +18,19 @@ namespace AuthorizationCenter.Stores
         /// <param name="context"></param>
         public UserOrgStore(ApplicationDbContext context):base(context){}
 
+
+        /// <summary>
+        /// 判断重复
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        public bool Repetition(List<string> userIds)
+        {
+            var rep = from uo in Context.Set<UserOrg>()
+                      where userIds.Contains(uo.UserId)
+                      select uo;
+            return false;
+        }
+
     }
 }

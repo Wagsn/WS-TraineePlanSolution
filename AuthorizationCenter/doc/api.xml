@@ -1065,6 +1065,21 @@
             分页数量
             </summary>
         </member>
+        <member name="T:AuthorizationCenter.Dto.Jsons.CheckBox`1">
+            <summary>
+            选择框
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.CheckBox`1.Data">
+            <summary>
+            数据
+            </summary>
+        </member>
+        <member name="P:AuthorizationCenter.Dto.Jsons.CheckBox`1.IsChecked">
+            <summary>
+            是否被选择
+            </summary>
+        </member>
         <member name="T:AuthorizationCenter.Dto.Jsons.OrganizationJson">
             <summary>
             组织Dto -ViewModel
