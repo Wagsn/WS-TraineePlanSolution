@@ -82,14 +82,14 @@ namespace AuthorizationCenter
         /// 主机初始化
         /// </summary>
         /// <param name="args">参数</param>
-        /// <param name="configuration">配置</param>
+        /// <param name="config">配置</param>
         /// <returns></returns>
-        public static IWebHost GetHost(string[] args, IConfigurationRoot configuration)
+        public static IWebHost GetHost(string[] args, IConfigurationRoot config)
         {
             // 配置文件设置端口号，检查是否符合端口规范，默认端口 5000
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls($"http://*:{configuration["Port"]??"5000"}")
+                .UseUrls($"http://*:{config["Port"]}")
                 .Build();
         }
 

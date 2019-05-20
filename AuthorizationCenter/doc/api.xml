@@ -4511,6 +4511,13 @@
             </summary>
             <param name="context"></param>
         </member>
+        <member name="M:AuthorizationCenter.Stores.UserOrgStore.Repetition(System.Collections.Generic.List{System.String})">
+            <summary>
+            判断重复
+            </summary>
+            <param name="userIds"></param>
+            <returns></returns>
+        </member>
         <member name="T:AuthorizationCenter.Stores.UserPermissionExpansionStore">
             <summary>
             用户权限存储

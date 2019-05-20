@@ -20,6 +20,7 @@ namespace AuthorizationCenter.Controllers
     /// <summary>
     /// 组织架构管理模块
     /// </summary>
+    [Route("[controller]/[action]")]
     public class OrganizationController : Controller
     {
         /// <summary>
@@ -47,7 +48,7 @@ namespace AuthorizationCenter.Controllers
             OrganizationManager = organizationManager ?? throw new ArgumentNullException(nameof(organizationManager));
             RoleOrgPerManager = roleOrgPerManager ?? throw new ArgumentNullException(nameof(roleOrgPerManager));
         }
-        
+
         /// <summary>
         /// [MVC] 组织管理-组织列表
         /// 只能查看ORG_QUERY的组织森林
@@ -55,6 +56,7 @@ namespace AuthorizationCenter.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Organization
+        [HttpGet]
         public async Task<IActionResult> Index(string orgId, int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -109,6 +111,7 @@ namespace AuthorizationCenter.Controllers
         /// -只能看到自己所在的组织（查找方式，通过角色->三者关联->组织）
         /// </summary>
         /// <returns></returns>
+        [HttpGet]
         public async Task<PageResponesBody<OrganizationJson>> List()
         {
             try
@@ -135,6 +138,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: Organization/Details/5
+        [HttpGet("{id}")]
         [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
         public async Task<IActionResult> Details(string id)
         {
@@ -173,6 +177,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id">父组织ID</param>
         /// <returns></returns>
         // GET: Organization/Create
+        [HttpGet]
         [TypeFilter(typeof(CheckPermission), Arguments = new object[] { Constants.ORG_MANAGE })]
         public async Task<IActionResult> Create(string id)
         {
@@ -254,6 +259,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         // GET: Organization/Edit/5
+        [HttpGet("{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             Logger.Trace($"[{nameof(Edit)}] 请求参数: id: " + id);
@@ -295,7 +301,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="organization"></param>
         /// <returns></returns>
         // POST: Organization/Edit/5
-        [HttpPost]
+        [HttpPost("{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, /*[Bind("Id,ParentId,Name,Description")]*/ OrganizationJson organization)
         {
@@ -337,6 +343,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id">组织ID</param>
         /// <returns></returns>
         // GET: Organization/Delete/5
+        [HttpGet("{id}")]
         [TypeFilter(typeof(CheckPermission))]
         public async Task<IActionResult> Delete(string id)
         {
@@ -377,6 +384,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id">组织ID</param>
         /// <returns></returns>
         //[HttpDelete]
+        [HttpDelete("{id}")]
         [TypeFilter(typeof(CheckPermission), Arguments = new object[]{Constants.ORG_MANAGE})]
         public async Task<ResponseBody<OrganizationJson>> DeleteById (string id)
         {
@@ -410,7 +418,7 @@ namespace AuthorizationCenter.Controllers
         /// <param name="id">组织ID</param>
         /// <returns></returns>
         // POST: Organization/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {

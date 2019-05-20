@@ -12,8 +12,8 @@
         /// 检查
         /// </summary>
         /// <returns></returns>
-        [Microsoft.AspNetCore.Mvc.HttpGet]
         [Filters.NoSign]
+        [Microsoft.AspNetCore.Mvc.HttpGet]
         public Microsoft.AspNetCore.Mvc.ActionResult<string> Get()
         {
             return "The website is working.";
@@ -24,6 +24,7 @@
         /// </summary>
         /// <returns></returns>
         [Filters.NoSign]
+        [Microsoft.AspNetCore.Mvc.HttpGet("check")]
         public Microsoft.AspNetCore.Mvc.ViewResult Check()
         {
             return View();
