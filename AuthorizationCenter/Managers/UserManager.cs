@@ -83,7 +83,7 @@ namespace AuthorizationCenter.Managers
             try
             {
                 var dbub = await UserStore.Create(ub);
-                response.Extension = Mapper.Map<UserJson>(dbub);
+                response.Data = Mapper.Map<UserJson>(dbub);
             }
             catch (Exception e)
             {
@@ -148,7 +148,7 @@ namespace AuthorizationCenter.Managers
         /// <param name="request"></param>
         public async Task List([Required] PagingResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
         {
-            response.Extension = await UserStore.Find().Select(ub => Mapper.Map<UserJson>(ub)).ToListAsync();
+            response.Data = await UserStore.Find().Select(ub => Mapper.Map<UserJson>(ub)).ToListAsync();
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace AuthorizationCenter.Managers
         /// <returns></returns>
         public async Task ById([Required] ResponseMessage<UserJson> response, [Required] ModelRequest<UserJson> request)
         {
-            response.Extension = await UserStore.Find(user => user.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
+            response.Data = await UserStore.Find(user => user.Id == request.Data.Id).Select(ub => Mapper.Map<UserJson>(ub)).FirstOrDefaultAsync();
         }
 
         /// <summary>

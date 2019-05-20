@@ -153,7 +153,7 @@ namespace WS.Core.Dto
         /// <summary>
         /// 携带的记录
         /// </summary>
-        public TEx Extension { get; set; }
+        public TEx Data { get; set; }
     }
 
     /// <summary>
