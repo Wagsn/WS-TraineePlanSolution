@@ -1,4 +1,5 @@
 ﻿using AuthorizationCenter.Define;
+using AuthorizationCenter.Dto.Jsons;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -40,12 +41,16 @@ namespace AuthorizationCenter.Filters
             var signname = context.HttpContext.Session.GetString(Constants.SIGNNAME);
             var password = context.HttpContext.Session.GetString(Constants.PASSWORD);
 
+            var userInfo = new SignUserInfo();
+
             // 检查登陆信息
             if (userid == null && signname == null)
             {
                 Logger.Trace($"[{nameof(OnActionExecuting)}] 用户未登陆");
                 context.Result = new RedirectResult("/Sign/Index");
             }
+            context.ActionArguments.Add("User", userInfo);
+
             base.OnActionExecuting(context);
         }
     }

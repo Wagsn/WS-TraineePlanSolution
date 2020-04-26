@@ -3361,7 +3361,7 @@
             主机初始化
             </summary>
             <param name="args">参数</param>
-            <param name="configuration">配置</param>
+            <param name="config">配置</param>
             <returns></returns>
         </member>
         <member name="T:AuthorizationCenter.Properties.Resources">
